@@ -1,0 +1,57 @@
+<com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:title="Profile"
+            app:titleTextColor="@color/white"
+            />
+
+
+            <ProgressBar
+                   android:visibility="gone"
+                   android:id="@+id/pgBar"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   app:layout_constraintTop_toTopOf="parent"
+                   app:layout_constraintEnd_toEndOf="parent"
+                   app:layout_constraintStart_toStartOf="parent"
+                   app:layout_constraintBottom_toBottomOf="parent"
+                   />
+
+
+
+
+//    private fun loadQuestionByIndex() {
+//
+//        binding.pgBar.visibility = View.VISIBLE
+//        val docId = "q$index"
+//        db.collection(AppConstants.math)
+//            .document(docId)
+//            .get()
+//            .addOnSuccessListener { doc ->
+//                if (doc.exists()) {
+//                    val question = doc.toObject(MathQuestion::class.java)
+//                    question?.let {
+//                        binding.question.text = "${it.operand1} _ ${it.operand2} = ${it.answer}"
+////
+////                        val animationZoomOut = AnimationUtils.loadAnimation(requireContext(), R.anim.move)
+////                        view?.findViewById<TextView>(R.id.question)?.startAnimation(animationZoomOut)
+//
+//                        operator = it.operator
+//                        operand1 = it.operand1.toString()
+//                        operand2 = it.operand2.toString()
+//                        answer = it.answer.toString()
+//                    }
+//                } else {
+//                    binding.question.text = "Question $index not found"
+//                }
+//            }
+//            .addOnFailureListener {
+//                binding.question.text = "Error loading question $index"
+//            }
+//
+//        binding.pgBar.visibility = View.GONE
+//
+//    }
+

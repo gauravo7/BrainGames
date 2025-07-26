@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="mathAccent">#F9E5A1</color>
+    <color name="primary">#301934</color>
+    <color name="red">#E57373</color>
+    <color name="green">#00FF00</color>
+
+    <!-- Background Colors -->
+    <color name="primary_dark">#764BA2</color>
+
+    <!-- Glassmorphism Colors -->
+    <color name="glassmorphism_bg">#40FFFFFF</color>
+    <color name="glassmorphism_border">#4DFFFFFF</color>
+
+    <!-- Text Colors -->
+    <color name="question_text">#2D3748</color>
+
+    <!-- Card Colors -->
+    <color name="question_card_bg">#FFFFFF</color>
+    <color name="question_card_border">#19FFFFFF</color>
+
+    <!-- Button Colors -->
+    <color name="plus_button_bg">#FF6B6B</color>
+    <color name="minus_button_bg">#4ECDC4</color>
+    <color name="multiply_button_bg">#45B7D1</color>
+    <color name="divide_button_bg">#F093FB</color>
+
+    <!-- Progress Colors -->
+    <color name="progress_color">#667EEA</color>
+    <color name="progress_track_color">#4DFFFFFF</color>
+
+    <color name="nav_item_inactive">#B3FFFFFF</color>
+    <color name="ripple_color">#33FFFFFF</color>
+
+</resources>

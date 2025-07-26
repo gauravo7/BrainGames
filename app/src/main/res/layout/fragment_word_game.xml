@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--<androidx.constraintlayout.widget.ConstraintLayout-->
+<!--    xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--    xmlns:app="http://schemas.android.com/apk/res-auto"-->
+<!--    xmlns:tools="http://schemas.android.com/tools"-->
+<!--    android:layout_width="match_parent"-->
+<!--    android:layout_height="match_parent"-->
+<!--    android:background="@drawable/gradient_background"-->
+<!--    android:padding="16dp"-->
+<!--    tools:context=".WordQuizActivity">-->
+
+<!--    &lt;!&ndash; Main Card Container &ndash;&gt;-->
+<!--    <androidx.cardview.widget.CardView-->
+<!--        android:id="@+id/mainCard"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginStart="16dp"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        app:cardCornerRadius="24dp"-->
+<!--        app:cardElevation="12dp"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintVertical_bias="0.5">-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical">-->
+
+<!--            &lt;!&ndash; Header Section &ndash;&gt;-->
+<!--            <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--                android:id="@+id/headerSection"-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:background="@drawable/header_gradient"-->
+<!--                android:padding="24dp">-->
+
+<!--                &lt;!&ndash; Title &ndash;&gt;-->
+<!--                <TextView-->
+<!--                    android:id="@+id/titleText"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Word Quiz"-->
+<!--                    android:textColor="@android:color/white"-->
+<!--                    android:textSize="24sp"-->
+<!--                    android:textStyle="bold"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintTop_toTopOf="parent" />-->
+
+<!--                &lt;!&ndash; Question Counter &ndash;&gt;-->
+<!--                <TextView-->
+<!--                    android:id="@+id/questionCounter"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Question 1/3"-->
+<!--                    android:textColor="@android:color/white"-->
+<!--                    android:textSize="14sp"-->
+<!--                    app:layout_constraintEnd_toStartOf="@+id/scoreCard"-->
+<!--                    app:layout_constraintTop_toTopOf="parent"-->
+<!--                    android:layout_marginEnd="16dp" />-->
+
+<!--                &lt;!&ndash; Score Card &ndash;&gt;-->
+<!--                <androidx.cardview.widget.CardView-->
+<!--                    android:id="@+id/scoreCard"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    app:cardCornerRadius="16dp"-->
+<!--                    app:cardBackgroundColor="#33FFFFFF"-->
+<!--                    app:cardElevation="0dp"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintTop_toTopOf="parent">-->
+
+<!--                    <TextView-->
+<!--                        android:id="@+id/scoreText"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="Score: 0"-->
+<!--                        android:textColor="@android:color/white"-->
+<!--                        android:textSize="14sp"-->
+<!--                        android:textStyle="bold"-->
+<!--                        android:paddingHorizontal="12dp"-->
+<!--                        android:paddingVertical="6dp" />-->
+<!--                </androidx.cardview.widget.CardView>-->
+
+<!--                &lt;!&ndash; Progress Bar &ndash;&gt;-->
+<!--                <ProgressBar-->
+<!--                    android:id="@+id/progressBar"-->
+<!--                    style="?android:attr/progressBarStyleHorizontal"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="8dp"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:progress="33"-->
+<!--                    android:max="100"-->
+<!--                    android:progressTint="@android:color/white"-->
+<!--                    android:progressBackgroundTint="#33FFFFFF"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/titleText" />-->
+
+<!--            </androidx.constraintlayout.widget.ConstraintLayout>-->
+
+<!--            &lt;!&ndash; Content Section &ndash;&gt;-->
+<!--            <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:padding="32dp">-->
+
+<!--                &lt;!&ndash; Word Display Card &ndash;&gt;-->
+<!--                <androidx.cardview.widget.CardView-->
+<!--                    android:id="@+id/wordCard"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    app:cardCornerRadius="16dp"-->
+<!--                    app:cardBackgroundColor="#F3F4F6"-->
+<!--                    app:cardElevation="4dp"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintTop_toTopOf="parent"-->
+<!--                    android:layout_marginBottom="24dp">-->
+
+<!--                    <TextView-->
+<!--                        android:id="@+id/wordText"-->
+<!--                        android:layout_width="wrap_content"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:text="SERENDIPITY"-->
+<!--                        android:textSize="32sp"-->
+<!--                        android:textStyle="bold"-->
+<!--                        android:textColor="#1F2937"-->
+<!--                        android:letterSpacing="0.1"-->
+<!--                        android:paddingHorizontal="24dp"-->
+<!--                        android:paddingVertical="16dp" />-->
+<!--                </androidx.cardview.widget.CardView>-->
+
+<!--                &lt;!&ndash; Instruction Text &ndash;&gt;-->
+<!--                <TextView-->
+<!--                    android:id="@+id/instructionText"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:text="Choose the correct definition:"-->
+<!--                    android:textSize="16sp"-->
+<!--                    android:textColor="#6B7280"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/wordCard" />-->
+
+<!--                &lt;!&ndash; Options Container &ndash;&gt;-->
+<!--                <LinearLayout-->
+<!--                    android:id="@+id/optionsContainer"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:orientation="vertical"-->
+<!--                    android:layout_marginTop="24dp"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/instructionText">-->
+
+<!--                    &lt;!&ndash; Option 1 &ndash;&gt;-->
+<!--                    <androidx.cardview.widget.CardView-->
+<!--                        android:id="@+id/option1Card"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        app:cardCornerRadius="12dp"-->
+<!--                        app:cardElevation="2dp"-->
+<!--                        app:cardBackgroundColor="@android:color/white"-->
+<!--                        android:layout_marginBottom="12dp"-->
+<!--                        android:clickable="true"-->
+<!--                        android:focusable="true"-->
+<!--                        android:foreground="?android:attr/selectableItemBackground">-->
+
+<!--                        <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:padding="16dp">-->
+
+<!--                            <TextView-->
+<!--                                android:id="@+id/option1Text"-->
+<!--                                android:layout_width="0dp"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:text="A planned sequence of events"-->
+<!--                                android:textSize="16sp"-->
+<!--                                android:textColor="#374151"-->
+<!--                                android:lineSpacingExtra="4dp"-->
+<!--                                app:layout_constraintStart_toStartOf="parent"-->
+<!--                                app:layout_constraintEnd_toStartOf="@+id/option1Icon"-->
+<!--                                app:layout_constraintTop_toTopOf="parent"-->
+<!--                                app:layout_constraintBottom_toBottomOf="parent" />-->
+
+<!--                            <ImageView-->
+<!--                                android:id="@+id/option1Icon"-->
+<!--                                android:layout_width="24dp"-->
+<!--                                android:layout_height="24dp"-->
+<!--                                android:src="@drawable/ic_check_circle"-->
+<!--                                android:visibility="gone"-->
+<!--                                app:tint="#10B981"-->
+<!--                                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                                app:layout_constraintTop_toTopOf="parent"-->
+<!--                                app:layout_constraintBottom_toBottomOf="parent" />-->
+<!--                        </androidx.constraintlayout.widget.ConstraintLayout>-->
+<!--                    </androidx.cardview.widget.CardView>-->
+
+<!--                    &lt;!&ndash; Option 2 &ndash;&gt;-->
+<!--                    <androidx.cardview.widget.CardView-->
+<!--                        android:id="@+id/option2Card"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        app:cardCornerRadius="12dp"-->
+<!--                        app:cardElevation="2dp"-->
+<!--                        app:cardBackgroundColor="@android:color/white"-->
+<!--                        android:layout_marginBottom="12dp"-->
+<!--                        android:clickable="true"-->
+<!--                        android:focusable="true"-->
+<!--                        android:foreground="?android:attr/selectableItemBackground">-->
+
+<!--                        <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:padding="16dp">-->
+
+<!--                            <TextView-->
+<!--                                android:id="@+id/option2Text"-->
+<!--                                android:layout_width="0dp"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:text="The occurrence of events by chance in a happy or beneficial way"-->
+<!--                                android:textSize="16sp"-->
+<!--                                android:textColor="#374151"-->
+<!--                                android:lineSpacingExtra="4dp"-->
+<!--                                app:layout_constraintStart_toStartOf="parent"-->
+<!--                                app:layout_constraintEnd_toStartOf="@+id/option2Icon"-->
+<!--                                app:layout_constraintTop_toTopOf="parent"-->
+<!--                                app:layout_constraintBottom_toBottomOf="parent" />-->
+
+<!--                            <ImageView-->
+<!--                                android:id="@+id/option2Icon"-->
+<!--                                android:layout_width="24dp"-->
+<!--                                android:layout_height="24dp"-->
+<!--                                android:src="@drawable/ic_check_circle"-->
+<!--                                android:visibility="gone"-->
+<!--                                app:tint="#10B981"-->
+<!--                                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                                app:layout_constraintTop_toTopOf="parent"-->
+<!--                                app:layout_constraintBottom_toBottomOf="parent" />-->
+<!--                        </androidx.constraintlayout.widget.ConstraintLayout>-->
+<!--                    </androidx.cardview.widget.CardView>-->
+
+<!--                    &lt;!&ndash; Option 3 &ndash;&gt;-->
+<!--                    <androidx.cardview.widget.CardView-->
+<!--                        android:id="@+id/option3Card"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        app:cardCornerRadius="12dp"-->
+<!--                        app:cardElevation="2dp"-->
+<!--                        app:cardBackgroundColor="@android:color/white"-->
+<!--                        android:layout_marginBottom="12dp"-->
+<!--                        android:clickable="true"-->
+<!--                        android:focusable="true"-->
+<!--                        android:foreground="?android:attr/selectableItemBackground">-->
+
+<!--                        <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:padding="16dp">-->
+
+<!--                            <TextView-->
+<!--                                android:id="@+id/option3Text"-->
+<!--                                android:layout_width="0dp"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:text="A feeling of deep regret"-->
+<!--                                android:textSize="16sp"-->
+<!--                                android:textColor="#374151"-->
+<!--                                android:lineSpacingExtra="4dp"-->
+<!--                                app:layout_constraintStart_toStartOf="parent"-->
+<!--                                app:layout_constraintEnd_toStartOf="@+id/option3Icon"-->
+<!--                                app:layout_constraintTop_toTopOf="parent"-->
+<!--                                app:layout_constraintBottom_toBottomOf="parent" />-->
+
+<!--&lt;!&ndash;                            <ImageView&ndash;&gt;-->
+<!--&lt;!&ndash;                                android:id="@+id/option3Icon"&ndash;&gt;-->
+<!--&lt;!&ndash;                                android:layout_width="24dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                                android:layout_height="24dp"&ndash;&gt;-->
+<!--&lt;!&ndash;                                android:src="@drawable/ic_cancel"&ndash;&gt;-->
+<!--&lt;!&ndash;                                android:visibility="gone"&ndash;&gt;-->
+<!--&lt;!&ndash;                                app:tint="#EF4444"&ndash;&gt;-->
+<!--&lt;!&ndash;                                app:layout_constraintEnd_toEndOf="parent"&ndash;&gt;-->
+<!--&lt;!&ndash;                                app:layout_constraintTop_toTopOf="parent"&ndash;&gt;-->
+<!--&lt;!&ndash;                                app:layout_constraintBottom_toBottomOf="parent" />&ndash;&gt;-->
+<!--                        </androidx.constraintlayout.widget.ConstraintLayout>-->
+<!--                    </androidx.cardview.widget.CardView>-->
+
+<!--                    &lt;!&ndash; Option 4 &ndash;&gt;-->
+<!--                    <androidx.cardview.widget.CardView-->
+<!--                        android:id="@+id/option4Card"-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        app:cardCornerRadius="12dp"-->
+<!--                        app:cardElevation="2dp"-->
+<!--                        app:cardBackgroundColor="@android:color/white"-->
+<!--                        android:clickable="true"-->
+<!--                        android:focusable="true"-->
+<!--                        android:foreground="?android:attr/selectableItemBackground">-->
+
+<!--                        <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:padding="16dp">-->
+
+<!--                            <TextView-->
+<!--                                android:id="@+id/option4Text"-->
+<!--                                android:layout_width="0dp"-->
+<!--                                android:layout_height="wrap_content"-->
+<!--                                android:text="The act of avoiding responsibility"-->
+<!--                                android:textSize="16sp"-->
+<!--                                android:textColor="#374151"-->
+<!--                                android:lineSpacingExtra="4dp"-->
+<!--                                app:layout_constraintStart_toStartOf="parent"-->
+<!--                                app:layout_constraintEnd_toStartOf="@+id/option4Icon"-->
+<!--                                app:layout_constraintTop_toTopOf="parent"-->
+<!--                                app:layout_constraintBottom_toBottomOf="parent" />-->
+
+<!--                            <ImageView-->
+<!--                                android:id="@+id/option4Icon"-->
+<!--                                android:layout_width="24dp"-->
+<!--                                android:layout_height="24dp"-->
+<!--                                android:src="@drawable/ic_cancel"-->
+<!--                                android:visibility="gone"-->
+<!--                                app:tint="#EF4444"-->
+<!--                                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                                app:layout_constraintTop_toTopOf="parent"-->
+<!--                                app:layout_constraintBottom_toBottomOf="parent" />-->
+<!--                        </androidx.constraintlayout.widget.ConstraintLayout>-->
+<!--                    </androidx.cardview.widget.CardView>-->
+
+<!--                </LinearLayout>-->
+
+<!--                &lt;!&ndash; Feedback Card &ndash;&gt;-->
+<!--                <androidx.cardview.widget.CardView-->
+<!--                    android:id="@+id/feedbackCard"-->
+<!--                    android:layout_width="0dp"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    app:cardCornerRadius="12dp"-->
+<!--                    app:cardElevation="4dp"-->
+<!--                    app:cardBackgroundColor="#F9FAFB"-->
+<!--                    android:layout_marginTop="16dp"-->
+<!--                    android:visibility="gone"-->
+<!--                    app:layout_constraintStart_toStartOf="parent"-->
+<!--                    app:layout_constraintEnd_toEndOf="parent"-->
+<!--                    app:layout_constraintTop_toBottomOf="@+id/optionsContainer">-->
+
+<!--                    <LinearLayout-->
+<!--                        android:layout_width="match_parent"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:orientation="vertical"-->
+<!--                        android:padding="16dp">-->
+
+<!--                        <TextView-->
+<!--                            android:id="@+id/feedbackStatus"-->
+<!--                            android:layout_width="wrap_content"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="✅ Correct!"-->
+<!--                            android:textSize="16sp"-->
+<!--                            android:textStyle="bold"-->
+<!--                            android:textColor="#10B981" />-->
+
+<!--                        <TextView-->
+<!--                            android:id="@+id/feedbackDefinition"-->
+<!--                            android:layout_width="match_parent"-->
+<!--                            android:layout_height="wrap_content"-->
+<!--                            android:text="SERENDIPITY means: The occurrence of events by chance in a happy or beneficial way"-->
+<!--                            android:textSize="14sp"-->
+<!--                            android:textColor="#6B7280"-->
+<!--                            android:layout_marginTop="8dp"-->
+<!--                            android:lineSpacingExtra="2dp" />-->
+<!--                    </LinearLayout>-->
+<!--                </androidx.cardview.widget.CardView>-->
+
+<!--            </androidx.constraintlayout.widget.ConstraintLayout>-->
+<!--        </LinearLayout>-->
+<!--    </androidx.cardview.widget.CardView>-->
+
+<!--    &lt;!&ndash; Result Screen (Initially Hidden) &ndash;&gt;-->
+<!--    <androidx.cardview.widget.CardView-->
+<!--        android:id="@+id/resultCard"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginStart="16dp"-->
+<!--        android:layout_marginEnd="16dp"-->
+<!--        app:cardCornerRadius="24dp"-->
+<!--        app:cardElevation="12dp"-->
+<!--        android:visibility="gone"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintBottom_toBottomOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent">-->
+
+<!--        <androidx.constraintlayout.widget.ConstraintLayout-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:padding="32dp">-->
+
+<!--            &lt;!&ndash; Trophy Icon &ndash;&gt;-->
+<!--            <ImageView-->
+<!--                android:id="@+id/trophyIcon"-->
+<!--                android:layout_width="64dp"-->
+<!--                android:layout_height="64dp"-->
+<!--                android:src="@drawable/ic_trophy"-->
+<!--                app:tint="#F59E0B"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintTop_toTopOf="parent" />-->
+
+<!--            &lt;!&ndash; Result Title &ndash;&gt;-->
+<!--            <TextView-->
+<!--                android:id="@+id/resultTitle"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Quiz Complete!"-->
+<!--                android:textSize="28sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textColor="#1F2937"-->
+<!--                android:layout_marginTop="16dp"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/trophyIcon" />-->
+
+<!--            &lt;!&ndash; Result Subtitle &ndash;&gt;-->
+<!--            <TextView-->
+<!--                android:id="@+id/resultSubtitle"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Your final score"-->
+<!--                android:textSize="16sp"-->
+<!--                android:textColor="#6B7280"-->
+<!--                android:layout_marginTop="8dp"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/resultTitle" />-->
+
+<!--            &lt;!&ndash; Final Score &ndash;&gt;-->
+<!--            <TextView-->
+<!--                android:id="@+id/finalScore"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="0/3"-->
+<!--                android:textSize="48sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textColor="#3B82F6"-->
+<!--                android:layout_marginTop="24dp"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/resultSubtitle" />-->
+
+<!--            &lt;!&ndash; Score Message &ndash;&gt;-->
+<!--            <TextView-->
+<!--                android:id="@+id/scoreMessage"-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Keep practicing! 💪"-->
+<!--                android:textSize="18sp"-->
+<!--                android:textColor="#6B7280"-->
+<!--                android:layout_marginTop="8dp"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/finalScore" />-->
+
+<!--            &lt;!&ndash; Play Again Button &ndash;&gt;-->
+<!--            <Button-->
+<!--                android:id="@+id/playAgainButton"-->
+<!--                android:layout_width="0dp"-->
+<!--                android:layout_height="56dp"-->
+<!--                android:text="🔄 Play Again"-->
+<!--                android:textSize="16sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textColor="@android:color/white"-->
+<!--                android:background="@drawable/button_gradient"-->
+<!--                android:layout_marginTop="32dp"-->
+<!--                app:layout_constraintStart_toStartOf="parent"-->
+<!--                app:layout_constraintEnd_toEndOf="parent"-->
+<!--                app:layout_constraintTop_toBottomOf="@+id/scoreMessage" />-->
+
+<!--        </androidx.constraintlayout.widget.ConstraintLayout>-->
+<!--    </androidx.cardview.widget.CardView>-->
+
+<!--</androidx.constraintlayout.widget.ConstraintLayout>-->
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".WordGame.WordGameFragment">
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

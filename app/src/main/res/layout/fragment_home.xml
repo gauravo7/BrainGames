@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/home_background"
+    android:orientation="vertical"
+
+    tools:context=".BottomNav.HomeFragment">
+
+   <com.google.android.material.appbar.MaterialToolbar
+       android:id="@+id/toolbar"
+       android:layout_width="match_parent"
+       android:layout_height="wrap_content"
+       app:layout_constraintTop_toTopOf="parent"
+       app:title="Games"
+       android:background="@color/primary"
+       app:titleTextColor="@color/white"
+       />
+
+   <androidx.core.widget.NestedScrollView
+       android:layout_width="match_parent"
+       android:layout_height="match_parent"
+      >
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:orientation="vertical"
+          android:padding="12dp"
+         >
+         <TextView
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:text="Logical"
+             android:textStyle="bold"
+             android:textColor="@color/white"
+             android:shadowColor="#80000000"
+             android:shadowDx="2"
+             android:shadowDy="2"
+             android:shadowRadius="4"
+             android:letterSpacing="0.02"
+             android:fontFamily="sans-serif-black"
+             android:textSize="20sp"
+             android:layout_margin="12dp"
+             />
+         <View
+             android:layout_width="match_parent"
+             android:layout_height="1dp"
+             android:background="@color/white"
+             android:shadowColor="#80000000"
+             android:shadowDx="2"
+             android:shadowDy="2"
+             android:shadowRadius="4"
+            />
+
+         <androidx.recyclerview.widget.RecyclerView
+             android:id="@+id/recyclerView"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_weight="1"
+             />
+         <TextView
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:text="Memory"
+             android:textStyle="bold"
+             android:shadowColor="#80000000"
+             android:shadowDx="2"
+             android:textColor="@color/white"
+             android:shadowDy="2"
+             android:shadowRadius="4"
+             android:letterSpacing="0.02"
+             android:fontFamily="sans-serif-black"
+             android:textSize="20sp"
+             android:layout_margin="12dp"
+             />
+
+         <View
+             android:layout_width="match_parent"
+             android:layout_height="1dp"
+             android:background="@color/white"
+             android:shadowColor="#80000000"
+             android:shadowDx="2"
+             android:shadowDy="2"
+             android:shadowRadius="4"
+             />
+
+         <androidx.recyclerview.widget.RecyclerView
+             android:id="@+id/recyclerViewMemory"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_weight="1"
+             />
+
+         <TextView
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:text="Problem Solving"
+             android:textStyle="bold"
+             android:textColor="@color/white"
+             android:shadowColor="#80000000"
+             android:shadowDx="2"
+             android:shadowDy="2"
+             android:shadowRadius="4"
+             android:letterSpacing="0.02"
+             android:fontFamily="sans-serif-black"
+             android:textSize="20sp"
+             android:layout_margin="12dp"
+             />
+
+         <View
+             android:layout_width="match_parent"
+             android:layout_height="1dp"
+             android:background="@color/white"
+             android:shadowColor="#80000000"
+             android:shadowDx="2"
+             android:shadowDy="2"
+             android:shadowRadius="4"
+             />
+
+         <androidx.recyclerview.widget.RecyclerView
+             android:id="@+id/recyclerViewProblemSolving"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_weight="1"
+             />
+      </LinearLayout>
+   </androidx.core.widget.NestedScrollView>
+
+</LinearLayout>

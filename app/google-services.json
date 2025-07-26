@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "528764807613",
+    "project_id": "pets-paradise-c61d3",
+    "storage_bucket": "pets-paradise-c61d3.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:528764807613:android:8a46556dd1dcb9fb6d8ad4",
+        "android_client_info": {
+          "package_name": "com.example.pets"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJmRKXiYHKNrSWUBC5tSXzY2ixFo3iTBg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:528764807613:android:a8280c8b66dd58fb6d8ad4",
+        "android_client_info": {
+          "package_name": "com.o7solutions.braingames"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJmRKXiYHKNrSWUBC5tSXzY2ixFo3iTBg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
