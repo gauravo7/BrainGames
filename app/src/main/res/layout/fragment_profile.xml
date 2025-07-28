@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/profile_background"
+    android:background="@color/white"
     android:fillViewport="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -77,9 +77,10 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:text="GameMaster_2024"
-                android:textColor="@android:color/white"
+                android:textColor="@android:color/black"
                 android:textSize="24sp"
                 android:textStyle="bold"
+                tools:text="Name"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/profileImageCard" />
@@ -90,7 +91,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
-                app:cardBackgroundColor="#33FFFFFF"
+                android:elevation="12dp"
+                app:cardBackgroundColor="@android:color/darker_gray"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -104,7 +106,7 @@
                     android:paddingHorizontal="16dp"
                     android:paddingVertical="8dp"
                     android:text="Level 25 • 12,450 XP"
-                    android:textColor="@android:color/white"
+                    android:textColor="@android:color/black"
                     android:textSize="14sp"
                     android:textStyle="bold" />
             </androidx.cardview.widget.CardView>
@@ -707,23 +709,25 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/achievementsCard">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/editProfileButton"
                 android:layout_width="0dp"
                 android:layout_height="56dp"
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:backgroundTint="@color/white"
                 android:text="Edit Profile"
                 android:textColor="@color/primary"
                 android:textStyle="bold" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/logOutBTN"
                 android:layout_width="0dp"
                 android:layout_height="56dp"
                 android:layout_marginStart="8dp"
                 android:layout_weight="1"
+                style="@style/Widget.Material3.Button.OutlinedButton"
                 android:backgroundTint="@color/white"
                 android:text="Log Out"
                 android:textColor="@color/primary"

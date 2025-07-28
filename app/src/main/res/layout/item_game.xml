@@ -12,15 +12,16 @@
         android:layout_height="280dp"
         android:id="@+id/gameCard"
         app:cardCornerRadius="20dp"
-        app:cardElevation="12dp"
-        app:cardUseCompatPadding="true"
+        app:cardElevation="4dp"
+        android:layout_margin="8dp"
         android:foreground="?android:attr/selectableItemBackground"
         android:clickable="true"
         android:focusable="true">
 
-        <FrameLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            >
 
             <!-- Background Image with Overlay -->
             <ImageView
@@ -67,7 +68,7 @@
 
 
 
-        </FrameLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.cardview.widget.CardView>
 
