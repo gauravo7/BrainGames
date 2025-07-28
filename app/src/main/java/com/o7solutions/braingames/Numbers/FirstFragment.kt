@@ -37,15 +37,21 @@ class FirstFragment : Fragment() {
     var operator2 = " "
     var answer = ""
     var points = 0
-    var level = 1
+    var level = 3
     var questionList = arrayListOf<String>()
     private var countDownTimer: CountDownTimer? = null
     var totalQuestions= 0
     var rightQuestions = 0
     var totalSeconds = 60
 
+    // For level 3+ tracking
+    var selectedOperator1 = ""
+    var selectedOperator2 = ""
+    var isFirstOperatorSelected = false
+
     lateinit var moveUp: Animation
     lateinit var moveDown: Animation
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -59,94 +65,71 @@ class FirstFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-
         moveUp = AnimationUtils.loadAnimation(requireContext(), R.anim.move_up)
         moveDown = AnimationUtils.loadAnimation(requireContext(), R.anim.move_down)
 
-//        val serviceIntent = Intent(requireActivity(), UserTimerService::class.java)
-//        serviceIntent.putExtra("userId", FirebaseAuth.getInstance().currentUser?.uid)
-//        requireActivity().startService(serviceIntent)
-
         var blinkAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.blink)
-        binding.viewOne.visibility = View.GONE
-        binding.viewOne.startAnimation(blinkAnimation)
-        binding.viewTwo.startAnimation(blinkAnimation)
-//        binding.totalQuestions.startAnimation(blinkAnimation)
+
         binding.operator1.startAnimation(blinkAnimation)
+        binding.operator2.startAnimation(blinkAnimation)
+
 
         binding.points.text = points.toString()
 
         binding.apply {
 
             plus.setOnClickListener {
-
-                binding.operator1.text = "+"
-
-
-                if(level<3) {
-                    lifecycleScope.launch {
-                        checkAnswer("+")
-                        delay(1000)
-                        setData()
-                    }
-                } else {
-
-//                    lifecycleScope.
-
-                }
-
-
-
+                handleOperatorClick("+")
             }
 
             minus.setOnClickListener {
-                binding.operator1.text = "-"
-                if(level<3) {
-                    lifecycleScope.launch {
-                        checkAnswer("+")
-                        delay(1000)
-                        setData()
-                    }
-                } else {
-
-                }
+                handleOperatorClick("-")
             }
 
             division.setOnClickListener {
-
-                binding.operator1.text = "\u00F7"
-
-                if(level<3) {
-                    lifecycleScope.launch {
-                        checkAnswer("+")
-                        delay(1000)
-                        setData()
-                    }
-                } else {
-
-                }
+                handleOperatorClick("/")
             }
 
             multiply.setOnClickListener {
-
-                binding.operator1.text = "x"
-                if(level<3) {
-                    lifecycleScope.launch {
-                        checkAnswer("+")
-                        delay(1000)
-                        setData()
-                    }
-                } else {
-
-                }
-
+                handleOperatorClick("x")
             }
         }
         setData()
         startTimer()
     }
 
+    private fun handleOperatorClick(operatorChoice: String) {
+        if (level < 3) {
+            // Level 1-2: Single operator guess
+            binding.operator1.text = if (operatorChoice == "/") "\u00F7" else if (operatorChoice == "*") "x" else operatorChoice
 
+            lifecycleScope.launch {
+                checkAnswer(operatorChoice)
+                delay(1000)
+                setData()
+            }
+        } else {
+            if (!isFirstOperatorSelected) {
+                selectedOperator1 = operatorChoice
+                binding.operator1.text = if (operatorChoice == "/") "\u00F7" else if (operatorChoice == "*") "x" else operatorChoice
+                isFirstOperatorSelected = true
+                Toast.makeText(requireContext(), "Now select the second operator", Toast.LENGTH_SHORT).show()
+            } else {
+                // Second operator selection
+                selectedOperator2 = operatorChoice
+                binding.operator2.text = if (operatorChoice == "/") "\u00F7" else if (operatorChoice == "*") "x" else operatorChoice
+
+                lifecycleScope.launch {
+                    checkAnswerHigherLevel(selectedOperator1, selectedOperator2)
+                    delay(1000)
+                    setDataLevel3()
+                    isFirstOperatorSelected = false
+                    selectedOperator1 = ""
+                    selectedOperator2 = ""
+                }
+            }
+        }
+    }
 
     private fun startTimer() {
         countDownTimer?.cancel()
@@ -162,45 +145,27 @@ class FirstFragment : Fragment() {
             }
 
             override fun onFinish() {
-
                 if (!isAdded) return
                 binding.seekBarBrightness.progress = 0
                 Toast.makeText(requireActivity(), "Time's up!", Toast.LENGTH_SHORT).show()
                 showCustomDialog("Time Up", "Total Points=${points}")
-
             }
         }.start()
     }
-
-//    fun clear() {
-//
-//
-//        operator = ""
-//        operator2 = ""
-//        binding.operator2.setText("")
-//        binding.operator1.setText("")
-//        binding.operand1.text = ""
-//        binding.operand2.text = ""
-//        binding.operand3.text = ""
-//        binding.answer.text = ""
-//        Log.d("First Fragment","clear called ${binding.operator1.text}")
-//        Log.d("First Fragment","$operator")
-//    }
 
     fun updateQuestions() {
         binding.totalQuestions.text = "$rightQuestions / $totalQuestions"
     }
 
     private fun checkAnswer(choice: String) {
-
-
+        var displayChoice = choice
         if(choice == "/") {
-            binding.operator1.text = "\u00F7"
-        }
-        else {
-            binding.operator1.text = choice
+            displayChoice = "\u00F7"
+        } else if(choice == "*") {
+            displayChoice = "x"
         }
 
+        binding.operator1.text = displayChoice
 
         if (choice == operator) {
             rightQuestions++
@@ -216,6 +181,7 @@ class FirstFragment : Fragment() {
 
             binding.movePoints.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
             binding.movePoints.text = "+20"
+            binding.movePoints.visibility = View.VISIBLE
             binding.movePoints.startAnimation(moveUp)
             points = points + 20
             binding.points.text = points.toString()
@@ -230,8 +196,7 @@ class FirstFragment : Fragment() {
                 override fun onAnimationRepeat(animation: Animation?) {}
             })
 
-        }
-        else {
+        } else {
             binding.questionCard.setStrokeColor(
                 ContextCompat.getColor(
                     requireContext(),
@@ -241,6 +206,7 @@ class FirstFragment : Fragment() {
 
             binding.movePoints.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
             binding.movePoints.text = "-10"
+            binding.movePoints.visibility = View.VISIBLE
             binding.movePoints.startAnimation(moveDown)
             points = points - 10
             binding.points.text = points.toString()
@@ -248,86 +214,123 @@ class FirstFragment : Fragment() {
                 override fun onAnimationStart(animation: Animation?) {}
 
                 override fun onAnimationEnd(animation: Animation?) {
-
                     binding.movePoints.text = ""
                     binding.movePoints.visibility = View.INVISIBLE
-
                 }
 
                 override fun onAnimationRepeat(animation: Animation?) {}
             })
 
-            var correctAnswer = "${operand1} ${operator} ${operand2} = ${answer}"
-            var wrongAnswer = "${operand1} ${choice} ${operand2} = ${answer}"
+            var correctAnswer = "${operand1} ${if(operator == "/") "\u00F7" else if(operator == "*") "x" else operator} ${operand2} = ${answer}"
+            var wrongAnswer = "${operand1} ${displayChoice} ${operand2} = ${answer}"
             showResultDialog(wrongAnswer, correctAnswer)
-
         }
 
-        if(points >= 200) {
+        if(points >= 200 && level == 1) {
             level = 2
-            totalSeconds = totalSeconds+60
-        } else if(points >= 400) {
+            totalSeconds = totalSeconds + 60
+            startTimer()
+            Toast.makeText(requireContext(), "Level 2 Unlocked! +60 seconds", Toast.LENGTH_LONG).show()
+        } else if(points >= 400 && level == 2) {
             level = 3
-            totalSeconds = totalSeconds+60
-        } else if(points >= 600) {
+            totalSeconds = totalSeconds + 60
+            startTimer()
+            Toast.makeText(requireContext(), "Level 3 Unlocked! Now guess both operators! +60 seconds", Toast.LENGTH_LONG).show()
+        } else if(points >= 600 && level == 3) {
             level = 4
-            totalSeconds = totalSeconds+60
+            totalSeconds = totalSeconds + 60
+            startTimer()
+            Toast.makeText(requireContext(), "Level 4 Unlocked! +60 seconds", Toast.LENGTH_LONG).show()
         }
-
-
-
     }
 
     private fun setData() {
         totalQuestions++
         updateQuestions()
-        questionList = LevelOne.solveLevelOne()
-        operand1 = questionList[0]
-        operand2 = questionList[1]
-        operator = questionList[2]
-        answer = questionList[3]
 
-        binding.questionCard.setStrokeColor(ContextCompat.getColor(requireContext(), R.color.white))
+        if (level < 3) {
+            // Level 1-2: Single operator format
+            if(level <2) {
+                questionList = LevelOne.solveLevelOne()
+            } else if(level > 1) {
+                questionList = LevelTwo.solveLevelTwo()
 
-        binding.operator1.text = "?"
-        binding.operator2.text = "?"
-        binding.operand1.text = "${operand1}"
-        binding.operand2.text = "$operand2"
-        binding.answer.text = "$answer"
+            }
 
+            operand1 = questionList[0]
+            operand2 = questionList[1]
+            operator = questionList[2]
+            answer = questionList[3]
+
+            // Hide level 3+ UI elements
+//            binding.viewTwo.visibility = View.GONE
+            binding.operator2.visibility = View.GONE
+            binding.operand3.visibility = View.GONE
+
+            binding.questionCard.setStrokeColor(ContextCompat.getColor(requireContext(), R.color.white))
+
+            binding.operator1.text = "?"
+            binding.operand1.text = operand1
+            binding.operand2.text = operand2
+            binding.answer.text = answer
+        } else {
+            // Level 3+: Switch to two operator format
+            setDataLevel3()
+        }
     }
 
     private fun setDataLevel3() {
-        questionList = LevelThree.solveLevelThree()
+        totalQuestions++
+        updateQuestions()
+
+        if(level > 3) {
+            questionList = LevelFour.solveLevelFour()
+
+        } else if(level <4) {
+            questionList = LevelThree.solveLevelThree()
+
+        }
         operand1 = questionList[0]
         operand2 = questionList[1]
         operand3 = questionList[2]
-
         operator = questionList[3]
         operator2 = questionList[4]
         answer = questionList[5]
 
-        binding.viewTwo.visibility = View.VISIBLE
+        // Show level 3+ UI elements
+//        binding.viewTwo.visibility = View.VISIBLE
         binding.operator2.visibility = View.VISIBLE
         binding.operand3.visibility = View.VISIBLE
+
         binding.questionCard.setStrokeColor(ContextCompat.getColor(requireContext(), R.color.white))
 
-        binding.operand1.text = "${operand1}"
-        binding.operator1.text = ""
-        binding.operator2.text = ""
-        binding.operand2.text = "$operand2"
-        binding.operand3.text = "$operand3"
-        binding.answer.text = "$answer"
-
+        binding.operand1.text = operand1
+        binding.operator1.text = "?"
+        binding.operator2.text = "?"
+        binding.operand2.text = operand2
+        binding.operand3.text = operand3
+        binding.answer.text = answer
     }
 
-    private fun checkAnswerHigherLevel(op1: String,op2: String) {
+    private fun checkAnswerHigherLevel(op1: String, op2: String) {
+        // Convert display operators back to actual operators for comparison
+        val actualOp1 = when(operator) {
+            "/" -> "/"
+            "*" -> "*"
+            "+" -> "+"
+            "-" -> "-"
+            else -> operator
+        }
 
+        val actualOp2 = when(operator2) {
+            "/" -> "/"
+            "*" -> "*"
+            "+" -> "+"
+            "-" -> "-"
+            else -> operator2
+        }
 
-        var actualAnswer = "$operand1$operator$operand2$operator2$operand3=$answer"
-        var userAnswer =  "${binding.operand1.text.toString()}$op1${binding.operand2.text.toString()}$op2=${binding.answer.text.toString()}"
-
-        if(actualAnswer == userAnswer) {
+        if (op1 == actualOp1 && op2 == actualOp2) {
             rightQuestions++
             updateQuestions()
             Toast.makeText(requireContext(), "Correct answer!", Toast.LENGTH_SHORT).show()
@@ -341,6 +344,7 @@ class FirstFragment : Fragment() {
 
             binding.movePoints.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
             binding.movePoints.text = "+20"
+            binding.movePoints.visibility = View.VISIBLE
             binding.movePoints.startAnimation(moveUp)
             points = points + 20
             binding.points.text = points.toString()
@@ -355,7 +359,41 @@ class FirstFragment : Fragment() {
                 override fun onAnimationRepeat(animation: Animation?) {}
             })
         } else {
-            
+            binding.questionCard.setStrokeColor(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.red
+                )
+            )
+
+            binding.movePoints.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+            binding.movePoints.text = "-10"
+            binding.movePoints.visibility = View.VISIBLE
+            binding.movePoints.startAnimation(moveDown)
+            points = points - 10
+            binding.points.text = points.toString()
+            moveDown.setAnimationListener(object : Animation.AnimationListener {
+                override fun onAnimationStart(animation: Animation?) {}
+
+                override fun onAnimationEnd(animation: Animation?) {
+                    binding.movePoints.text = ""
+                    binding.movePoints.visibility = View.INVISIBLE
+                }
+
+                override fun onAnimationRepeat(animation: Animation?) {}
+            })
+
+            val correctAnswer = "${operand1} ${if(operator == "/") "\u00F7" else if(operator == "*") "x" else operator} ${operand2} ${if(operator2 == "/") "\u00F7" else if(operator2 == "*") "x" else operator2} ${operand3} = ${answer}"
+            val wrongAnswer = "${operand1} ${if(op1 == "/") "\u00F7" else if(op1 == "*") "x" else op1} ${operand2} ${if(op2 == "/") "\u00F7" else if(op2 == "*") "x" else op2} ${operand3} = ${answer}"
+            showResultDialog(wrongAnswer, correctAnswer)
+        }
+
+        // Level progression logic for higher levels
+        if(points >= 600 && level == 3) {
+            level = 4
+            totalSeconds = totalSeconds + 60
+            startTimer() // Restart timer with new time
+            Toast.makeText(requireContext(), "Level 4 Unlocked! +60 seconds", Toast.LENGTH_LONG).show()
         }
     }
 
@@ -384,23 +422,18 @@ class FirstFragment : Fragment() {
     private fun showCustomDialog(title: String, message: String) {
         val dialogView = layoutInflater.inflate(R.layout.time_finish, null)
 
-//        val imageView = dialogView.findViewById<ImageView>(R.id.dialogImage)
-
         var winingMessage = ""
         if(points > 200) {
             winingMessage = "You won \uD83D\uDE00 "
-//            AppFunctions.updateUserData(points,true)
         } else {
             winingMessage = "You lose \uD83D\uDE22"
-//            AppFunctions.updateUserData(points,false)
-
         }
 
         val animation = AnimationUtils.loadAnimation(requireContext(), R.anim.fade)
         val titleView = dialogView.findViewById<TextView>(R.id.dialogTitle)
         val messageView = dialogView.findViewById<TextView>(R.id.dialogMessage)
         val okButton = dialogView.findViewById<Button>(R.id.okButton)
-//        imageView.startAnimation(animation)
+
         titleView.startAnimation(animation)
         titleView.text = "\u23F3 Time Up"
         messageView.text ="$rightQuestions/$totalQuestions \n$message\n$winingMessage"
@@ -411,17 +444,12 @@ class FirstFragment : Fragment() {
             .create()
 
         okButton.setOnClickListener {
-
             if(points < 200) {
                 AppFunctions.updateUserData(points,false,60000)
             } else {
                 AppFunctions.updateUserData(points,true,60000)
             }
             dialog.dismiss()
-
-//            val stopIntent = Intent(requireActivity(), UserTimerService::class.java)
-//            requireActivity().stopService(stopIntent)
-
             findNavController().popBackStack()
         }
 

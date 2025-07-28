@@ -4,6 +4,10 @@ import android.app.AlertDialog
 import android.content.Context
 import android.util.Log
 import android.view.View
+import android.view.animation.AnimationUtils
+import android.widget.Button
+import android.widget.TextView
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
@@ -11,6 +15,7 @@ import com.google.firebase.firestore.auth.User
 import com.o7solutions.braingames.BottomNav.BottomNavActivity
 import com.o7solutions.braingames.DataClasses.Users
 import com.o7solutions.braingames.R
+import com.o7solutions.braingames.R.layout.dialog_result
 import kotlin.random.Random
 
 object AppFunctions
@@ -118,6 +123,66 @@ object AppFunctions
                 }
         }
     }
+
+     fun showResultDialog(userAnswer: String, correctAnswer: String,context: Context) {
+        val dialogView = View.inflate(context,R.layout.dialog_result, null)
+
+        val wrongText = dialogView.findViewById<TextView>(R.id.wrongAnswerText)
+        val correctText = dialogView.findViewById<TextView>(R.id.correctAnswerText)
+        val okBtn = dialogView.findViewById<Button>(R.id.okButton)
+
+        wrongText.text = "Your Answer: $userAnswer❌"
+        correctText.text = "Correct Answer: $correctAnswer✅"
+
+        val dialog = AlertDialog.Builder(context)
+            .setView(dialogView)
+            .create()
+
+        okBtn.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.show()
+    }
+
+//    private fun showCustomDialog(message: String,context: Context,points: Int) {
+//        val dialogView = View.inflate(context,R.layout.time_finish, null)
+//
+//        var winingMessage = ""
+//        if(points > 200) {
+//            winingMessage = "You won \uD83D\uDE00 "
+//        } else {
+//            winingMessage = "You lose \uD83D\uDE22"
+//        }
+//
+//        val animation = AnimationUtils.loadAnimation(context, R.anim.fade)
+//        val titleView = dialogView.findViewById<TextView>(R.id.dialogTitle)
+//        val messageView = dialogView.findViewById<TextView>(R.id.dialogMessage)
+//        val okButton = dialogView.findViewById<Button>(R.id.okButton)
+//
+//        titleView.startAnimation(animation)
+//        titleView.text = "\u23F3 Time Up"
+////        messageView.text ="$rightQuestions/$totalQuestions \n$message\n$winingMessage"
+//
+//        val dialog = AlertDialog.Builder(context)
+//            .setView(dialogView)
+//            .setCancelable(false)
+//            .create()
+//
+//        okButton.setOnClickListener {
+//            if(points < 200) {
+//                AppFunctions.updateUserData(points,false,60000)
+//            } else {
+//                AppFunctions.updateUserData(points,true,60000)
+//            }
+//            dialog.dismiss()
+//            findNavController().popBackStack()
+//        }
+//
+//        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+//        dialog.show()
+//    }
 
 
 }

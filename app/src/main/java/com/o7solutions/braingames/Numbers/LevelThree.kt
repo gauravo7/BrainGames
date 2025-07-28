@@ -13,8 +13,8 @@ object LevelThree {
         val operand1 = returnRandom(1, 10)
         val operand2 = returnRandom(1, 10)
         var operand3 = returnRandom(1,10)
-        var operatorPosition = returnRandom(0,1)
-        var operatorPosition2 = returnRandom(0,1)
+        var operatorPosition = returnRandom(0,2)
+        var operatorPosition2 = returnRandom(0,2)
         var operator1 = ""
         var operator2 = ""
         var answer = 0
@@ -25,7 +25,7 @@ object LevelThree {
         when(operatorPosition2) {
             0-> {
                 tempAnswer = operand1 * operand2
-                operator1 = "*"
+                operator1 = "x"
             }
             1-> {
                 answer = operand1 / operand2

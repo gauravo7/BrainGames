@@ -25,4 +25,9 @@
         android:id="@+id/firstFragment"
         android:name="com.o7solutions.braingames.Numbers.FirstFragment"
         android:label="Number's Theory" />
+    <fragment
+        android:id="@+id/guessNumberFragment"
+        android:name="com.o7solutions.braingames.GuessNumber.GuessNumberFragment"
+        android:label="fragment_guess_number"
+        tools:layout="@layout/fragment_guess_number" />
 </navigation>
