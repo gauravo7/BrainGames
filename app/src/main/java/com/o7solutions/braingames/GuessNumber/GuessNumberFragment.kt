@@ -20,6 +20,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.o7solutions.braingames.DataClasses.Games
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.FragmentGuessNumberBinding
 import com.o7solutions.braingames.utils.AppFunctions
@@ -39,6 +40,15 @@ class GuessNumberFragment : Fragment() {
     private var totalSeconds = 60
     private var countDownTimer: CountDownTimer? = null
     var newMaxLength = 3
+    private lateinit var game : Games
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+            game = it.getSerializable("game_data") as Games
+        }
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -237,7 +247,7 @@ class GuessNumberFragment : Fragment() {
                 .create()
 
             okButton.setOnClickListener {
-                AppFunctions.updateUserData(points,true,totalSeconds.toLong())
+                AppFunctions.updateUserData(points,true,totalSeconds.toLong(),game.id!!.toInt())
                 dialog.dismiss()
                 requireActivity().onBackPressed()
             }

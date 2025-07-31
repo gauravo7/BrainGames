@@ -13,6 +13,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.auth.User
 import com.o7solutions.braingames.BottomNav.BottomNavActivity
+import com.o7solutions.braingames.DataClasses.BestScore
 import com.o7solutions.braingames.DataClasses.Streak
 import com.o7solutions.braingames.DataClasses.Users
 import com.o7solutions.braingames.R
@@ -87,7 +88,7 @@ object AppFunctions {
         }
     }
 
-    fun updateUserData(score: Int, win: Boolean, time: Long) {
+    fun updateUserData(score: Int, win: Boolean, time: Long,id: Int) {
         val auth = FirebaseAuth.getInstance()
         var userData = Users()
 
@@ -130,6 +131,8 @@ object AppFunctions {
                     Log.d("User data", "user data updated successfully")
                 }
         }
+
+        updateBestScore(id,score)
     }
 
     fun getStreak(callback: (Streak) -> Unit) {
@@ -150,12 +153,51 @@ object AppFunctions {
     }
 
 
+    fun updateBestScore(gameId: Int, newScore: Int) {
+        val email = auth.currentUser?.email.toString()
+        val docRef = db.collection(AppConstants.games)
+            .document(gameId.toString())
+            .collection(gameId.toString())
+            .document(email)
 
-    fun getBestScore(id: Int) {
+        docRef.get().addOnSuccessListener { document ->
+            val currentBest = if (document.exists()) {
+                document.toObject(BestScore::class.java)?.bestScore ?: 0
+            } else {
+                0
+            }
 
-        db.collection()
-
+            if (newScore > currentBest) {
+                val updatedScore = BestScore(email = email, bestScore = newScore)
+                docRef.set(updatedScore)
+            }
+        }.addOnFailureListener {
+            Log.e("UpdateBestScore", "Error getting document", it)
+        }
     }
+
+
+    fun getBestScore(id: Int, callback: (Int?) -> Unit) {
+        val email = auth.currentUser?.email.toString()
+
+        db.collection(AppConstants.games)
+            .document(id.toString())
+            .collection(id.toString())
+            .document(email)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val bestScore = document.toObject(BestScore::class.java)?.bestScore
+                    callback(bestScore)
+                } else {
+                    callback(0) // or null, if you prefer
+                }
+            }
+            .addOnFailureListener {
+                callback(null)
+            }
+    }
+
 
     fun updateDailyStreak() {
         val email = auth.currentUser?.email.toString()

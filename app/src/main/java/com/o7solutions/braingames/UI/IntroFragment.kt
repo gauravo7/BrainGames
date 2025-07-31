@@ -6,10 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
+import com.o7solutions.braingames.Adapters.LevelsAdapter
 import com.o7solutions.braingames.DataClasses.Games
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.FragmentIntroBinding
+import com.o7solutions.braingames.utils.AppFunctions
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -27,6 +30,8 @@ class IntroFragment : Fragment() {
     private var param2: String? = null
     private lateinit var binding: FragmentIntroBinding
     private lateinit var game: Games
+    private lateinit var adapter: LevelsAdapter
+    var levelsList = arrayListOf<String>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,14 +62,27 @@ class IntroFragment : Fragment() {
                 .load(game.url) // game.url must be a valid image URL
                 .into(binding.imageViewGame)
 
+            AppFunctions.getBestScore(game.id!!.toInt(),{ score->
+                bestScore.text = score.toString()
+            })
+
+            levelsRecyclerView.layoutManager = LinearLayoutManager(requireActivity(),
+                LinearLayoutManager.HORIZONTAL,false)
+            adapter= LevelsAdapter(levelsList)
+            levelsRecyclerView.adapter = adapter
+            adapter.notifyDataSetChanged()
 //            gameName.text = game.name
             startGame.setOnClickListener {
+
+                val bundle = Bundle().apply {
+                    putSerializable("game_data", game)
+                }
                 val fragmentToGo = game.fragmentId
                 val context = requireContext()
                 val resId =
                     context?.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
                 if (resId != null) {
-                    findNavController().navigate(resId)
+                    findNavController().navigate(resId,bundle)
                 }
             }
         }

@@ -9,6 +9,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import androidx.navigation.NavController
+import androidx.navigation.NavOptions
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
@@ -33,6 +34,27 @@ class BottomNavActivity : AppCompatActivity() {
         navController = findNavController(R.id.nav_host_fragment_activity_bottom_nav)
         AppFunctions.updateDailyStreak()
 
+        navView.setOnItemSelectedListener { item ->
+            val navOptions = NavOptions.Builder()
+                .setLaunchSingleTop(true)
+                .setPopUpTo(navController.graph.startDestinationId, false)
+                .build()
+
+            when (item.itemId) {
+                R.id.homeFragment -> {
+                    navController.navigate(R.id.homeFragment, null, navOptions)
+                    true
+                }
+                R.id.profileFragment -> {
+                    navController.navigate(R.id.profileFragment, null, navOptions)
+                    true
+                }
+
+                else -> false
+            }
+        }
+
+
 //        val appBarConfiguration = AppBarConfiguration(
 //            setOf(
 //                R.id.homeFragment
@@ -46,7 +68,7 @@ class BottomNavActivity : AppCompatActivity() {
 //
 //
 //        setupActionBarWithNavController(navController, appBarConfiguration)
-        navView.setupWithNavController(navController)
+//        navView.setupWithNavController(navController)
     }
     override fun onSupportNavigateUp(): Boolean {
         return  super.onSupportNavigateUp()|| navController.popBackStack()

@@ -29,6 +29,7 @@ import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.lifecycleScope
 import com.example.game.RetrofitInstance
 import com.example.game.WordRepository
+import com.o7solutions.braingames.DataClasses.Games
 import com.o7solutions.braingames.utils.AppFunctions
 import kotlinx.coroutines.launch
 import kotlin.math.max
@@ -72,6 +73,7 @@ class WordGameFragment : Fragment() {
     private var timeLeftInMillis: Long = totalGameTime
     private var isPaused = false
     private var loadingDialog: androidx.appcompat.app.AlertDialog? = null
+    private lateinit var game: Games
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -80,6 +82,8 @@ class WordGameFragment : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
             currentLevel = it.getInt("SELECTED_LEVEL", 1)
+            game = it.getSerializable("game_data") as Games
+
 
         }
 
@@ -446,7 +450,7 @@ class WordGameFragment : Fragment() {
         GameResult.finalScore = score
         GameResult.allLevelsCompleted = false
         GameResult.timePlayedMillis = totalGameTime
-        AppFunctions.updateUserData(score, false, totalGameTime)
+        AppFunctions.updateUserData(score, false, totalGameTime,game.id!!.toInt())
         findNavController().popBackStack()
     }
 
@@ -470,7 +474,7 @@ class WordGameFragment : Fragment() {
             GameResult.finalScore = score
             GameResult.allLevelsCompleted = true
             GameResult.timePlayedMillis = totalGameTime - timeLeftInMillis
-            AppFunctions.updateUserData(score, true, totalGameTime - timeLeftInMillis)
+            AppFunctions.updateUserData(score, true, totalGameTime - timeLeftInMillis,game.id!!.toInt())
 
 //            here update score
             findNavController().popBackStack()

@@ -18,6 +18,7 @@ import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.firestore.FirebaseFirestore
+import com.o7solutions.braingames.DataClasses.Games
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.R.layout.dialog_result
 import com.o7solutions.braingames.databinding.FragmentFirstBinding
@@ -52,6 +53,15 @@ class FirstFragment : Fragment() {
 
     lateinit var moveUp: Animation
     lateinit var moveDown: Animation
+    private lateinit var game: Games
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        arguments?.let {
+
+            game = it.getSerializable("game_data") as Games
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -471,9 +481,9 @@ class FirstFragment : Fragment() {
 
         okButton.setOnClickListener {
             if(points < 200) {
-                AppFunctions.updateUserData(points,false,60000)
+                AppFunctions.updateUserData(points,false,60000,game.id!!.toInt())
             } else {
-                AppFunctions.updateUserData(points,true,60000)
+                AppFunctions.updateUserData(points,true,60000,game.id!!.toInt())
             }
             dialog.dismiss()
             findNavController().popBackStack()
