@@ -1,5 +1,6 @@
 package com.o7solutions.braingames.DataClasses
 
+import java.io.Serializable
 import java.net.URL
 
 data class Games(
@@ -14,4 +15,4 @@ data class Games(
     var timeAdded: Int ?= 0,
     var positiveScore: String ?= null,
     var negativeScore: String ?= null,
-)
+): Serializable

@@ -34,4 +34,8 @@
         android:id="@+id/dashboardFragment"
         android:name="com.o7solutions.braingames.WordGame.DashboardFragment"
         android:label="DashboardFragment" />
+    <fragment
+        android:id="@+id/introFragment"
+        android:name="com.o7solutions.braingames.UI.IntroFragment"
+        android:label="IntroFragment" />
 </navigation>

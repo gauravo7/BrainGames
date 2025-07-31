@@ -64,6 +64,12 @@ object AppFunctions {
         return randomNumber
     }
 
+//    fun updateBestScore() {
+//
+//        db.collection()
+//
+//    }
+
     fun getUserDataFromFirestore(userId: String, callback: (Users?) -> Unit) {
         val db = FirebaseFirestore.getInstance()
         val docRef = db.collection(AppConstants.user).document(userId)
@@ -144,6 +150,12 @@ object AppFunctions {
     }
 
 
+
+    fun getBestScore(id: Int) {
+
+        db.collection()
+
+    }
 
     fun updateDailyStreak() {
         val email = auth.currentUser?.email.toString()

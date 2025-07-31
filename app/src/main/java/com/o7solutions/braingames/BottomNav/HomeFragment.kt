@@ -131,12 +131,17 @@ class HomeFragment : Fragment(), GamesAdapter.OnClick {
 
     override fun onGameClick(game: Games) {
 
-        val fragmentToGo = game.fragmentId
-        val context = requireContext()
-            val resId = context?.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
-        if(resId != null) {
-            findNavController().navigate(resId)
+        val bundle = Bundle().apply {
+            putSerializable("game_data", game)
         }
+        findNavController().navigate(R.id.introFragment, bundle)
+//        val fragmentToGo = game.fragmentId
+//        val context = requireContext()
+//            val resId = context?.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
+//        if(resId != null) {
+//            findNavController().navigate(resId)
+//        }
+
     }
 
     fun  fillData() {

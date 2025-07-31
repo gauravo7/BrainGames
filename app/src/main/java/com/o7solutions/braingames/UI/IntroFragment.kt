@@ -5,7 +5,11 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
+import com.o7solutions.braingames.DataClasses.Games
 import com.o7solutions.braingames.R
+import com.o7solutions.braingames.databinding.FragmentIntroBinding
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -21,12 +25,15 @@ class IntroFragment : Fragment() {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
+    private lateinit var binding: FragmentIntroBinding
+    private lateinit var game: Games
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
+            game = it.getSerializable("game_data") as Games
         }
     }
 
@@ -34,8 +41,33 @@ class IntroFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_intro, container, false)
+
+        binding = FragmentIntroBinding.inflate(layoutInflater)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        binding.apply {
+
+            positiveScore.text = game.positiveScore
+            negativeScore.text = game.negativeScore
+            Glide.with(requireActivity())
+                .load(game.url) // game.url must be a valid image URL
+                .into(binding.imageViewGame)
+
+//            gameName.text = game.name
+            startGame.setOnClickListener {
+                val fragmentToGo = game.fragmentId
+                val context = requireContext()
+                val resId =
+                    context?.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
+                if (resId != null) {
+                    findNavController().navigate(resId)
+                }
+            }
+        }
     }
 
     companion object {

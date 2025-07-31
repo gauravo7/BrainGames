@@ -41,7 +41,6 @@ class GamesAdapter(
             if (!game.url.isNullOrEmpty()) {
                 Glide.with(gameImage)
                     .load(game.url)
-                    .placeholder(R.drawable.logo)
                     .into(gameImage)
             } else {
                 gameImage.setImageResource(R.drawable.logo) // fallback image

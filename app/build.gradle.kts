@@ -80,5 +80,9 @@ dependencies {
     // (Optional) OkHttp logging interceptor for debugging
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
+    implementation("com.intuit.sdp:sdp-android:1.1.0")   // for dimensions
+    implementation("com.intuit.ssp:ssp-android:1.1.0")   // for scalable text size (optional)
+
+
 
 }
