@@ -71,7 +71,7 @@ class SignupActivity : AppCompatActivity() {
     private fun registerUser(name: String,email: String, password: String) {
         binding.buttonSignUp.isEnabled = false
 
-        binding.pgBar.visibility = View.VISIBLE
+        binding.progressContainer.visibility = View.VISIBLE
         firebaseAuth.createUserWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
                 binding.buttonSignUp.isEnabled = true
@@ -82,7 +82,7 @@ class SignupActivity : AppCompatActivity() {
                 }
             }
 
-        binding.pgBar.visibility = View.GONE
+        binding.progressContainer.visibility = View.GONE
     }
 
     fun createUser(name: String,email: String, password: String) {

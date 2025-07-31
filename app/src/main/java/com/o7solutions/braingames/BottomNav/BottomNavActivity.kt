@@ -15,6 +15,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.ActivityBottomNavBinding
+import com.o7solutions.braingames.utils.AppFunctions
 
 class BottomNavActivity : AppCompatActivity() {
 
@@ -30,6 +31,7 @@ class BottomNavActivity : AppCompatActivity() {
         val navView: BottomNavigationView = binding.navView
 
         navController = findNavController(R.id.nav_host_fragment_activity_bottom_nav)
+        AppFunctions.updateDailyStreak()
 
 //        val appBarConfiguration = AppBarConfiguration(
 //            setOf(

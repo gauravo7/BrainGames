@@ -49,10 +49,10 @@ class GamesAdapter(
 
             // Set background color if colorHex is valid
             try {
-                game.colorHex?.let {
-                    gameCard.setCardBackgroundColor(Color.parseColor(it))
-                    gameImage.setBackgroundColor(Color.parseColor(it))
-                }
+//                game.colorHex?.let {
+//                    gameCard.setCardBackgroundColor(Color.parseColor(it))
+//                    gameImage.setBackgroundColor(Color.parseColor(it))
+//                }
             } catch (e: Exception) {
                 e.printStackTrace()
             }

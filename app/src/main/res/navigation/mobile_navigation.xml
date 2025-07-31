@@ -30,4 +30,8 @@
         android:name="com.o7solutions.braingames.GuessNumber.GuessNumberFragment"
         android:label="fragment_guess_number"
         tools:layout="@layout/fragment_guess_number" />
+    <fragment
+        android:id="@+id/dashboardFragment"
+        android:name="com.o7solutions.braingames.WordGame.DashboardFragment"
+        android:label="DashboardFragment" />
 </navigation>

@@ -40,6 +40,8 @@ class LoginActivity : AppCompatActivity() {
             if (email.isEmpty() || password.isEmpty()) {
                 Toast.makeText(this, "Please enter email and password", Toast.LENGTH_SHORT).show()
             } else {
+                binding.progressContainer.visibility = View.VISIBLE
+
                 loginUser(email, password)
             }
         }
@@ -52,11 +54,10 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun loginUser(email: String, password: String) {
-        binding.pgBar.visibility = View.VISIBLE
 
         firebaseAuth.signInWithEmailAndPassword(email, password)
             .addOnCompleteListener { task ->
-                binding.pgBar.visibility = View.GONE
+                binding.progressContainer.visibility = View.GONE
 
                 if (task.isSuccessful) {
                     Toast.makeText(this, "Login successful", Toast.LENGTH_SHORT).show()

@@ -64,23 +64,26 @@ class HomeFragment : Fragment(), GamesAdapter.OnClick {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+//        Updating Streak
+
+        binding.pgBarStreak.visibility = View.VISIBLE
 
         var recyclerAnimation = AnimationUtils.loadLayoutAnimation(requireContext(),R.anim.fall_down_layout)
 
         adapter = GamesAdapter(gamesList,this)
-        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(),2)
+        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutAnimation = recyclerAnimation
         binding.recyclerView.scheduleLayoutAnimation()
 
         problemAdapter = GamesAdapter(problemsList,this)
-        binding.recyclerViewProblemSolving.layoutManager = GridLayoutManager(requireContext(),2)
+        binding.recyclerViewProblemSolving.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerViewProblemSolving.adapter = problemAdapter
         binding.recyclerViewProblemSolving.layoutAnimation = recyclerAnimation
         binding.recyclerViewProblemSolving.scheduleLayoutAnimation()
 
         memoryAdapter = GamesAdapter(memoryList,this)
-        binding.recyclerViewMemory.layoutManager = GridLayoutManager(requireContext(),2)
+        binding.recyclerViewMemory.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerViewMemory.adapter = memoryAdapter
         binding.recyclerViewMemory.layoutAnimation = recyclerAnimation
         binding.recyclerViewMemory.scheduleLayoutAnimation()
@@ -88,22 +91,33 @@ class HomeFragment : Fragment(), GamesAdapter.OnClick {
 
 //        (requireActivity() as BottomNavActivity).showBottomNav(true)
 
-        getGames()
+        getGames(AppConstants.logical,gamesList)
+        getGames(AppConstants.memory,memoryList)
         fillData()
+        AppFunctions.getStreak { streak->
+            binding.streakTV.text = streak.count.toString()
+            binding.pgBarStreak.visibility = View.GONE
+//            if(binding.streakTV.text.isEmpty())
+//            }
+        }
     }
 
-    fun getGames() {
-        db.collection(AppConstants.games).addSnapshotListener { snapShot,error->
+    fun getGames(category: Int,list: ArrayList<Games>) {
+        binding.pgBar.visibility = View.VISIBLE
+        db.collection(AppConstants.games)
+            .whereEqualTo("category",category)
+            .addSnapshotListener { snapShot,error->
 
-            gamesList.clear()
+            list.clear()
             if(snapShot != null) {
                 for (doc in snapShot) {
 
                     var game = doc.toObject(Games::class.java)
-                    gamesList.add(game)
+                    list.add(game)
                 }
 
                 adapter.notifyDataSetChanged()
+                memoryAdapter.notifyDataSetChanged()
             }
 
             if(error != null) {
@@ -111,6 +125,8 @@ class HomeFragment : Fragment(), GamesAdapter.OnClick {
             }
 
         }
+
+        binding.pgBar.visibility = View.GONE
     }
 
     override fun onGameClick(game: Games) {
@@ -124,10 +140,10 @@ class HomeFragment : Fragment(), GamesAdapter.OnClick {
     }
 
     fun  fillData() {
-        problemsList.clear()
-        memoryList.clear()
-        problemsList.addAll(getStaticDataList())
-        memoryList.addAll(getStaticDataList())
+//        problemsList.clear()
+////        memoryList.clear()
+//        problemsList.addAll(getStaticDataList())
+//        memoryList.addAll(getStaticDataList())
 
         memoryAdapter.notifyDataSetChanged()
         problemAdapter.notifyDataSetChanged()

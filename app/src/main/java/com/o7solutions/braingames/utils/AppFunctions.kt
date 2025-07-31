@@ -13,14 +13,16 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.auth.User
 import com.o7solutions.braingames.BottomNav.BottomNavActivity
+import com.o7solutions.braingames.DataClasses.Streak
 import com.o7solutions.braingames.DataClasses.Users
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.R.layout.dialog_result
 import kotlin.random.Random
 
-object AppFunctions
-{
+object AppFunctions {
 
+    var db = FirebaseFirestore.getInstance()
+    var auth = FirebaseAuth.getInstance()
     fun showAlert(message: String, context: Context) {
 
         val alertDialog = AlertDialog.Builder(context)
@@ -37,7 +39,7 @@ object AppFunctions
 
     }
 
-    fun showMessage(title: String,message: String, context: Context) {
+    fun showMessage(title: String, message: String, context: Context) {
 
         val alertDialog = AlertDialog.Builder(context)
             .setTitle(title)
@@ -57,8 +59,8 @@ object AppFunctions
 //        bottomNav.visibility = View.GONE
 //    }iew: View
 
-    fun returnRandom(min: Int,max: Int): Int {
-        val randomNumber = Random.nextInt(min,max)
+    fun returnRandom(min: Int, max: Int): Int {
+        val randomNumber = Random.nextInt(min, max)
         return randomNumber
     }
 
@@ -79,7 +81,7 @@ object AppFunctions
         }
     }
 
-    fun updateUserData(score: Int, win: Boolean,time: Long) {
+    fun updateUserData(score: Int, win: Boolean, time: Long) {
         val auth = FirebaseAuth.getInstance()
         var userData = Users()
 
@@ -124,27 +126,76 @@ object AppFunctions
         }
     }
 
-     fun showResultDialog(userAnswer: String, correctAnswer: String,context: Context) {
-        val dialogView = View.inflate(context,R.layout.dialog_result, null)
-
-        val wrongText = dialogView.findViewById<TextView>(R.id.wrongAnswerText)
-        val correctText = dialogView.findViewById<TextView>(R.id.correctAnswerText)
-        val okBtn = dialogView.findViewById<Button>(R.id.okButton)
-
-        wrongText.text = "Your Answer: $userAnswer❌"
-        correctText.text = "Correct Answer: $correctAnswer✅"
-
-        val dialog = AlertDialog.Builder(context)
-            .setView(dialogView)
-            .create()
-
-        okBtn.setOnClickListener {
-            dialog.dismiss()
-        }
-
-        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-        dialog.show()
+    fun getStreak(callback: (Streak) -> Unit) {
+        val email = auth.currentUser?.email.toString()
+        db.collection(AppConstants.streak).document(email)
+            .get()
+            .addOnSuccessListener { document ->
+                if (document.exists()) {
+                    val streak = document.toObject(Streak::class.java)
+                    callback(streak ?: Streak())
+                } else {
+                    callback(Streak())
+                }
+            }
+            .addOnFailureListener {
+                callback(Streak())
+            }
     }
+
+
+
+    fun updateDailyStreak() {
+        val email = auth.currentUser?.email.toString()
+        val streakRef = db.collection(AppConstants.streak).document(email)
+
+        streakRef.get().addOnSuccessListener { document ->
+            val currentTime = System.currentTimeMillis()
+            val oneDayMillis = 24 * 60 * 60 * 1000L
+
+            if (document.exists()) {
+                val streak = document.toObject(Streak::class.java)
+                val lastTime = streak?.timestamp ?: 0
+                val diff = currentTime - lastTime
+
+                val newStreak = when {
+                    diff < oneDayMillis -> streak?.count ?: 1 // Already updated today
+                    diff < 2 * oneDayMillis -> (streak?.count ?: 0) + 1 // Daily streak continues
+                    else -> 1 // Reset streak
+                }
+
+                val updatedStreak = Streak(count = newStreak, timestamp = currentTime)
+                streakRef.set(updatedStreak)
+            } else {
+                val newStreak = Streak(count = 1, timestamp = currentTime)
+                streakRef.set(newStreak)
+            }
+        }.addOnFailureListener {
+        }
+    }
+
+
+    fun showResultDialog(userAnswer: String, correctAnswer: String, context: Context) {
+    val dialogView = View.inflate(context, R.layout.dialog_result, null)
+
+    val wrongText = dialogView.findViewById<TextView>(R.id.wrongAnswerText)
+    val correctText = dialogView.findViewById<TextView>(R.id.correctAnswerText)
+    val okBtn = dialogView.findViewById<Button>(R.id.okButton)
+
+    wrongText.text = "Your Answer: $userAnswer❌"
+    correctText.text = "Correct Answer: $correctAnswer✅"
+
+    val dialog = AlertDialog.Builder(context)
+        .setView(dialogView)
+        .create()
+
+    okBtn.setOnClickListener {
+        dialog.dismiss()
+    }
+
+    dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+    dialog.show()
+}
 
 //    private fun showCustomDialog(message: String,context: Context,points: Int) {
 //        val dialogView = View.inflate(context,R.layout.time_finish, null)

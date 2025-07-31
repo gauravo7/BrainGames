@@ -44,10 +44,18 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         auth = FirebaseAuth.getInstance()
+        binding.pgBar.visibility = View.VISIBLE
 
         binding.logOutBTN.setOnClickListener {
             showLogOutDialog()
         }
+
+
+//        Updating Streak
+        AppFunctions.getStreak { streak->
+            binding.streakTV.text = streak.count.toString()
+        }
+
 
         AppFunctions.getUserDataFromFirestore(auth.currentUser!!.email.toString()) { user ->
 
@@ -64,6 +72,7 @@ class ProfileFragment : Fragment() {
                 Log.e("ProfileFragment",user.name.toString())
                 binding.levelText.text = "Level${user.level}"
 
+                binding.pgBar.visibility = View.GONE
             }
         }
     }

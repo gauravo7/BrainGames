@@ -4,6 +4,8 @@ import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.text.InputFilter
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -14,8 +16,10 @@ import android.view.inputmethod.EditorInfo
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.FragmentGuessNumberBinding
 import com.o7solutions.braingames.utils.AppFunctions
@@ -34,6 +38,7 @@ class GuessNumberFragment : Fragment() {
     private lateinit var moveDown: Animation
     private var totalSeconds = 60
     private var countDownTimer: CountDownTimer? = null
+    var newMaxLength = 3
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -46,10 +51,28 @@ class GuessNumberFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+        val callback = requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Exit?")
+                    .setMessage("Do you want to go back?")
+                    .setPositiveButton("Yes") { _, _ ->
+                        findNavController().popBackStack()
+                    }
+                    .setNegativeButton("No", null)
+                    .show()
+            }
+
+        })
         binding.points.text = "0"
 //        binding.level.text = "Level $level"
         moveUp = AnimationUtils.loadAnimation(requireContext(), R.anim.move_up)
         moveDown = AnimationUtils.loadAnimation(requireContext(), R.anim.move_down)
+
+
+//        dynamically changing the length of numbers
+        binding.numbers.filters = arrayOf(InputFilter.LengthFilter(newMaxLength))
 
         binding.numbers.setOnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_DONE) {
@@ -116,8 +139,8 @@ class GuessNumberFragment : Fragment() {
             if (points >= level * 100) {
                 level++
                 totalSeconds += 30
-                lowRange = highRange
-                highRange = highRange * 10
+                lowRange = highRange*10
+                highRange = highRange * 100
 //                binding.level.text = "Level $level"
                 startTimer()
                 Toast.makeText(
@@ -153,6 +176,9 @@ class GuessNumberFragment : Fragment() {
         lifecycleScope.launch {
             actualNumber = AppFunctions.returnRandom(lowRange, highRange)
             binding.questionTV.visibility = View.VISIBLE
+            newMaxLength = actualNumber.toString().length
+            binding.numbers.filters = arrayOf(InputFilter.LengthFilter(newMaxLength))
+            Log.d("Guess Number Fragment",newMaxLength.toString())
             binding.numbers.setText("")
             binding.questionTV.text = actualNumber.toString()
 //            binding.questionTV.startAnimation(moveUp)
@@ -211,6 +237,7 @@ class GuessNumberFragment : Fragment() {
                 .create()
 
             okButton.setOnClickListener {
+                AppFunctions.updateUserData(points,true,totalSeconds.toLong())
                 dialog.dismiss()
                 requireActivity().onBackPressed()
             }

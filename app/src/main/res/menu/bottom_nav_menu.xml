@@ -6,10 +6,10 @@
         android:icon="@drawable/ic_home_black_24dp"
         android:title="@string/title_home" />
 
-    <item
-        android:id="@+id/guessNumberFragment"
-        android:icon="@android:drawable/ic_menu_add"
-        android:title="Practise" />
+<!--    <item-->
+<!--        android:id="@+id/guessNumberFragment"-->
+<!--        android:icon="@android:drawable/ic_menu_add"-->
+<!--        android:title="Practise" />-->
     <item
         android:id="@+id/profileFragment"
         android:icon="@drawable/baseline_person_24"

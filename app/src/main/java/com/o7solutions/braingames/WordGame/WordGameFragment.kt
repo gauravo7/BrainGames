@@ -1,13 +1,38 @@
 package com.o7solutions.braingames.WordGame
 
+import android.graphics.PorterDuff
+import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.LayerDrawable
 import android.os.Bundle
+import android.os.CountDownTimer
+import android.graphics.Color
+import android.os.Handler
+import android.os.Looper
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.viewbinding.ViewBinding
+import android.view.animation.DecelerateInterpolator
+import android.widget.FrameLayout
+import android.widget.ImageButton
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.core.content.ContextCompat
+import androidx.navigation.fragment.findNavController
+import com.example.game.GameResult
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.FragmentWordGameBinding
+import androidx.core.graphics.drawable.toDrawable
+import androidx.lifecycle.lifecycleScope
+import com.example.game.RetrofitInstance
+import com.example.game.WordRepository
+import com.o7solutions.braingames.utils.AppFunctions
+import kotlinx.coroutines.launch
+import kotlin.math.max
+import kotlin.random.Random
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -24,13 +49,41 @@ class WordGameFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     private lateinit var binding: FragmentWordGameBinding
+    private lateinit var wordDisplayBox: FrameLayout
+    private lateinit var wordTextView: TextView
+    private lateinit var optionTextViews: List<TextView>
+    private lateinit var pauseButton: ImageButton
+    private lateinit var timeTextView: TextView
+    private lateinit var progressTextView: TextView
+    private lateinit var scoreTextView: TextView
+    private lateinit var timerProgressBar: ProgressBar
+    private lateinit var progressFeedbackTextView: TextView
+    private lateinit var scoreFeedbackTextView: TextView
+    private var score = 0
+    private var currentWord: String = ""
+    private var correctAnswer: String = ""
+    private var originalWordList: List<String> = listOf()
+    private var remainingWords: MutableList<String> = mutableListOf()
+    private var isAnswerable = true
+    private var correctAnswersCount = 0
+    private var currentLevel = 1
+    private lateinit var countDownTimer: CountDownTimer
+    private var totalGameTime: Long = 120000L
+    private var timeLeftInMillis: Long = totalGameTime
+    private var isPaused = false
+    private var loadingDialog: androidx.appcompat.app.AlertDialog? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
+            currentLevel = it.getInt("SELECTED_LEVEL", 1)
+
         }
+
+
     }
 
     override fun onCreateView(
@@ -43,6 +96,41 @@ class WordGameFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        if (savedInstanceState == null) {
+            if (currentLevel == 1) score = 0
+        }
+
+        wordDisplayBox = view.findViewById(R.id.wordDisplayBox)
+        wordTextView = view.findViewById(R.id.wordTextView)
+        pauseButton = view.findViewById(R.id.pauseButton)
+        timeTextView = view.findViewById(R.id.timeTextView)
+        progressTextView = view.findViewById(R.id.progressTextView)
+        scoreTextView = view.findViewById(R.id.scoreTextView)
+        timerProgressBar = view.findViewById(R.id.timerProgressBar)
+        progressFeedbackTextView = view.findViewById(R.id.progressFeedbackTextView)
+        scoreFeedbackTextView = view.findViewById(R.id.scoreFeedbackTextView)
+        optionTextViews = listOf(
+            view.findViewById(R.id.option1TextView),
+            view.findViewById(R.id.option2TextView),
+            view.findViewById(R.id.option3TextView),
+            view.findViewById(R.id.option4TextView)
+        )
+        optionTextViews.forEach { it.setOnClickListener { view -> if (isAnswerable) checkAnswer(view as TextView) } }
+        pauseButton.setOnClickListener { togglePause() }
+        initViews()
+        setupOnBackPressed()
+
+        if (isPaused) {
+            Toast.makeText(requireActivity(), "Please resume the timer!", Toast.LENGTH_SHORT).show()
+        } else {
+            if (loadLevelData(currentLevel)) {
+                startGame()
+            } else {
+                findNavController().popBackStack()
+            }
+        }
+
     }
 
     companion object {
@@ -63,5 +151,367 @@ class WordGameFragment : Fragment() {
                     putString(ARG_PARAM2, param2)
                 }
             }
+    }
+
+    private fun loadLevelData(level: Int): Boolean {
+        totalGameTime = when (level) {
+            1 -> 120000L
+            2 -> 110000L
+            3 -> 100000L
+            4 -> 90000L
+            else -> 120000L
+        }
+        timeLeftInMillis = totalGameTime
+
+
+        val wordsForLevel = WordRepository.wordList
+
+        if (wordsForLevel.size < 10) {
+            Toast.makeText(
+                requireActivity(),
+                "Not enough words were loaded for Level $level.",
+                Toast.LENGTH_LONG
+            ).show()
+            return false
+        }
+
+        originalWordList = wordsForLevel
+        remainingWords = originalWordList.toMutableList()
+        return true
+    }
+
+    private fun initViews() {
+
+    }
+
+    private fun startGame() {
+        correctAnswersCount = 0
+        isPaused = false
+        updateProgress()
+        setupNewRound()
+        startTimer(timeLeftInMillis)
+    }
+
+    private fun startNextLevel() {
+        currentLevel++
+        showLoadingDialog()
+
+        val requiredLength = when (currentLevel) {
+            2 -> 6
+            3 -> 7
+            4 -> 8
+            else -> 0
+        }
+
+        lifecycleScope.launch {
+            try {
+                val wordsForLevel =
+                    RetrofitInstance.api.getRandomWords(length = requiredLength, count = 50)
+                if (wordsForLevel.size < 10) {
+                    Toast.makeText(
+                        requireActivity(),
+                        "API did not provide enough words for the next level.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    findNavController().popBackStack()
+                    return@launch
+                }
+                WordRepository.wordList = wordsForLevel
+
+                if (isPaused) {
+                    Toast.makeText(
+                        requireActivity(),
+                        "Please resume the Timer!",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    return@launch
+                }
+                if (loadLevelData(currentLevel)) {
+                    startGame()
+                } else {
+                    findNavController().popBackStack()
+                }
+
+            } catch (e: Exception) {
+                Toast.makeText(
+                    requireActivity(),
+                    "Failed to load words: ${e.message}",
+                    Toast.LENGTH_LONG
+                ).show()
+                findNavController().popBackStack()
+            } finally {
+                loadingDialog?.dismiss()
+            }
+        }
+    }
+
+    private fun setupNewRound() {
+//        if (isPaused) {
+//            Toast.makeText(requireActivity(), "Please resume the timer!", Toast.LENGTH_SHORT).show()
+//            return
+//        }
+        if (remainingWords.isEmpty()) {
+            remainingWords = originalWordList.shuffled().toMutableList()
+        }
+
+
+        isAnswerable = true
+        resetBoxBackgrounds()
+        currentWord = remainingWords.removeAt(0)
+        wordTextView.text = currentWord
+        val options = generateOptions()
+        correctAnswer = options.first()
+        options.shuffled()
+            .forEachIndexed { index, option -> optionTextViews[index].text = option }
+
+
+    }
+
+    private fun generateOptions(): List<String> {
+        var shuffledCorrectAnswer: String
+        do {
+            shuffledCorrectAnswer = currentWord.toList().shuffled().joinToString("")
+        } while (shuffledCorrectAnswer == currentWord && currentWord.length > 1)
+        val wrongAnswers = mutableSetOf<String>()
+        val alphabet = "abcdefghijklmnopqrstuvwxyz"
+        while (wrongAnswers.size < 3) {
+            val wordChars = currentWord.toMutableList()
+            val positionToChange = Random.nextInt(wordChars.size)
+            val originalChar = wordChars[positionToChange]
+            var newChar: Char
+            do {
+                newChar = alphabet.random()
+            } while (newChar == originalChar)
+            wordChars[positionToChange] = newChar
+            val fakeWord = wordChars.joinToString("")
+            wrongAnswers.add(fakeWord)
+        }
+        val finalOptions = mutableListOf(shuffledCorrectAnswer)
+        finalOptions.addAll(wrongAnswers)
+        return finalOptions
+    }
+
+    private fun checkAnswer(selectedView: TextView) {
+        isAnswerable = false
+        val isCorrect = selectedView.text.toString() == correctAnswer
+
+        showProgressAnimation(isCorrect)
+        showScoreAnimation(isCorrect)
+
+        if (isCorrect) {
+            correctAnswersCount++
+            score += 30
+            wordDisplayBox.setBackgroundResource(R.drawable.correct_answer_background)
+            selectedView.setBackgroundResource(R.drawable.correct_answer_background)
+        } else {
+            score = max(0, score - 10)
+            if (correctAnswersCount > 0) {
+                correctAnswersCount--
+            }
+            wordDisplayBox.setBackgroundResource(R.drawable.wrong_answer_background)
+            selectedView.setBackgroundResource(R.drawable.wrong_answer_background)
+            val correctOptionView = optionTextViews.find { it.text.toString() == correctAnswer }
+            correctOptionView?.setBackgroundResource(R.drawable.correct_answer_background)
+        }
+        updateProgress()
+        if (isCorrect && correctAnswersCount == 10) {
+            countDownTimer.cancel()
+            Handler(Looper.getMainLooper()).postDelayed({
+                handleLevelCompletion()
+            }, 1000)
+
+        } else {
+            Handler(Looper.getMainLooper()).postDelayed({
+                setupNewRound()
+            }, 1500)
+        }
+    }
+
+    private fun showProgressAnimation(isCorrect: Boolean) {
+        val view = progressFeedbackTextView
+        if (isCorrect) {
+            view.text = "+1"
+            view.setTextColor(ContextCompat.getColor(requireActivity(), R.color.feedback_green))
+        } else {
+            if (correctAnswersCount > 0) {
+                view.text = "-1"
+                view.setTextColor(ContextCompat.getColor(requireActivity(), R.color.feedback_red))
+            } else return
+        }
+        view.alpha = 1.0f
+        view.translationY = 0f
+        view.animate()
+            .alpha(0f)
+            .translationYBy(-60f)
+            .setDuration(800)
+            .withEndAction { view.translationY = 0f }
+            .start()
+    }
+
+    private fun showScoreAnimation(isCorrect: Boolean) {
+        val view = scoreFeedbackTextView
+        if (isCorrect) {
+            view.text = "+30"
+            view.setTextColor(ContextCompat.getColor(requireActivity(), R.color.feedback_green))
+        } else {
+            if (score > 0) {
+                view.text = "-10"
+                view.setTextColor(ContextCompat.getColor(requireActivity(), R.color.feedback_red))
+            } else return
+        }
+        view.alpha = 1.0f
+        view.translationY = 0f
+        view.animate()
+            .alpha(0f)
+            .translationYBy(-70f)
+            .setDuration(800)
+            .setInterpolator(DecelerateInterpolator())
+            .withEndAction { view.translationY = 0f }
+            .start()
+    }
+
+    private fun updateProgress() {
+        progressTextView.text = "$correctAnswersCount/10"
+        scoreTextView.text = score.toString()
+    }
+
+    private fun startTimer(time: Long) {
+        countDownTimer = object : CountDownTimer(time, 100) {
+            override fun onTick(millisUntilFinished: Long) {
+                timeLeftInMillis = millisUntilFinished
+                updateTimerUI()
+            }
+
+            override fun onFinish() {
+                timeLeftInMillis = 0
+                updateTimerUI()
+                gameOver()
+            }
+        }.start()
+    }
+
+    private fun updateTimerUI() {
+        val minutes = (timeLeftInMillis / 1000) / 60
+        val seconds = (timeLeftInMillis / 1000) % 60
+        timeTextView.text = String.format("%02d:%02d", minutes, seconds)
+
+        val progress = (timeLeftInMillis * 100 / totalGameTime).toInt()
+        timerProgressBar.progress = progress
+        val progressDrawable = timerProgressBar.progressDrawable as LayerDrawable
+        val clipDrawable = progressDrawable.findDrawableByLayerId(android.R.id.progress)
+        when {
+            progress < 25 -> clipDrawable.setColorFilter(
+                ContextCompat.getColor(
+                    requireActivity(),
+                    R.color.feedback_red
+                ), PorterDuff.Mode.SRC_IN
+            )
+
+            progress < 50 -> clipDrawable.setColorFilter(Color.YELLOW, PorterDuff.Mode.SRC_IN)
+            else -> clipDrawable.setColorFilter(
+                ContextCompat.getColor(
+                    requireActivity(),
+                    R.color.feedback_green
+                ), PorterDuff.Mode.SRC_IN
+            )
+        }
+    }
+
+    private fun togglePause() {
+        isPaused = !isPaused
+        if (isPaused) {
+            countDownTimer.cancel()
+            pauseButton.setImageResource(R.drawable.ic_resume)
+        } else {
+            startTimer(timeLeftInMillis)
+            pauseButton.setImageResource(R.drawable.ic_pause)
+        }
+    }
+
+    private fun showLoadingDialog() {
+        val dialogView =
+            LayoutInflater.from(requireActivity()).inflate(R.layout.dialog_loading, null)
+        loadingDialog = MaterialAlertDialogBuilder(requireActivity())
+            .setView(dialogView)
+            .setCancelable(false)
+            .show()
+        loadingDialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    }
+
+    private fun gameOver() {
+        isAnswerable = false
+        if (::countDownTimer.isInitialized) {
+            countDownTimer.cancel()
+        }
+        GameResult.finalScore = score
+        GameResult.allLevelsCompleted = false
+        GameResult.timePlayedMillis = totalGameTime
+        AppFunctions.updateUserData(score, false, totalGameTime)
+        findNavController().popBackStack()
+    }
+
+    private fun handleLevelCompletion() {
+        if (currentLevel < 4) {
+            val dialogView =
+                LayoutInflater.from(requireActivity()).inflate(R.layout.dialog_level_complete, null)
+            val title = dialogView.findViewById<TextView>(R.id.levelCompleteTitle)
+            title.text = "Level ${currentLevel} Cleared!"
+            val dialog = MaterialAlertDialogBuilder(requireActivity())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create()
+            dialog.show()
+            dialog.window?.setBackgroundDrawable(Color.TRANSPARENT.toDrawable())
+            Handler(Looper.getMainLooper()).postDelayed({
+                dialog.dismiss()
+                startNextLevel()
+            }, 2500)
+        } else {
+            GameResult.finalScore = score
+            GameResult.allLevelsCompleted = true
+            GameResult.timePlayedMillis = totalGameTime - timeLeftInMillis
+            AppFunctions.updateUserData(score, true, totalGameTime - timeLeftInMillis)
+
+//            here update score
+            findNavController().popBackStack()
+        }
+    }
+
+    private fun resetBoxBackgrounds() {
+        wordDisplayBox.setBackgroundResource(R.drawable.neon_box_background)
+        optionTextViews.forEach { textView ->
+            textView.setBackgroundResource(R.drawable.neon_box_background)
+        }
+    }
+
+    private fun setupOnBackPressed() {
+        requireActivity().onBackPressedDispatcher.addCallback(
+            requireActivity(),
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    if (!isPaused) togglePause()
+                    showExitConfirmationDialog()
+                }
+            })
+    }
+
+    private fun showExitConfirmationDialog() {
+
+        if (!isAdded) return
+        MaterialAlertDialogBuilder(requireActivity())
+            .setTitle("Exit Game?")
+            .setMessage("Are you sure you want to exit?")
+            .setNegativeButton("No") { _, _ -> if (isPaused) togglePause() }
+            .setPositiveButton("Yes") { _, _ -> findNavController().popBackStack() }
+            .setOnCancelListener { if (isPaused) togglePause() }
+            .show()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (!isPaused) {
+            togglePause()
+        }
+        loadingDialog?.dismiss()
     }
 }

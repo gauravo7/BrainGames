@@ -5,4 +5,7 @@ object AppConstants {
     var math = "questions"
     var games = "games"
     var user = "users"
+    var logical = 0
+    var memory = 1
+    var streak = "streak"
 }

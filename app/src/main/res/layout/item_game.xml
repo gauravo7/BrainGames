@@ -9,7 +9,7 @@
 
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
-        android:layout_height="280dp"
+        android:layout_height="200dp"
         android:id="@+id/gameCard"
         app:cardCornerRadius="20dp"
         app:cardElevation="4dp"
@@ -28,7 +28,6 @@
                 android:id="@+id/gameImage"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/logo"
                 android:scaleType="centerCrop"
                 android:contentDescription="Game Image" />
 
@@ -49,8 +48,9 @@
                     android:layout_height="wrap_content"
                     tools:text="Epic Adventure Game"
                     android:textAlignment="center"
+                    android:visibility="gone"
                     android:textSize="24sp"
-                    android:textColor="@android:color/white"
+                    android:textColor="@android:color/black"
                     android:textStyle="bold"
                     android:fontFamily="@font/neut"
                     android:shadowColor="#80000000"

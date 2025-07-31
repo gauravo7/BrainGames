@@ -25,7 +25,7 @@ object LevelFour {
         when(operatorPosition2) {
             0-> {
                 tempAnswer = operand1 * operand2
-                operator1 = "*"
+                operator1 = "x"
             }
             1-> {
                 answer = operand1 / operand2

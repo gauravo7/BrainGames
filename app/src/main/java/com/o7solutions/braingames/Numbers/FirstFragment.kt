@@ -13,6 +13,7 @@ import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
@@ -37,7 +38,7 @@ class FirstFragment : Fragment() {
     var operator2 = " "
     var answer = ""
     var points = 0
-    var level = 3
+    var level = 1
     var questionList = arrayListOf<String>()
     private var countDownTimer: CountDownTimer? = null
     var totalQuestions= 0
@@ -73,7 +74,21 @@ class FirstFragment : Fragment() {
         binding.operator1.startAnimation(blinkAnimation)
         binding.operator2.startAnimation(blinkAnimation)
 
+        val callback = requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Exit?")
+                    .setMessage("Do you want to go back?")
+                    .setPositiveButton("Yes") { _, _ ->
+                        findNavController().popBackStack()
+                    }
+                    .setNegativeButton("No", null)
+                    .show()
+            }
 
+        })
+
+//
         binding.points.text = points.toString()
 
         binding.apply {
@@ -159,15 +174,26 @@ class FirstFragment : Fragment() {
 
     private fun checkAnswer(choice: String) {
         var displayChoice = choice
+
+        var calculatedAnswer= 0
         if(choice == "/") {
             displayChoice = "\u00F7"
-        } else if(choice == "*") {
+            calculatedAnswer = operand1.toInt()/operand2.toInt()
+        } else if(choice == "x") {
             displayChoice = "x"
-        }
+            calculatedAnswer = operand1.toInt()*operand2.toInt()
+        } else if(choice == "+") {
+            calculatedAnswer = operand1.toInt()+operand2.toInt()
+        } else if(choice == "-") {
+            calculatedAnswer = operand1.toInt() - operand2.toInt()
 
+        }
+//        var userChoice = "${operand1} ${if(operator == "/") "\u00F7" else if(operator == "*") "x" else operator} ${operand2} = ${answer}"
+//
+//        var actualAnswer = "${operand1} ${displayChoice} ${operand2} = ${answer}"
         binding.operator1.text = displayChoice
 
-        if (choice == operator) {
+        if (calculatedAnswer.toString() == answer) {
             rightQuestions++
             updateQuestions()
             Toast.makeText(requireContext(), "Correct answer!", Toast.LENGTH_SHORT).show()
