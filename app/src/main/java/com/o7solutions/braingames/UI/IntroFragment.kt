@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -32,7 +33,6 @@ class IntroFragment : Fragment() {
     private lateinit var game: Games
     private lateinit var adapter: LevelsAdapter
     var levelsList = arrayListOf<String>()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -55,7 +55,9 @@ class IntroFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.apply {
+            val animationZoomOut = AnimationUtils.loadAnimation(requireActivity(), R.anim.zoom)
 
+//            startGame.startAnimation(animationZoomOut)
             positiveScore.text = game.positiveScore
             negativeScore.text = game.negativeScore
             Glide.with(requireActivity())

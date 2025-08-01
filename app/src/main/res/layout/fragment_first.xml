@@ -304,7 +304,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="@color/plus_button_bg"
+                app:cardBackgroundColor="@color/divide_button_bg"
                 app:cardCornerRadius="16dp"
                 >
 
@@ -336,7 +336,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="@color/minus_button_bg"
+                app:cardBackgroundColor="@color/divide_button_bg"
                 app:cardCornerRadius="16dp"
                 >
 
@@ -377,7 +377,7 @@
                 android:clickable="true"
                 android:focusable="true"
                 android:foreground="?attr/selectableItemBackground"
-                app:cardBackgroundColor="@color/multiply_button_bg"
+                app:cardBackgroundColor="@color/divide_button_bg"
                 app:cardCornerRadius="16dp"
                 >
 
