@@ -38,4 +38,9 @@
         android:id="@+id/introFragment"
         android:name="com.o7solutions.braingames.UI.IntroFragment"
         android:label="IntroFragment" />
+    <fragment
+        android:id="@+id/oddOutFragment"
+        android:name="com.o7solutions.braingames.OddOut.OddOutFragment"
+        android:label="fragment_odd_out"
+        tools:layout="@layout/fragment_odd_out" />
 </navigation>

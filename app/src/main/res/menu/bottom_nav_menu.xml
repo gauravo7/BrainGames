@@ -10,6 +10,11 @@
 <!--        android:id="@+id/guessNumberFragment"-->
 <!--        android:icon="@android:drawable/ic_menu_add"-->
 <!--        android:title="Practise" />-->
+
+    <item
+        android:id="@+id/oddOutFragment"
+        android:icon="@drawable/thumbs_up"
+        android:title="Test" />
     <item
         android:id="@+id/profileFragment"
         android:icon="@drawable/baseline_person_24"

@@ -45,6 +45,10 @@ class BottomNavActivity : AppCompatActivity() {
                     navController.navigate(R.id.homeFragment, null, navOptions)
                     true
                 }
+                R.id.oddOutFragment -> {
+                    navController.navigate(R.id.oddOutFragment, null, navOptions)
+                    true
+                }
                 R.id.profileFragment -> {
                     navController.navigate(R.id.profileFragment, null, navOptions)
                     true
