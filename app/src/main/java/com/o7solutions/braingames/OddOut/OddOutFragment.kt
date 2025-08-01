@@ -79,7 +79,7 @@ class OddOutFragment : Fragment() {
 //        val answerIndex = 1 // Assume the odd one is at index 1
 //        val itemCount = images.size
 
-        var listOfIndexes = GameLib.getUniqueRandomNumbers(0,16,7)
+        var listOfIndexes = GameLib.getUniqueRandomNumbers(0,15,7)
         var answerIndex = GameLib.getRandomNumberFromList(listOfIndexes)
         val images = listOf(
             R.drawable.rectangle, R.drawable.circle, R.drawable.star,R.drawable.cone

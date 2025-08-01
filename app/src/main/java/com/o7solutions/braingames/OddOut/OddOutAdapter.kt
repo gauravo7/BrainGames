@@ -17,6 +17,16 @@ class OddOutAdapter(
     var answerIndexImage: Int,
     var onClick: OnClick): RecyclerView.Adapter<OddOutAdapter.ViewHolder>() {
 
+    var imageZero = false
+    var imageOne = false
+    var imageTwo = false
+    var imageThree = false
+    var imageFour = false
+
+    val images = listOf(
+        R.drawable.rectangle, R.drawable.circle, R.drawable.star,R.drawable.cone
+    )
+
     inner class ViewHolder(var view: View): RecyclerView.ViewHolder(view) {
         var image: ImageView = view.findViewById<ImageView>(R.id.itemImage)
     }
@@ -30,27 +40,44 @@ class OddOutAdapter(
     }
 
     override fun onBindViewHolder(holder: OddOutAdapter.ViewHolder, position: Int) {
-
-
-        val images = listOf(
-            R.drawable.rectangle, R.drawable.circle, R.drawable.star,R.drawable.cone
-        )
         val otherImages = images.filter { it != images[answerIndexImage] }.toMutableList()
-        Log.d("Other Images",otherImages.toString())
+        Log.d("Other Images", otherImages.toString())
+
+        // Get the list of indices excluding the answer index
+        val nonAnswerIndices = list.filter { it != answerIndex }
+
+        // Map non-answer indices to images (2 positions per image)
+        val positionToImage = mutableMapOf<Int, Int>()
+        var imageIndex = 0
+        for (i in nonAnswerIndices.indices) {
+            positionToImage[nonAnswerIndices[i]] = otherImages[imageIndex]
+            if ((i + 1) % 2 == 0 && imageIndex < otherImages.size - 1) {
+                imageIndex++
+            }
+        }
 
         holder.apply {
-            if(list.contains(position) && answerIndex != position) {
-                val randomImage = otherImages.random()
-                image.setImageResource(randomImage)
-            } else {
-                holder.image.setImageDrawable(null)
+            when (position) {
+                answerIndex -> {
+                    // Set correct answer image
+                    image.setImageResource(images[answerIndexImage])
+                }
+                in positionToImage -> {
+                    // Set the mapped other image
+                    image.setImageResource(positionToImage[position]!!)
+                }
+                else -> {
+                    image.setImageDrawable(null)
+                }
             }
 
-            if(answerIndex == position) {
-                val drawable = ContextCompat.getDrawable(holder.itemView.context, images[answerIndexImage])
-                image.setImageDrawable(drawable)
-            }
-            holder.image.setOnClickListener {
+            image.setOnClickListener {
+
+                if(position == answerIndex) {
+                    image.setImageResource(R.drawable.right_tick)
+                } else {
+                    image.setImageResource(R.drawable.red_cross)
+                }
                 onClick.onImageClick(position == answerIndex)
             }
         }
