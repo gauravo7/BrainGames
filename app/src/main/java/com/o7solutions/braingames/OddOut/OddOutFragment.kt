@@ -1,6 +1,7 @@
 package com.o7solutions.braingames.OddOut
 
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -8,6 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.GridLayoutManager
+import com.google.firebase.Firebase
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.FragmentOddOutBinding
 import com.o7solutions.braingames.utils.AppFunctions
@@ -27,7 +31,10 @@ class OddOutFragment : Fragment() {
     private var param1: String? = null
     private var param2: String? = null
     lateinit var binding: FragmentOddOutBinding
-    private lateinit var adapter : OddOutAdapter
+    private lateinit var adapter: OddOutAdapter
+    private var points = 0
+    private var totalSeconds = 60
+    private var countDownTimer: CountDownTimer? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,7 +56,11 @@ class OddOutFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerView()
+
+        startTimer()
+        binding.pointsText.text = "$points"
     }
+
     companion object {
         /**
          * Use this factory method to create a new instance of
@@ -70,6 +81,11 @@ class OddOutFragment : Fragment() {
             }
     }
 
+    override fun onDetach() {
+        super.onDetach()
+        countDownTimer?.cancel()
+    }
+
     private fun setupRecyclerView() {
         // Example drawable resources
 //        val images = listOf(
@@ -79,24 +95,91 @@ class OddOutFragment : Fragment() {
 //        val answerIndex = 1 // Assume the odd one is at index 1
 //        val itemCount = images.size
 
-        var listOfIndexes = GameLib.getUniqueRandomNumbers(0,15,7)
+        var listOfIndexes = GameLib.getUniqueRandomNumbers(0, 15, 7)
         var answerIndex = GameLib.getRandomNumberFromList(listOfIndexes)
         val images = listOf(
-            R.drawable.rectangle, R.drawable.circle, R.drawable.star,R.drawable.cone
+            R.drawable.rectangle, R.drawable.circle, R.drawable.star, R.drawable.cone
         )
-        var answerIndexImage = AppFunctions.returnRandom(0,4)
-        Log.d("Answer Index",answerIndexImage.toString())
+        var answerIndexImage = AppFunctions.returnRandom(0, 4)
+        Log.d("Answer Index", answerIndexImage.toString())
 
-        adapter = OddOutAdapter(listOfIndexes, answerIndex, 16,answerIndexImage, object : OddOutAdapter.OnClick {
-            override fun onImageClick(isCorrect: Boolean) {
-                Toast.makeText(requireContext(), if (isCorrect) "Correct!" else "Wrong!", Toast.LENGTH_SHORT).show()
-                setupRecyclerView()
-            }
-        })
+        adapter = OddOutAdapter(
+            listOfIndexes,
+            answerIndex,
+            16,
+            answerIndexImage,
+            object : OddOutAdapter.OnClick {
+                override fun onImageClick(isCorrect: Boolean) {
+                    if (isCorrect) {
+                        points += 20
+                    } else {
+                        points -= 10
+                    }
+                    binding.pointsText.text = "$points"
+
+
+                    setupRecyclerView()
+
+                }
+            })
+
         Toast.makeText(requireContext(), answerIndex.toString(), Toast.LENGTH_SHORT).show()
 
         binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 4) // 3 columns
         binding.recyclerView.adapter = adapter
     }
+
+    private fun startTimer() {
+        countDownTimer?.cancel()
+        binding.timeText.text = "$totalSeconds"
+        binding.seekBarBrightness.max = totalSeconds
+        binding.seekBarBrightness.progress = totalSeconds
+
+        countDownTimer = object : CountDownTimer(totalSeconds * 1000L, 1000L) {
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsLeft = (millisUntilFinished / 1000).toInt()
+                binding.timeText.text = "$secondsLeft"
+                binding.seekBarBrightness.progress = secondsLeft
+            }
+
+            override fun onFinish() {
+
+                if (isAdded) {
+
+
+                    AppFunctions.updateUserData(points,true,60000, FirebaseAuth.getInstance().currentUser.email.toString())
+                    binding.timeText.text = "0"
+                    Toast.makeText(
+                        requireContext(),
+                        "Time's up!\nScore: $points",
+                        Toast.LENGTH_LONG
+                    )
+                        .show()
+                    binding.recyclerView.isEnabled = false
+                    binding.seekBarBrightness.progress = 0
+                    showGameOverDialog()
+                }
+            }
+        }.start()
+    }
+
+    private fun showGameOverDialog() {
+        val dialog = android.app.AlertDialog.Builder(requireContext())
+            .setTitle("Time's up!")
+            .setMessage("Your final score: $points")
+            .setCancelable(false)
+            .setPositiveButton("Play Again") { _, _ ->
+                points = 0
+                binding.pointsText.text = "$points"
+                setupRecyclerView()
+                startTimer()
+            }
+            .setNegativeButton("Exit") { _, _ ->
+                requireActivity().onBackPressedDispatcher.onBackPressed()
+            }
+            .create()
+        dialog.show()
+    }
+
 
 }
