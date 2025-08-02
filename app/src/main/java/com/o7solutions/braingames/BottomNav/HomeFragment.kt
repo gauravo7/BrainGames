@@ -93,6 +93,7 @@ class HomeFragment : Fragment(), GamesAdapter.OnClick {
 
         getGames(AppConstants.logical,gamesList)
         getGames(AppConstants.memory,memoryList)
+        getGames(AppConstants.problemSolving,problemsList)
         fillData()
         AppFunctions.getStreak { streak->
             binding.streakTV.text = streak.count.toString()
@@ -116,8 +117,14 @@ class HomeFragment : Fragment(), GamesAdapter.OnClick {
                     list.add(game)
                 }
 
-                adapter.notifyDataSetChanged()
-                memoryAdapter.notifyDataSetChanged()
+                if(category == AppConstants.logical) {
+                    adapter.notifyDataSetChanged()
+                } else if(category == AppConstants.memory) {
+                    memoryAdapter.notifyDataSetChanged()
+
+                } else if(category == AppConstants.problemSolving) {
+                    problemAdapter.notifyDataSetChanged()
+                }
             }
 
             if(error != null) {

@@ -1,5 +1,6 @@
 package com.o7solutions.braingames.OddOut
 
+import android.app.AlertDialog
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
@@ -8,10 +9,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import com.o7solutions.braingames.DataClasses.Games
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.FragmentOddOutBinding
 import com.o7solutions.braingames.utils.AppFunctions
@@ -35,12 +39,16 @@ class OddOutFragment : Fragment() {
     private var points = 0
     private var totalSeconds = 60
     private var countDownTimer: CountDownTimer? = null
+    private lateinit var game: Games
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
+            game = it.getSerializable("game_data") as Games
+
         }
     }
 
@@ -59,6 +67,23 @@ class OddOutFragment : Fragment() {
 
         startTimer()
         binding.pointsText.text = "$points"
+
+
+
+//        Show dialog on back click
+        val callback = requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Exit?")
+                    .setMessage("Do you want to go back?")
+                    .setPositiveButton("Yes") { _, _ ->
+                        findNavController().popBackStack()
+                    }
+                    .setNegativeButton("No", null)
+                    .show()
+            }
+
+        })
     }
 
     companion object {
@@ -147,7 +172,7 @@ class OddOutFragment : Fragment() {
                 if (isAdded) {
 
 
-                    AppFunctions.updateUserData(points,true,60000, FirebaseAuth.getInstance().currentUser.email.toString())
+                    AppFunctions.updateUserData(points,true,60000,game.id!!.toInt())
                     binding.timeText.text = "0"
                     Toast.makeText(
                         requireContext(),

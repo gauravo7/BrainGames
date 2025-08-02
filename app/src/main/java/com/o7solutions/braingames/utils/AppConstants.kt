@@ -7,5 +7,6 @@ object AppConstants {
     var user = "users"
     var logical = 0
     var memory = 1
+    var problemSolving = 2
     var streak = "streak"
 }
