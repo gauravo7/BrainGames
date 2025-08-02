@@ -73,12 +73,20 @@ class OddOutAdapter(
 
             image.setOnClickListener {
 
-                if(position == answerIndex) {
-                    image.setImageResource(R.drawable.right_tick)
+                if(list.contains(position)) {
+
+
+                    if (position == answerIndex) {
+                        image.setImageResource(R.drawable.right_tick)
+                    } else {
+                        image.setImageResource(R.drawable.red_cross)
+                    }
+                    image.postDelayed({
+                        onClick.onImageClick(position == answerIndex)
+                    }, 1000)
                 } else {
-                    image.setImageResource(R.drawable.red_cross)
+//                    perform nothing
                 }
-                onClick.onImageClick(position == answerIndex)
             }
         }
     }

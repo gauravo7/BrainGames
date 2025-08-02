@@ -9,20 +9,20 @@
     tools:context=".OddOut.OddOutFragment">
 
     <!-- Title Section -->
-    <TextView
-        android:id="@+id/titleText"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Odd One Out"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:textColor="@android:color/white"
-        android:fontFamily="sans-serif-medium"
-        android:elevation="2dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="24dp" />
+<!--    <TextView-->
+<!--        android:id="@+id/titleText"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:text="Odd One Out"-->
+<!--        android:textSize="28sp"-->
+<!--        android:textStyle="bold"-->
+<!--        android:textColor="@android:color/white"-->
+<!--        android:fontFamily="sans-serif-medium"-->
+<!--        android:elevation="2dp"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        android:layout_marginTop="24dp" />-->
 
     <!-- Main Content Card -->
     <com.google.android.material.card.MaterialCardView
@@ -32,9 +32,8 @@
         android:layout_margin="16dp"
         app:cardBackgroundColor="@color/white"
         app:cardCornerRadius="16dp"
-        app:cardElevation="8dp"
         app:strokeWidth="0dp"
-        app:layout_constraintTop_toBottomOf="@id/titleText"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/bottomActionArea"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -138,7 +137,7 @@
             android:layout_marginEnd="8dp"
             app:cardBackgroundColor="@android:color/white"
             app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
+           >
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -177,7 +176,7 @@
             android:layout_marginStart="8dp"
             app:cardBackgroundColor="@android:color/white"
             app:cardCornerRadius="12dp"
-            app:cardElevation="4dp">
+         >
 
             <LinearLayout
                 android:layout_width="match_parent"
