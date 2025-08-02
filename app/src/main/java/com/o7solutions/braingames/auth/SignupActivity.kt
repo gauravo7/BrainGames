@@ -2,6 +2,7 @@ package com.o7solutions.braingames.auth
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -10,11 +11,18 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.o7solutions.braingames.BottomNav.BottomNavActivity
+import com.o7solutions.braingames.DataClasses.Auth.RegisterResponse
 import com.o7solutions.braingames.DataClasses.Users
+import com.o7solutions.braingames.Model.ApiService
+import com.o7solutions.braingames.Model.RetrofitClient
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.ActivitySignupBinding
 import com.o7solutions.braingames.utils.AppConstants
 import com.o7solutions.braingames.utils.AppFunctions
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
 
 class SignupActivity : AppCompatActivity() {
 
@@ -58,7 +66,8 @@ class SignupActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            registerUser(name,email, password)
+            registerUserWithApi(name,email,password)
+//            registerUser(name,email, password)
         }
 
         binding.textViewSignIn.setOnClickListener {
@@ -66,6 +75,34 @@ class SignupActivity : AppCompatActivity() {
             startActivity(intent)
             finish()
         }
+    }
+
+    private fun registerUserWithApi(name: String,email: String, password: String) {
+        val call = RetrofitClient.instance.registerUser(name, email, password)
+
+        call.enqueue(object : Callback<RegisterResponse> {
+            override fun onResponse(call: Call<RegisterResponse>, response: Response<RegisterResponse>) {
+                if (response.isSuccessful) {
+                    val res = response.body()
+                    Toast.makeText(this@SignupActivity, "Registered: ${res?.message}", Toast.LENGTH_SHORT).show()
+
+                    val intent = Intent(this@SignupActivity, BottomNavActivity::class.java)
+                    startActivity(intent)
+                    finish()
+
+
+                    Log.d("REGISTER", "Token: ${res?.token}")
+                } else {
+                    Toast.makeText(this@SignupActivity, "Failed: ${response.code()}", Toast.LENGTH_SHORT).show()
+                    Log.e("Register Error",response.code().toString())
+                }
+            }
+
+            override fun onFailure(call: Call<RegisterResponse>, t: Throwable) {
+                Toast.makeText(this@SignupActivity, "Error: ${t.message}", Toast.LENGTH_SHORT).show()
+            }
+        })
+
     }
 
     private fun registerUser(name: String,email: String, password: String) {

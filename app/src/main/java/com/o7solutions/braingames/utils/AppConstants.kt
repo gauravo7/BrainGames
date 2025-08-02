@@ -9,4 +9,6 @@ object AppConstants {
     var memory = 1
     var problemSolving = 2
     var streak = "streak"
+    var userPref = "user_prefs"
+    var token = "token"
 }

@@ -148,7 +148,7 @@ class OddOutFragment : Fragment() {
                 }
             })
 
-        Toast.makeText(requireContext(), answerIndex.toString(), Toast.LENGTH_SHORT).show()
+//        Toast.makeText(requireContext(), answerIndex.toString(), Toast.LENGTH_SHORT).show()
 
         binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 4) // 3 columns
         binding.recyclerView.adapter = adapter
@@ -156,14 +156,14 @@ class OddOutFragment : Fragment() {
 
     private fun startTimer() {
         countDownTimer?.cancel()
-        binding.timeText.text = "$totalSeconds"
+        binding.timeText.text = "\u23F3 $totalSeconds"
         binding.seekBarBrightness.max = totalSeconds
         binding.seekBarBrightness.progress = totalSeconds
 
         countDownTimer = object : CountDownTimer(totalSeconds * 1000L, 1000L) {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsLeft = (millisUntilFinished / 1000).toInt()
-                binding.timeText.text = "$secondsLeft"
+                binding.timeText.text = "\u23F3 $secondsLeft"
                 binding.seekBarBrightness.progress = secondsLeft
             }
 
@@ -173,7 +173,7 @@ class OddOutFragment : Fragment() {
 
 
                     AppFunctions.updateUserData(points,true,60000,game.id!!.toInt())
-                    binding.timeText.text = "0"
+                    binding.timeText.text = "\u23F3 0"
                     Toast.makeText(
                         requireContext(),
                         "Time's up!\nScore: $points",

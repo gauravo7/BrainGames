@@ -83,6 +83,7 @@ class WordGameFragment : Fragment() {
             param2 = it.getString(ARG_PARAM2)
             currentLevel = it.getInt("SELECTED_LEVEL", 1)
 //            game = it.getSerializable("game_data") as Games
+            game = it.getSerializable("game_data") as Games
 
 
         }

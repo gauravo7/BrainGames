@@ -289,5 +289,25 @@ object AppFunctions {
 //        dialog.show()
 //    }
 
+    fun saveToken(context: Context, token: String) {
+        val sharedPref = context.getSharedPreferences(AppConstants.userPref, Context.MODE_PRIVATE)
+        sharedPref.edit().putString(AppConstants.token, token).apply()
+    }
+
+    fun getToken(context: Context): String? {
+        val sharedPref = context.getSharedPreferences(AppConstants.userPref, Context.MODE_PRIVATE)
+        return sharedPref.getString(AppConstants.token, null)
+    }
+
+    fun deleteToken(context: Context) {
+        val sharedPref = context.getSharedPreferences(AppConstants.userPref, Context.MODE_PRIVATE)
+        sharedPref.edit().remove(AppConstants.token).apply()
+    }
+
+    fun isTokenAvailable(context: Context): Boolean {
+        val sharedPref = context.getSharedPreferences(AppConstants.userPref, Context.MODE_PRIVATE)
+        return sharedPref.contains(AppConstants.token)
+    }
+
 
 }

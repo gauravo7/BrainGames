@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.RecyclerView
 import com.o7solutions.braingames.R
@@ -12,6 +13,7 @@ class LevelsAdapter(var list: ArrayList<String>): RecyclerView.Adapter<LevelsAda
 
     inner class ViewHolder(var view: View): RecyclerView.ViewHolder(view) {
         var image = view.findViewById<ImageView>(R.id.level_image)
+        var levelTV = view.findViewById<TextView>(R.id.level_TV)
     }
     override fun onCreateViewHolder(
         parent: ViewGroup,
@@ -22,6 +24,17 @@ class LevelsAdapter(var list: ArrayList<String>): RecyclerView.Adapter<LevelsAda
     }
 
     override fun onBindViewHolder(holder: LevelsAdapter.ViewHolder, position: Int) {
+
+        holder.apply {
+
+            if(position ==0) {
+                image.visibility = View.GONE
+                levelTV.text = "${position+1}"
+            } else {
+                image.visibility = View.VISIBLE
+                levelTV.visibility = View.GONE
+            }
+        }
 
     }
 

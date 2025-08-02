@@ -7,7 +7,7 @@
     android:layout_margin="12dp"
     app:cardBackgroundColor="@color/white"
     app:cardElevation="4dp"
-    app:cardCornerRadius="@dimen/_50sdp">
+    app:cardCornerRadius="50dp">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
@@ -16,23 +16,27 @@
         >
 
 
+
+        <TextView
+            android:id="@+id/level_TV"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            tools:text="1"
+            android:gravity="center"
+            android:elevation="12dp"
+            android:fontFamily="@font/neut"
+            android:textSize="@dimen/_20sdp"
+            />
         <ImageView
             android:id="@+id/level_image"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:src="@drawable/baseline_lock_24"
+            android:src="@drawable/lock"
             android:scaleType="fitXY"
+            android:elevation="8dp"
             android:padding="12dp"
-            app:tint="@color/black" />
+            />
 
-<!--        <TextView-->
-<!--            android:id="@+id/level_TV"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="match_parent"-->
-<!--            tools:text="1"-->
-<!--            android:elevation="12dp"-->
-<!--            android:textSize="@dimen/_20sdp"-->
-<!--            />-->
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
