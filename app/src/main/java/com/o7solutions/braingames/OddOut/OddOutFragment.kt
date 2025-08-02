@@ -40,6 +40,7 @@ class OddOutFragment : Fragment() {
     private var totalSeconds = 60
     private var countDownTimer: CountDownTimer? = null
     private lateinit var game: Games
+    var level = 1
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -112,6 +113,13 @@ class OddOutFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
+        if(points >=100) {
+            level = 2
+        } else if(points >= 200) {
+            level = 3
+        } else if(points >= 300) {
+            level = 4
+        }
         // Example drawable resources
 //        val images = listOf(
 //            R.drawable.rectangle, R.drawable.circle, R.drawable.star,
@@ -120,7 +128,17 @@ class OddOutFragment : Fragment() {
 //        val answerIndex = 1 // Assume the odd one is at index 1
 //        val itemCount = images.size
 
-        var listOfIndexes = GameLib.getUniqueRandomNumbers(0, 15, 7)
+        lateinit var listOfIndexes : List<Int>
+        if(level == 1) {
+            listOfIndexes = GameLib.getUniqueRandomNumbers(0, 15, 5)
+        } else if(level == 2) {
+            listOfIndexes = GameLib.getUniqueRandomNumbers(0, 15, 7)
+        } else if(level == 3) {
+            listOfIndexes = GameLib.getUniqueRandomNumbers(0, 15, 9)
+        } else if(level == 4) {
+            listOfIndexes = GameLib.getUniqueRandomNumbers(0, 15, 11)
+
+        }
         var answerIndex = GameLib.getRandomNumberFromList(listOfIndexes)
         val images = listOf(
             R.drawable.rectangle, R.drawable.circle, R.drawable.star, R.drawable.cone

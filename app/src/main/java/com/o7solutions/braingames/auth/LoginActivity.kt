@@ -51,9 +51,9 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 binding.progressContainer.visibility = View.VISIBLE
 
-                loginUserWithApi(email,password)
+//                loginUserWithApi(email,password)
 
-//                loginUser(email, password)
+                loginUser(email, password)
             }
         }
 

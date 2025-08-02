@@ -24,7 +24,8 @@ class OddOutAdapter(
     var imageFour = false
 
     val images = listOf(
-        R.drawable.rectangle, R.drawable.circle, R.drawable.star,R.drawable.cone
+        R.drawable.rectangle, R.drawable.circle, R.drawable.star,R.drawable.cone,
+        R.drawable.pentagon,R.drawable.heptagon
     )
 
     inner class ViewHolder(var view: View): RecyclerView.ViewHolder(view) {
