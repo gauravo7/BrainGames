@@ -11,6 +11,8 @@ import android.view.ViewGroup
 import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.animation.LayoutAnimationController
+import android.widget.Button
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
@@ -264,20 +266,56 @@ class OddOutFragment : Fragment() {
     }
 
     private fun showGameOverDialog() {
-        val dialog = android.app.AlertDialog.Builder(requireContext())
-            .setTitle("Time's up!")
-            .setMessage("Your final score: $points")
+//        val dialog = android.app.AlertDialog.Builder(requireContext())
+//            .setTitle("Time's up!")
+//            .setMessage("Your final score: $points")
+//            .setCancelable(false)
+//            .setPositiveButton("Play Again") { _, _ ->
+//                points = 0
+//                binding.pointsText.text = "$points"
+//                setupRecyclerView()
+//                startTimer()
+//            }
+//            .setNegativeButton("Exit") { _, _ ->
+//                requireActivity().onBackPressedDispatcher.onBackPressed()
+//            }
+//            .create()
+//        dialog.show()
+
+        val dialogView = layoutInflater.inflate(R.layout.time_finish, null)
+
+        var winingMessage = ""
+        if(points > 200) {
+            winingMessage = "You won \uD83D\uDE00 "
+        } else {
+            winingMessage = "You lose \uD83D\uDE22"
+        }
+
+        val animation = AnimationUtils.loadAnimation(requireContext(), R.anim.fade)
+        val titleView = dialogView.findViewById<TextView>(R.id.dialogTitle)
+        val messageView = dialogView.findViewById<TextView>(R.id.dialogMessage)
+        val okButton = dialogView.findViewById<Button>(R.id.okButton)
+
+        titleView.startAnimation(animation)
+        titleView.text = "\u23F3 Time Up"
+        messageView.text ="\nTotalPoints = $points\n$winingMessage"
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
             .setCancelable(false)
-            .setPositiveButton("Play Again") { _, _ ->
-                points = 0
-                binding.pointsText.text = "$points"
-                setupRecyclerView()
-                startTimer()
-            }
-            .setNegativeButton("Exit") { _, _ ->
-                requireActivity().onBackPressedDispatcher.onBackPressed()
-            }
             .create()
+
+        okButton.setOnClickListener {
+            if(points < 200) {
+                AppFunctions.updateUserData(points,false,60000,game.id!!.toInt())
+            } else {
+                AppFunctions.updateUserData(points,true,60000,game.id!!.toInt())
+            }
+            dialog.dismiss()
+            findNavController().popBackStack()
+        }
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.show()
     }
 

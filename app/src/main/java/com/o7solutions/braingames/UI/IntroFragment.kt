@@ -1,11 +1,13 @@
 package com.o7solutions.braingames.UI
 
+import android.app.AlertDialog
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import androidx.activity.OnBackPressedCallback
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -53,6 +55,20 @@ class IntroFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val callback = requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                AlertDialog.Builder(requireContext())
+                    .setTitle("Exit?")
+                    .setMessage("Do you want to go back?")
+                    .setPositiveButton("Yes") { _, _ ->
+                        findNavController().popBackStack()
+                    }
+                    .setNegativeButton("No", null)
+                    .show()
+            }
+
+        })
 
         binding.apply {
             val animationZoomOut = AnimationUtils.loadAnimation(requireActivity(), R.anim.zoom)

@@ -17,6 +17,7 @@ import com.example.game.GameResult
 import com.example.game.RetrofitInstance
 import com.example.game.WordRepository
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.o7solutions.braingames.DataClasses.Games
 import com.o7solutions.braingames.R
 import kotlinx.coroutines.launch
 
@@ -39,12 +40,16 @@ class DashboardFragment : Fragment() {
     private lateinit var level2Card: CardView
     private lateinit var level3Card: CardView
     private lateinit var level4Card: CardView
+    private lateinit var game: Games
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
+            game = it.getSerializable("game_data") as Games
+
         }
     }
 
@@ -147,6 +152,7 @@ class DashboardFragment : Fragment() {
 
                 val bundle = Bundle()
                 bundle.putInt("SELECTED_LEVEL",level)
+                bundle.putSerializable("game_data", game)
                 findNavController().navigate(R.id.wordGameFragment,bundle)
 
             } catch (e: Exception) {

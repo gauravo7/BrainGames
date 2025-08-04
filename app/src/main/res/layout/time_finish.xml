@@ -1,60 +1,340 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="350dp"
+    android:layout_width="400dp"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:padding="40dp"
+    android:padding="0dp"
     android:background="#FFFFFF"
     android:gravity="center"
-    android:elevation="24dp"
-    android:translationZ="24dp"
+    android:elevation="48dp"
+    android:translationZ="48dp"
     android:clipToPadding="false">
 
-    <!-- Success Icon using Unicode -->
-    <TextView
-        android:layout_width="80dp"
-        android:layout_height="80dp"
-        android:text="✓"
-        android:textSize="48sp"
-        android:textStyle="bold"
-        android:textColor="#FFFFFF"
-        android:gravity="center"
-        android:background="#4CAF50"
-        android:layout_marginBottom="24dp" />
+    <!-- Hero Background Section with Gradient Effect -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="180dp"
+        android:background="#F8FFF8"
+        android:gravity="center">
 
-    <TextView
-        android:id="@+id/dialogTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Excellent Work!"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        android:textColor="#1A1A1A"
-        android:letterSpacing="0.02"
-        android:layout_marginBottom="16dp" />
+        <!-- Multiple Gradient Layers for Depth -->
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#E8F5E8"
+            android:alpha="0.3" />
 
-    <TextView
-        android:id="@+id/dialogMessage"
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#C8E6C9"
+            android:alpha="0.2" />
+
+        <!-- Floating Circles Background -->
+        <View
+            android:layout_width="120dp"
+            android:layout_height="120dp"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="-30dp"
+            android:layout_marginStart="-40dp"
+            android:background="#4CAF50"
+            android:alpha="0.1" />
+
+        <View
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="-20dp"
+            android:background="#66BB6A"
+            android:alpha="0.15" />
+
+        <View
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_centerInParent="true"
+            android:layout_marginTop="-40dp"
+            android:layout_marginEnd="30dp"
+            android:background="#81C784"
+            android:alpha="0.1" />
+
+        <!-- Main Success Icon with Multiple Layers -->
+        <FrameLayout
+            android:layout_width="140dp"
+            android:layout_height="140dp"
+            android:layout_centerInParent="true">
+
+            <!-- Outer Glow Ring -->
+            <View
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:background="#4CAF50"
+                android:alpha="0.15" />
+
+            <!-- Middle Ring -->
+            <View
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_gravity="center"
+                android:background="#4CAF50"
+                android:alpha="0.3" />
+
+            <!-- Inner Ring with Gradient -->
+            <LinearLayout
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:background="#4CAF50"
+                android:gravity="center"
+                android:elevation="8dp">
+
+                <!-- Shine Effect -->
+                <View
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:background="#66BB6A"
+                    android:alpha="0.4" />
+            </LinearLayout>
+
+            <!-- Success Check Mark -->
+            <TextView
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:layout_gravity="center"
+                android:text="✓"
+                android:textSize="64sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:gravity="center"
+                android:elevation="12dp"
+                android:shadowColor="#2E7D32"
+                android:shadowRadius="4"
+                android:shadowDx="2"
+                android:shadowDy="2" />
+
+            <!-- Sparkle Effects -->
+            <TextView
+                android:layout_width="12dp"
+                android:layout_height="12dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginStart="20dp"
+                android:text="✨"
+                android:textSize="12sp"
+                android:textColor="#FFD700"
+                android:elevation="14dp" />
+
+            <TextView
+                android:layout_width="8dp"
+                android:layout_height="8dp"
+                android:layout_gravity="end"
+                android:layout_marginTop="30dp"
+                android:layout_marginEnd="15dp"
+                android:text="✦"
+                android:textSize="8sp"
+                android:textColor="#FFC107"
+                android:elevation="14dp" />
+
+            <TextView
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginTop="110dp"
+                android:layout_marginStart="25dp"
+                android:text="⭐"
+                android:textSize="10sp"
+                android:textColor="#FF9800"
+                android:elevation="14dp" />
+        </FrameLayout>
+    </RelativeLayout>
+
+    <!-- Content Section -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="You answered correctly and finished right on time! Keep up the amazing progress."
-        android:textSize="16sp"
-        android:textColor="#666666"
-        android:gravity="center"
-        android:lineSpacingMultiplier="1.4"
-        android:layout_marginBottom="32dp" />
+        android:orientation="vertical"
+        android:padding="40dp"
+        android:gravity="center">
 
-    <!-- Beautiful Button -->
-    <Button
-        android:id="@+id/okButton"
-        android:layout_width="match_parent"
-        android:layout_height="56dp"
-        android:text="Continue"
-        android:textSize="16sp"
-        android:textStyle="bold"
-        android:textColor="#FFFFFF"
-        android:letterSpacing="0.05"
-        android:backgroundTint="#4CAF50"
-        android:elevation="4dp" />
+        <!-- Premium Title with Effects -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginBottom="24dp">
+
+            <!-- Title Shadow -->
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginTop="2dp"-->
+<!--                android:layout_marginStart="2dp"-->
+<!--                android:text="Excellent Work!"-->
+<!--                android:textSize="36sp"-->
+<!--                android:textStyle="bold"-->
+<!--                android:textColor="#E0E0E0"-->
+<!--                android:letterSpacing="0.02"-->
+<!--                android:fontFamily="sans-serif-black"-->
+<!--                android:alpha="0.3" />-->
+
+            <TextView
+                android:id="@+id/dialogTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="38dp"
+                android:text="Excellent Work!"
+                android:textSize="36sp"
+                android:textStyle="bold"
+                android:textColor="#1A1A1A"
+                android:fontFamily="sans-serif-black"
+                android:elevation="4dp" />
+
+            <!-- Animated Underline -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:layout_marginTop="12dp"
+                android:gravity="center">
+
+                <View
+                    android:layout_width="20dp"
+                    android:layout_height="4dp"
+                    android:background="#4CAF50"
+                    android:layout_marginEnd="4dp" />
+
+                <View
+                    android:layout_width="40dp"
+                    android:layout_height="4dp"
+                    android:background="#66BB6A"
+                    android:layout_marginEnd="4dp" />
+
+                <View
+                    android:layout_width="20dp"
+                    android:layout_height="4dp"
+                    android:background="#81C784" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/dialogMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="You answered correctly and finished right on time! Keep up the amazing progress."
+            android:textSize="18sp"
+            android:textColor="#555555"
+            android:gravity="center"
+            android:lineSpacingMultiplier="1.6"
+            android:fontFamily="sans-serif-light"
+            android:layout_marginBottom="40dp"
+            android:letterSpacing="0.01" />
+
+        <!-- Ultra Premium Button -->
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp">
+
+
+
+            <!-- Main Button -->
+            <Button
+                android:id="@+id/okButton"
+                android:layout_width="match_parent"
+                android:layout_height="68dp"
+                android:text="Continue"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:textColor="#FFFFFF"
+                android:letterSpacing="0.05"
+                android:fontFamily="sans-serif-medium"
+                android:backgroundTint="#4CAF50"
+                android:elevation="16dp"
+                android:shadowColor="#2E7D32"
+                android:shadowRadius="2"
+                android:shadowDx="1"
+                android:shadowDy="1" />
+
+            <!-- Button Corner Highlights -->
+            <View
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:background="#81C784"
+                android:alpha="0.6" />
+
+            <View
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_alignParentEnd="true"
+                android:layout_marginEnd="20dp"
+                android:layout_marginTop="10dp"
+                android:background="#81C784"
+                android:alpha="0.6" />
+
+            <!-- Button Glow Effect -->
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="66dp"
+                android:layout_marginStart="40dp"
+                android:layout_marginEnd="40dp"
+                android:background="#A5D6A7"
+                android:alpha="0.8" />
+        </RelativeLayout>
+
+        <!-- Decorative Success Patterns -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginTop="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="◆"
+                android:textSize="8sp"
+                android:textColor="#4CAF50"
+                android:layout_marginEnd="12dp"
+                android:alpha="0.6" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="●"
+                android:textSize="12sp"
+                android:textColor="#66BB6A"
+                android:layout_marginEnd="12dp"
+                android:alpha="0.7" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="◆"
+                android:textSize="16sp"
+                android:textColor="#4CAF50"
+                android:layout_marginEnd="12dp" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="●"
+                android:textSize="12sp"
+                android:textColor="#66BB6A"
+                android:layout_marginEnd="12dp"
+                android:alpha="0.7" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="◆"
+                android:textSize="8sp"
+                android:textColor="#4CAF50"
+                android:alpha="0.6" />
+        </LinearLayout>
+    </LinearLayout>
 
 </LinearLayout>

@@ -119,6 +119,10 @@ class GuessNumberFragment : Fragment() {
 
     private fun checkAnswer() {
         val userInput = binding.numbers.text.toString()
+        if(userInput.isEmpty()) {
+            Toast.makeText(requireContext(), "Please enter the number", Toast.LENGTH_SHORT).show()
+            return
+        }
 
         if (userInput == actualNumber.toString()) {
             binding.movePoints.setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
