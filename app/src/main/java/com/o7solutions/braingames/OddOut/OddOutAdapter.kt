@@ -5,10 +5,8 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.o7solutions.braingames.R
-import com.o7solutions.braingames.utils.AppFunctions
 
 class OddOutAdapter(
     var list: List<Int>,
@@ -17,11 +15,11 @@ class OddOutAdapter(
     var answerIndexImage: Int,
     var onClick: OnClick): RecyclerView.Adapter<OddOutAdapter.ViewHolder>() {
 
-    var imageZero = false
-    var imageOne = false
-    var imageTwo = false
-    var imageThree = false
-    var imageFour = false
+//    var imageZero = false
+//    var imageOne = false
+//    var imageTwo = false
+//    var imageThree = false
+//    var imageFour = false
 
     val images = listOf(
         R.drawable.rectangle, R.drawable.circle, R.drawable.star,R.drawable.cone,
@@ -84,7 +82,7 @@ class OddOutAdapter(
                     }
                     image.postDelayed({
                         onClick.onImageClick(position == answerIndex)
-                    }, 1000)
+                    }, 500)
                 } else {
 //                    perform nothing
                 }
