@@ -8,8 +8,12 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.Animation
+import android.view.animation.AnimationUtils
+import android.view.animation.LayoutAnimationController
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.core.content.ContextCompat
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.firebase.Firebase
@@ -41,6 +45,10 @@ class OddOutFragment : Fragment() {
     private var countDownTimer: CountDownTimer? = null
     private lateinit var game: Games
     var level = 1
+    lateinit var controller : LayoutAnimationController
+    lateinit var moveUp: Animation
+    lateinit var moveDown: Animation
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -64,6 +72,10 @@ class OddOutFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        moveUp = AnimationUtils.loadAnimation(requireContext(), R.anim.move_up)
+        moveDown = AnimationUtils.loadAnimation(requireContext(), R.anim.move_down)
+
+        controller =  AnimationUtils.loadLayoutAnimation(requireContext(), R.anim.fall_down_layout)
         setupRecyclerView()
 
         startTimer()
@@ -113,11 +125,11 @@ class OddOutFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        if(points >=100) {
+        if(points >=100 && points < 200) {
             level = 2
-        } else if(points >= 200) {
+        } else if(points >= 200 && points <300) {
             level = 3
-        } else if(points >= 300) {
+        } else if(points >= 300 ) {
             level = 4
         }
         // Example drawable resources
@@ -140,12 +152,14 @@ class OddOutFragment : Fragment() {
 
         }
         var answerIndex = GameLib.getRandomNumberFromList(listOfIndexes)
-        val images = listOf(
-            R.drawable.rectangle, R.drawable.circle, R.drawable.star, R.drawable.cone
-        )
+//        val images = listOf(
+//            R.drawable.rectangle, R.drawable.circle, R.drawable.star, R.drawable.cone
+//        )
         var answerIndexImage = AppFunctions.returnRandom(0, 4)
-        Log.d("Answer Index", answerIndexImage.toString())
+//        Log.d("Answer Index", answerIndexImage.toString())
 
+        Log.d("Level",level.toString())
+        Log.d("Level of Indices",listOfIndexes.size.toString())
         adapter = OddOutAdapter(
             listOfIndexes,
             answerIndex,
@@ -154,21 +168,64 @@ class OddOutFragment : Fragment() {
             object : OddOutAdapter.OnClick {
                 override fun onImageClick(isCorrect: Boolean) {
                     if (isCorrect) {
+
                         points += 20
+                        binding.movePoints.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
+                        binding.movePoints.text = "+20"
+                        binding.movePoints.visibility = View.VISIBLE
+                        binding.movePoints.startAnimation(moveUp)
+                        points = points + 20
+                        moveUp.setAnimationListener(object : Animation.AnimationListener {
+                            override fun onAnimationStart(animation: Animation?) {}
+
+                            override fun onAnimationEnd(animation: Animation?) {
+                                binding.movePoints.text = ""
+                                binding.movePoints.visibility = View.INVISIBLE
+                                binding.pointsText.text = "$points"
+
+
+                                setupRecyclerView()
+                            }
+
+                            override fun onAnimationRepeat(animation: Animation?) {}
+                        })
+
                     } else {
                         points -= 10
+                        binding.movePoints.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+                        binding.movePoints.text = "-10"
+                        binding.movePoints.visibility = View.VISIBLE
+                        binding.movePoints.startAnimation(moveDown)
+                        points = points - 10
+                        moveDown.setAnimationListener(object : Animation.AnimationListener {
+                            override fun onAnimationStart(animation: Animation?) {}
+
+                            override fun onAnimationEnd(animation: Animation?) {
+                                binding.movePoints.text = ""
+                                binding.movePoints.visibility = View.INVISIBLE
+                                binding.pointsText.text = "$points"
+
+
+                                setupRecyclerView()
+                            }
+
+                            override fun onAnimationRepeat(animation: Animation?) {}
+                        })
+
                     }
-                    binding.pointsText.text = "$points"
-
-
-                    setupRecyclerView()
+//                    binding.pointsText.text = "$points"
+//
+//
+//                    setupRecyclerView()
 
                 }
             })
 
 //        Toast.makeText(requireContext(), answerIndex.toString(), Toast.LENGTH_SHORT).show()
 
-        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 4) // 3 columns
+        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(), 4)// 4 columns
+        binding.recyclerView.layoutAnimation = controller
+        binding.recyclerView.scheduleLayoutAnimation()
         binding.recyclerView.adapter = adapter
     }
 
