@@ -8,12 +8,14 @@ import android.view.animation.AnimationUtils
 import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.browser.trusted.TokenStore
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.o7solutions.braingames.BottomNav.BottomNavActivity
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.auth.LoginActivity
+import com.o7solutions.braingames.utils.AppFunctions
 
 class SplashActivity : AppCompatActivity() {
 
@@ -36,7 +38,9 @@ class SplashActivity : AppCompatActivity() {
 
         Handler(Looper.getMainLooper()).postDelayed({
 
-            if(auth.currentUser != null) {
+            var token = AppFunctions.getToken(this)
+
+            if(token != null) {
                 val intent = Intent(this, BottomNavActivity::class.java)
                 startActivity(intent)
                 finish()
@@ -45,6 +49,15 @@ class SplashActivity : AppCompatActivity() {
                 startActivity(intent)
                 finish()
             }
+//            if(auth.currentUser != null) {
+//                val intent = Intent(this, BottomNavActivity::class.java)
+//                startActivity(intent)
+//                finish()
+//            } else {
+//                val intent = Intent(this, LoginActivity::class.java)
+//                startActivity(intent)
+//                finish()
+//            }
 
         },2000)
 

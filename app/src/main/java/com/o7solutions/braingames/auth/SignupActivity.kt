@@ -66,8 +66,8 @@ class SignupActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-//            registerUserWithApi(name,email,password)
-            registerUser(name,email, password)
+            registerUserWithApi(name,email,password)
+//            registerUser(name,email, password)
         }
 
         binding.textViewSignIn.setOnClickListener {

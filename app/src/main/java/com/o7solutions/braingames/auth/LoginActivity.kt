@@ -51,9 +51,9 @@ class LoginActivity : AppCompatActivity() {
             } else {
                 binding.progressContainer.visibility = View.VISIBLE
 
-//                loginUserWithApi(email,password)
+                loginUserWithApi(email,password)
 
-                loginUser(email, password)
+//                loginUser(email, password)
             }
         }
 
@@ -76,6 +76,7 @@ class LoginActivity : AppCompatActivity() {
                     val loginResponse = response.body()
                     if (loginResponse != null && loginResponse.success) {
                         val token = loginResponse.token
+                        val id = loginResponse.data._id
                         val userData = loginResponse.data
 
                         // Save token if needed
@@ -83,6 +84,7 @@ class LoginActivity : AppCompatActivity() {
 //                        sharedPref.edit().putString(AppConstants.token, token).apply()
 
                         AppFunctions.saveToken(this@LoginActivity,token)
+                        AppFunctions.saveUserId(this@LoginActivity,id)
 
                         // Show success message or navigate
                         Toast.makeText(this@LoginActivity, "Welcome ${userData.name}", Toast.LENGTH_SHORT).show()

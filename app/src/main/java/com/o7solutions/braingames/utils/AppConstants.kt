@@ -11,4 +11,5 @@ object AppConstants {
     var streak = "streak"
     var userPref = "user_prefs"
     var token = "token"
+    var userId = "USER_ID"
 }

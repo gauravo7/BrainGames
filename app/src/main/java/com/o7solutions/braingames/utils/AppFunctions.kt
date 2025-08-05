@@ -304,6 +304,21 @@ object AppFunctions {
         sharedPref.edit().remove(AppConstants.token).apply()
     }
 
+    fun deleteUserId(context: Context) {
+        val sharedPref = context.getSharedPreferences(AppConstants.userPref, Context.MODE_PRIVATE)
+        sharedPref.edit().remove(AppConstants.userId).apply()
+    }
+
+    fun saveUserId(context: Context, userId: String) {
+        val sharedPref = context.getSharedPreferences(AppConstants.userPref, Context.MODE_PRIVATE)
+        sharedPref.edit().putString(AppConstants.userId, userId).apply()
+    }
+
+    fun getUserId(context: Context): String? {
+        val sharedPref = context.getSharedPreferences(AppConstants.userPref, Context.MODE_PRIVATE)
+        return sharedPref.getString(AppConstants.userId, null)
+    }
+
     fun isTokenAvailable(context: Context): Boolean {
         val sharedPref = context.getSharedPreferences(AppConstants.userPref, Context.MODE_PRIVATE)
         return sharedPref.contains(AppConstants.token)

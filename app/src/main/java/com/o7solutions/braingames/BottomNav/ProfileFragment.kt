@@ -8,7 +8,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.auth.FirebaseAuth
+import com.o7solutions.braingames.BottomNav.ViewModel.HomeViewModel
+import com.o7solutions.braingames.BottomNav.ViewModel.ProfileViewModel
+import com.o7solutions.braingames.DataClasses.Auth.UserResponse
+import com.o7solutions.braingames.Model.Repository
+import com.o7solutions.braingames.Model.RetrofitClient
+import com.o7solutions.braingames.Model.StateClass
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.auth.LoginActivity
 import com.o7solutions.braingames.databinding.FragmentProfileBinding
@@ -25,6 +33,15 @@ class ProfileFragment : Fragment() {
     private var param2: String? = null
     lateinit var binding: FragmentProfileBinding
     private lateinit var auth: FirebaseAuth
+    val viewModel: ProfileViewModel by lazy {
+        val factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                val repo = Repository(RetrofitClient.authInstance) // Use your singleton Repository instance
+                return ProfileViewModel(repo) as T // <-- pass repo instead of apiService
+            }
+        }
+        ViewModelProvider(this, factory)[ProfileViewModel::class.java]
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,31 +68,76 @@ class ProfileFragment : Fragment() {
         }
 
 
+//        viewModel.userLiveData.observe {  }
+        viewModel.getUserById(AppFunctions.getUserId(requireActivity()).toString())
+
+
+        initView()
 //        Updating Streak
-        AppFunctions.getStreak { streak->
-            binding.streakTV.text = streak.count.toString()
-        }
+//        AppFunctions.getStreak { streak->
+//            binding.streakTV.text = streak.count.toString()
+//        }
 
 
-        AppFunctions.getUserDataFromFirestore(auth.currentUser!!.email.toString()) { user ->
+//        AppFunctions.getUserDataFromFirestore(auth.currentUser!!.email.toString()) { user ->
+//
+//            if (user != null) {
+//
+//                var playTimeHours: Float = user.playTime?.toFloat()!! / 60000
+//                binding.gamesPlayedValue.text = user.totalGames.toString()
+//                binding.winRateValue.text = "${user.winRate.toString()}%"
+//                binding.streakValue.text = user.winStreak.toString()
+//                binding.totalScoreValue.text = user.totalScore.toString()
+//                binding.playTimeValue.text = "${playTimeHours.toInt()} min"
+//                binding.totalWins.text = user.totalWins.toString()
+//                binding.usernameText.text = user.name.toString()
+//                Log.e("ProfileFragment",user.name.toString())
+//                binding.levelText.text = "Level${user.level}"
+//
+//                binding.pgBar.visibility = View.GONE
+//            }
+//        }
+    }
 
-            if (user != null) {
+    fun initView() {
+        viewModel.userLiveData.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is StateClass.Error -> {
+                    binding.pgBar.visibility = View.GONE
+                    Log.e("ProfileFragment", "Error: ${state.message}")
+                }
 
-                var playTimeHours: Float = user.playTime?.toFloat()!! / 60000
-                binding.gamesPlayedValue.text = user.totalGames.toString()
-                binding.winRateValue.text = "${user.winRate.toString()}%"
-                binding.streakValue.text = user.winStreak.toString()
-                binding.totalScoreValue.text = user.totalScore.toString()
-                binding.playTimeValue.text = "${playTimeHours.toInt()} min"
-                binding.totalWins.text = user.totalWins.toString()
-                binding.usernameText.text = user.name.toString()
-                Log.e("ProfileFragment",user.name.toString())
-                binding.levelText.text = "Level${user.level}"
+                StateClass.Loading -> {
+                    binding.pgBar.visibility = View.VISIBLE
+                }
 
-                binding.pgBar.visibility = View.GONE
+                is StateClass.Success<*> -> {
+                    binding.pgBar.visibility = View.GONE
+
+                    val user = state.data as UserResponse.UserData
+                    Log.d("User Data",user.toString())
+
+
+                    if (user != null) {
+                        val playTimeMinutes = user.playTime / 60  // Assuming playTime is in seconds
+                        binding.gamesPlayedValue.text = user.totalGames.toString()
+                        binding.winRateValue.text = "${user.winRate}%"
+                        binding.streakValue.text = user.winStreak.toString()
+                        binding.totalScoreValue.text = user.totalScore.toString()
+                        binding.playTimeValue.text = "$playTimeMinutes min"
+                        binding.totalWins.text = user.totalWins.toString()
+                        binding.usernameText.text = user.name
+                        binding.levelText.text = "Level ${user.level}"
+
+                        Log.d("ProfileFragment", "User loaded: ${user.name}")
+                    } else {
+                        Log.e("ProfileFragment", "User data is null or incorrect format")
+                    }
+                }
             }
         }
     }
+
 
     fun showLogOutDialog() {
 

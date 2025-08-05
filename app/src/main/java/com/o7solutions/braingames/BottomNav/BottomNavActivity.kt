@@ -3,6 +3,7 @@ package com.o7solutions.braingames.BottomNav
 import android.content.Intent
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import com.google.android.material.bottomnavigation.BottomNavigationView
@@ -33,6 +34,7 @@ class BottomNavActivity : AppCompatActivity() {
 
         navController = findNavController(R.id.nav_host_fragment_activity_bottom_nav)
         AppFunctions.updateDailyStreak()
+        Log.d("Auth Token =", AppFunctions.getToken(this).toString())
 
         navView.setOnItemSelectedListener { item ->
             val navOptions = NavOptions.Builder()

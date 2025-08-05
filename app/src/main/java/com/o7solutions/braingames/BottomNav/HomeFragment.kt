@@ -2,18 +2,27 @@ package com.o7solutions.braingames.BottomNav
 
 import android.R.id
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.view.animation.LayoutAnimationController
+import android.widget.Toast
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.firebase.firestore.FirebaseFirestore
 import com.o7solutions.braingames.DataClasses.Games
 import com.o7solutions.braingames.Adapters.GamesAdapter
+import com.o7solutions.braingames.BottomNav.ViewModel.HomeViewModel
+import com.o7solutions.braingames.DataClasses.GameFetchData
+import com.o7solutions.braingames.Model.Repository
+import com.o7solutions.braingames.Model.RetrofitClient
+import com.o7solutions.braingames.Model.StateClass
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.FragmentHomeBinding
 import com.o7solutions.braingames.utils.AppConstants
@@ -35,9 +44,19 @@ class HomeFragment : Fragment(), GamesAdapter.OnClick {
     private var param2: String? = null
     private lateinit var binding: FragmentHomeBinding
     lateinit var db : FirebaseFirestore
-    var gamesList = arrayListOf<Games>()
+    var gamesList = arrayListOf<GameFetchData.Data>()
     var problemsList = arrayListOf<Games>()
     var memoryList = arrayListOf<Games>()
+    val viewModel: HomeViewModel by lazy {
+        val factory = object : ViewModelProvider.Factory {
+            override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                val repo = Repository(RetrofitClient.authInstance) // Use your singleton Repository instance
+                return HomeViewModel(repo) as T // <-- pass repo instead of apiService
+            }
+        }
+        ViewModelProvider(this, factory)[HomeViewModel::class.java]
+    }
+
 
     private lateinit var adapter: GamesAdapter
     private lateinit var problemAdapter : GamesAdapter
@@ -64,6 +83,33 @@ class HomeFragment : Fragment(), GamesAdapter.OnClick {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        viewModel.gameState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is StateClass.Loading -> {
+                    // Show loading UI
+                    binding.pgBar.visibility = View.VISIBLE
+                }
+                is StateClass.Success -> {
+                    binding.pgBar.visibility = View.GONE
+
+                    val games = state.data
+                    gamesList.addAll(games)
+                    Log.d("Games List",gamesList.toString())
+                    adapter.notifyDataSetChanged()
+                    // Display in RecyclerView
+                }
+                is StateClass.Error -> {
+                    binding.pgBar.visibility = View.GONE
+
+                    Toast.makeText(context, "Error: ${state.message}", Toast.LENGTH_SHORT).show()
+                }
+
+
+            }
+
+
+        }
+        viewModel.getGames()
 //        Updating Streak
 
         binding.pgBarStreak.visibility = View.VISIBLE
@@ -75,32 +121,33 @@ class HomeFragment : Fragment(), GamesAdapter.OnClick {
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutAnimation = recyclerAnimation
         binding.recyclerView.scheduleLayoutAnimation()
+        adapter.notifyDataSetChanged()
 
-        problemAdapter = GamesAdapter(problemsList,this)
-        binding.recyclerViewProblemSolving.layoutManager = LinearLayoutManager(requireContext())
-        binding.recyclerViewProblemSolving.adapter = problemAdapter
-        binding.recyclerViewProblemSolving.layoutAnimation = recyclerAnimation
-        binding.recyclerViewProblemSolving.scheduleLayoutAnimation()
-
-        memoryAdapter = GamesAdapter(memoryList,this)
-        binding.recyclerViewMemory.layoutManager = LinearLayoutManager(requireContext())
-        binding.recyclerViewMemory.adapter = memoryAdapter
-        binding.recyclerViewMemory.layoutAnimation = recyclerAnimation
-        binding.recyclerViewMemory.scheduleLayoutAnimation()
-
-
-//        (requireActivity() as BottomNavActivity).showBottomNav(true)
-
-        getGames(AppConstants.logical,gamesList)
-        getGames(AppConstants.memory,memoryList)
-        getGames(AppConstants.problemSolving,problemsList)
-        fillData()
-        AppFunctions.getStreak { streak->
-            binding.streakTV.text = streak.count.toString()
-            binding.pgBarStreak.visibility = View.GONE
-//            if(binding.streakTV.text.isEmpty())
-//            }
-        }
+//        problemAdapter = GamesAdapter(problemsList,this)
+//        binding.recyclerViewProblemSolving.layoutManager = LinearLayoutManager(requireContext())
+//        binding.recyclerViewProblemSolving.adapter = problemAdapter
+//        binding.recyclerViewProblemSolving.layoutAnimation = recyclerAnimation
+//        binding.recyclerViewProblemSolving.scheduleLayoutAnimation()
+//
+//        memoryAdapter = GamesAdapter(memoryList,this)
+//        binding.recyclerViewMemory.layoutManager = LinearLayoutManager(requireContext())
+//        binding.recyclerViewMemory.adapter = memoryAdapter
+//        binding.recyclerViewMemory.layoutAnimation = recyclerAnimation
+//        binding.recyclerViewMemory.scheduleLayoutAnimation()
+//
+//
+////        (requireActivity() as BottomNavActivity).showBottomNav(true)
+//
+//        getGames(AppConstants.logical,gamesList)
+//        getGames(AppConstants.memory,memoryList)
+//        getGames(AppConstants.problemSolving,problemsList)
+//        fillData()
+//        AppFunctions.getStreak { streak->
+//            binding.streakTV.text = streak.count.toString()
+//            binding.pgBarStreak.visibility = View.GONE
+////            if(binding.streakTV.text.isEmpty())
+////            }
+//        }
     }
 
     fun getGames(category: Int,list: ArrayList<Games>) {
