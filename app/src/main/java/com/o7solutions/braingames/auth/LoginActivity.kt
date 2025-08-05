@@ -12,6 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.o7solutions.braingames.BottomNav.BottomNavActivity
 import com.o7solutions.braingames.DataClasses.Auth.LoginRequest
 import com.o7solutions.braingames.DataClasses.Auth.LoginRequest.LoginResponse
+import com.o7solutions.braingames.DataClasses.Auth.UserResponse
 import com.o7solutions.braingames.Model.RetrofitClient
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.ActivityLoginBinding
@@ -78,6 +79,7 @@ class LoginActivity : AppCompatActivity() {
                         val token = loginResponse.token
                         val id = loginResponse.data._id
                         val userData = loginResponse.data
+                        AppFunctions.saveUser(this@LoginActivity,userData as UserResponse.UserData)
 
                         // Save token if needed
 //                        val sharedPref = getSharedPreferences(AppConstants.userPref, MODE_PRIVATE)

@@ -115,6 +115,7 @@ class ProfileFragment : Fragment() {
                     binding.pgBar.visibility = View.GONE
 
                     val user = state.data as UserResponse.UserData
+                    AppFunctions.saveUser(requireActivity(),user)
                     Log.d("User Data",user.toString())
 
 

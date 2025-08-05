@@ -12,7 +12,9 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.auth.User
+import com.google.gson.Gson
 import com.o7solutions.braingames.BottomNav.BottomNavActivity
+import com.o7solutions.braingames.DataClasses.Auth.UserResponse
 import com.o7solutions.braingames.DataClasses.BestScore
 import com.o7solutions.braingames.DataClasses.Streak
 import com.o7solutions.braingames.DataClasses.Users
@@ -324,5 +326,23 @@ object AppFunctions {
         return sharedPref.contains(AppConstants.token)
     }
 
+
+    fun saveUser(context: Context, user: UserResponse.UserData) {
+        val gson = Gson()
+        val json = gson.toJson(user)
+        val sharedPref = context.getSharedPreferences(AppConstants.PREFS_NAME, Context.MODE_PRIVATE)
+        sharedPref.edit().putString(AppConstants.USER_KEY, json).apply()
+    }
+
+    fun getUser(context: Context): UserResponse.UserData? {
+        val sharedPref = context.getSharedPreferences(AppConstants.PREFS_NAME, Context.MODE_PRIVATE)
+        val json = sharedPref.getString(AppConstants.USER_KEY, null) ?: return null
+        return Gson().fromJson(json, UserResponse.UserData::class.java)
+    }
+
+    fun clearUser(context: Context) {
+        val sharedPref = context.getSharedPreferences(AppConstants.PREFS_NAME, Context.MODE_PRIVATE)
+        sharedPref.edit().remove(AppConstants.USER_KEY).apply()
+    }
 
 }

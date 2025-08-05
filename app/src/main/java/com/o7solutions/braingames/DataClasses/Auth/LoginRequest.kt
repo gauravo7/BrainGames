@@ -13,13 +13,32 @@ data class LoginRequest(
     )
 
     data class LoginData(
+
         val _id: String,
+        val autoId: Int,
         val name: String,
         val email: String,
-        val xp: Int,
+        val password: String,
+        val otp: Int,
+        val level: Int,
+        val playTime: Int,
+        val totalGames: Int,
         val totalScore: Int,
-        val recentLogins: List<RecentLogin>
+        val totalWins: Int,
+        val winRate: Int,
+        val winStreak: Int,
+        val xp: Int,
+        val isDelete: Boolean,
+        val isBlocked: Boolean,
+        val addedById: String?,
+        val updatedById: String?,
+        val updatedAt: String?,
+        val status: Boolean,
+        val recentLogins: List<UserResponse.RecentLogin>,
+        val createdAt: String,
+        val gameHistory: List<Any>
     )
+
 
     data class LoginResponse(
         val token: String,
