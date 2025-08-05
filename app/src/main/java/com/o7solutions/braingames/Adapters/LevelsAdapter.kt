@@ -9,7 +9,7 @@ import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.RecyclerView
 import com.o7solutions.braingames.R
 
-class LevelsAdapter(var list: ArrayList<String>): RecyclerView.Adapter<LevelsAdapter.ViewHolder>() {
+class LevelsAdapter(var list: ArrayList<String>,var size: Int,var unlocked: Int): RecyclerView.Adapter<LevelsAdapter.ViewHolder>() {
 
     inner class ViewHolder(var view: View): RecyclerView.ViewHolder(view) {
         var image = view.findViewById<ImageView>(R.id.level_image)
@@ -27,7 +27,7 @@ class LevelsAdapter(var list: ArrayList<String>): RecyclerView.Adapter<LevelsAda
 
         holder.apply {
 
-            if(position ==0) {
+            if(position <= unlocked) {
                 image.visibility = View.GONE
                 levelTV.text = "${position+1}"
             } else {
@@ -39,6 +39,6 @@ class LevelsAdapter(var list: ArrayList<String>): RecyclerView.Adapter<LevelsAda
     }
 
     override fun getItemCount(): Int {
-        return 10
+        return size
     }
 }

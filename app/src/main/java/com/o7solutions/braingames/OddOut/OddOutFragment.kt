@@ -21,6 +21,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.google.firebase.Firebase
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import com.o7solutions.braingames.DataClasses.GameFetchData
 import com.o7solutions.braingames.DataClasses.Games
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.FragmentOddOutBinding
@@ -45,7 +46,7 @@ class OddOutFragment : Fragment() {
     private var points = 0
     private var totalSeconds = 60
     private var countDownTimer: CountDownTimer? = null
-    private lateinit var game: Games
+    private lateinit var game: GameFetchData.Data
     var level = 1
     lateinit var controller : LayoutAnimationController
     lateinit var moveUp: Animation
@@ -58,7 +59,7 @@ class OddOutFragment : Fragment() {
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
-            game = it.getSerializable("game_data") as Games
+            game = it.getSerializable("game_data") as GameFetchData.Data
 
         }
     }
@@ -249,7 +250,7 @@ class OddOutFragment : Fragment() {
                 if (isAdded) {
 
 
-                    AppFunctions.updateUserData(points,true,60000,game.id!!.toInt())
+//                    AppFunctions.updateUserData(points,true,60000,game._id!!.toInt())
                     binding.timeText.text = "\u23F3 0"
                     Toast.makeText(
                         requireContext(),
@@ -307,9 +308,10 @@ class OddOutFragment : Fragment() {
 
         okButton.setOnClickListener {
             if(points < 200) {
-                AppFunctions.updateUserData(points,false,60000,game.id!!.toInt())
+//                AppFunctions.updateUserData(points,false,60000,game._id!!.toInt())
+                AppFunctions.updateUserDataThroughApi(points,false,60000,game._id.toString(),requireContext())
             } else {
-                AppFunctions.updateUserData(points,true,60000,game.id!!.toInt())
+                AppFunctions.updateUserDataThroughApi(points,true,60000,game._id.toString(),requireContext())
             }
             dialog.dismiss()
             findNavController().popBackStack()

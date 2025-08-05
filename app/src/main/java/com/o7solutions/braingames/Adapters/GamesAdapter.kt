@@ -1,6 +1,7 @@
 package com.o7solutions.braingames.Adapters
 
 import android.graphics.Color
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,11 +13,15 @@ import com.bumptech.glide.Glide
 import com.o7solutions.braingames.DataClasses.GameFetchData
 import com.o7solutions.braingames.DataClasses.Games
 import com.o7solutions.braingames.R
+import com.o7solutions.braingames.utils.AppConstants
 
 class GamesAdapter(
     private val list: ArrayList<GameFetchData.Data>,
     private val click: OnClick
 ) : RecyclerView.Adapter<GamesAdapter.ViewHolder>() {
+
+
+//    val startAddress = "http://192.168.10.65:6006/public/"
 
     inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
 
@@ -41,12 +46,13 @@ class GamesAdapter(
             // Load image using Glide (if url is provided)
             if (!game.image.isNullOrEmpty()) {
                 Glide.with(gameImage)
-                    .load(game.image)
+                    .load(AppConstants.imageAddress+game.image)
                     .into(gameImage)
             } else {
                 gameImage.setImageResource(R.drawable.logo) // fallback image
             }
 
+//            Log.e("Image Address",(startAddress+game.image).toString())
             // Set background color if colorHex is valid
             try {
 //                game.colorHex?.let {
@@ -57,9 +63,9 @@ class GamesAdapter(
                 e.printStackTrace()
             }
 
-//            gameImage.setOnClickListener {
-//                click.onGameClick(game)
-//            }
+            gameImage.setOnClickListener {
+                click.onGameClick(game)
+            }
             // Set click listener
 //            view.setOnClickListener {
 //                click.onGameClick(game)
@@ -70,6 +76,6 @@ class GamesAdapter(
     override fun getItemCount(): Int = list.size
 
     interface OnClick {
-        fun onGameClick(game: Games)
+        fun onGameClick(game: GameFetchData.Data)
     }
 }

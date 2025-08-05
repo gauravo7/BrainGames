@@ -42,4 +42,10 @@ interface ApiService {
     suspend fun getUser(
         @Field("_id") id: String
     ): Response<UserResponse>
+
+    @POST("player/update")
+    suspend fun updateUser(
+        @Body userData: UserResponse.UserData
+    ): Response<UserResponse>
+
 }

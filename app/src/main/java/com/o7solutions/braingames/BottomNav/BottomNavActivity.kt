@@ -33,7 +33,7 @@ class BottomNavActivity : AppCompatActivity() {
         val navView: BottomNavigationView = binding.navView
 
         navController = findNavController(R.id.nav_host_fragment_activity_bottom_nav)
-        AppFunctions.updateDailyStreak()
+//        AppFunctions.updateDailyStreak()
         Log.d("Auth Token =", AppFunctions.getToken(this).toString())
 
         navView.setOnItemSelectedListener { item ->

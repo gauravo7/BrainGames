@@ -5,9 +5,9 @@ object AppConstants {
     var math = "questions"
     var games = "games"
     var user = "users"
-    var logical = 0
-    var memory = 1
-    var problemSolving = 2
+    var logical = "68905e5b0056df5e39cadbfe"
+    var memory = "68905e750056df5e39cadc02"
+    var problemSolving = "68905e800056df5e39cadc06"
     var streak = "streak"
     var userPref = "user_prefs"
     var token = "token"
@@ -15,5 +15,6 @@ object AppConstants {
 
     const val PREFS_NAME = "user_prefs"
     const val USER_KEY = "user_data"
+    const val imageAddress = "http://192.168.10.65:6006/public/"
 
 }

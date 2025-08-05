@@ -11,6 +11,7 @@ data class UserResponse(
     data class UserData(
         val _id: String,
         val autoId: Int,
+        var streak: Streak,
         val name: String,
         val email: String,
         val password: String,
@@ -31,9 +32,19 @@ data class UserResponse(
         val status: Boolean,
         val recentLogins: List<RecentLogin>,
         val createdAt: String,
-        val gameHistory: List<Any>
+        val gameHistory: List<GameHistory>
     )
 
+    data class GameHistory(
+        val _id: String,
+        var bestScore: Int,
+        val gameId: String
+    )
+
+    data class Streak(
+        val count: Int,
+        val timeStamp: String
+    )
     data class RecentLogin(
         val userAgent: String,
         val ip: String,

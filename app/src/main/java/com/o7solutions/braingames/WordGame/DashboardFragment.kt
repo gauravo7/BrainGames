@@ -17,6 +17,7 @@ import com.example.game.GameResult
 import com.example.game.RetrofitInstance
 import com.example.game.WordRepository
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.o7solutions.braingames.DataClasses.GameFetchData
 import com.o7solutions.braingames.DataClasses.Games
 import com.o7solutions.braingames.R
 import kotlinx.coroutines.launch
@@ -40,7 +41,7 @@ class DashboardFragment : Fragment() {
     private lateinit var level2Card: CardView
     private lateinit var level3Card: CardView
     private lateinit var level4Card: CardView
-    private lateinit var game: Games
+    private lateinit var game: GameFetchData.Data
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,7 +49,7 @@ class DashboardFragment : Fragment() {
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
-            game = it.getSerializable("game_data") as Games
+            game = it.getSerializable("game_data") as GameFetchData.Data
 
         }
     }

@@ -45,8 +45,9 @@ class HomeFragment : Fragment(), GamesAdapter.OnClick {
     private lateinit var binding: FragmentHomeBinding
     lateinit var db : FirebaseFirestore
     var gamesList = arrayListOf<GameFetchData.Data>()
-    var problemsList = arrayListOf<Games>()
-    var memoryList = arrayListOf<Games>()
+    var problemsList = arrayListOf<GameFetchData.Data>()
+    var memoryList = arrayListOf<GameFetchData.Data>()
+    var logicalList = arrayListOf<GameFetchData.Data>()
     val viewModel: HomeViewModel by lazy {
         val factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -83,58 +84,45 @@ class HomeFragment : Fragment(), GamesAdapter.OnClick {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        viewModel.gameState.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is StateClass.Loading -> {
-                    // Show loading UI
-                    binding.pgBar.visibility = View.VISIBLE
-                }
-                is StateClass.Success -> {
-                    binding.pgBar.visibility = View.GONE
+        initViews()
 
-                    val games = state.data
-                    gamesList.addAll(games)
-                    Log.d("Games List",gamesList.toString())
-                    adapter.notifyDataSetChanged()
-                    // Display in RecyclerView
-                }
-                is StateClass.Error -> {
-                    binding.pgBar.visibility = View.GONE
-
-                    Toast.makeText(context, "Error: ${state.message}", Toast.LENGTH_SHORT).show()
-                }
-
-
-            }
-
-
-        }
         viewModel.getGames()
 //        Updating Streak
-
-        binding.pgBarStreak.visibility = View.VISIBLE
+//        binding.pgBarStreak.visibility = View.VISIBLE
 
         var recyclerAnimation = AnimationUtils.loadLayoutAnimation(requireContext(),R.anim.fall_down_layout)
 
-        adapter = GamesAdapter(gamesList,this)
+
+
+//        val user = AppFunctions.getUser(requireActivity())
+//        if (user != null) {
+//            binding.streakTV.text = user.streak.count.toString()
+//        }
+//        Logical games
+        adapter = GamesAdapter(logicalList,this)
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutAnimation = recyclerAnimation
         binding.recyclerView.scheduleLayoutAnimation()
         adapter.notifyDataSetChanged()
 
-//        problemAdapter = GamesAdapter(problemsList,this)
-//        binding.recyclerViewProblemSolving.layoutManager = LinearLayoutManager(requireContext())
-//        binding.recyclerViewProblemSolving.adapter = problemAdapter
-//        binding.recyclerViewProblemSolving.layoutAnimation = recyclerAnimation
-//        binding.recyclerViewProblemSolving.scheduleLayoutAnimation()
+
+//        problem solving games
+        problemAdapter = GamesAdapter(problemsList,this)
+        binding.recyclerViewProblemSolving.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewProblemSolving.adapter = problemAdapter
+        binding.recyclerViewProblemSolving.layoutAnimation = recyclerAnimation
+        binding.recyclerViewProblemSolving.scheduleLayoutAnimation()
 //
-//        memoryAdapter = GamesAdapter(memoryList,this)
-//        binding.recyclerViewMemory.layoutManager = LinearLayoutManager(requireContext())
-//        binding.recyclerViewMemory.adapter = memoryAdapter
-//        binding.recyclerViewMemory.layoutAnimation = recyclerAnimation
-//        binding.recyclerViewMemory.scheduleLayoutAnimation()
-//
+
+
+//        Memory based games
+        memoryAdapter = GamesAdapter(memoryList,this)
+        binding.recyclerViewMemory.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewMemory.adapter = memoryAdapter
+        binding.recyclerViewMemory.layoutAnimation = recyclerAnimation
+        binding.recyclerViewMemory.scheduleLayoutAnimation()
+
 //
 ////        (requireActivity() as BottomNavActivity).showBottomNav(true)
 //
@@ -150,76 +138,115 @@ class HomeFragment : Fragment(), GamesAdapter.OnClick {
 //        }
     }
 
-    fun getGames(category: Int,list: ArrayList<Games>) {
-        binding.pgBar.visibility = View.VISIBLE
-        db.collection(AppConstants.games)
-            .whereEqualTo("category",category)
-            .addSnapshotListener { snapShot,error->
+    fun initViews() {
+        viewModel.gameState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is StateClass.Loading -> {
+                    // Show loading UI
+                    binding.pgBar.visibility = View.VISIBLE
+                }
+                is StateClass.Success -> {
+                    binding.pgBar.visibility = View.GONE
 
-            list.clear()
-            if(snapShot != null) {
-                for (doc in snapShot) {
+                    gamesList.clear()
+                    val games = state.data
+                    gamesList.addAll(games)
+                    Log.d("Games List",gamesList.toString())
+                    segregate()
+//                    adapter.notifyDataSetChanged()
+                    // Display in RecyclerView
+                }
+                is StateClass.Error -> {
+                    binding.pgBar.visibility = View.GONE
 
-                    var game = doc.toObject(Games::class.java)
-                    list.add(game)
+                    Toast.makeText(context, "Error: ${state.message}", Toast.LENGTH_SHORT).show()
                 }
 
-                if(category == AppConstants.logical) {
-                    adapter.notifyDataSetChanged()
-                } else if(category == AppConstants.memory) {
-                    memoryAdapter.notifyDataSetChanged()
 
-                } else if(category == AppConstants.problemSolving) {
-                    problemAdapter.notifyDataSetChanged()
-                }
             }
 
-            if(error != null) {
-                AppFunctions.showAlert(error.localizedMessage.toString(),requireContext())
-            }
 
         }
-
-        binding.pgBar.visibility = View.GONE
     }
 
-    override fun onGameClick(game: Games) {
 
+    fun segregate() {
+        logicalList.clear()
+        memoryList.clear()
+        problemsList.clear()
+
+        for(game in gamesList) {
+
+            if(game.gameCategoryId == AppConstants.logical) {
+                logicalList.add(game)
+            } else if(game.gameCategoryId == AppConstants.memory) {
+                memoryList.add(game)
+            } else if(game.gameCategoryId == AppConstants.problemSolving) {
+                problemsList.add(game)
+            }
+        }
+        adapter.notifyDataSetChanged()
+        problemAdapter.notifyDataSetChanged()
+        memoryAdapter.notifyDataSetChanged()
+    }
+
+    override fun onGameClick(game: GameFetchData.Data) {
         val bundle = Bundle().apply {
             putSerializable("game_data", game)
         }
         findNavController().navigate(R.id.introFragment, bundle)
 //        val fragmentToGo = game.fragmentId
 //        val context = requireContext()
-//            val resId = context?.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
+//        val resId = context?.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
 //        if(resId != null) {
 //            findNavController().navigate(resId)
 //        }
-
     }
+//    fun getGames(category: Int,list: ArrayList<Games>) {
+//        binding.pgBar.visibility = View.VISIBLE
+//        db.collection(AppConstants.games)
+//            .whereEqualTo("category",category)
+//            .addSnapshotListener { snapShot,error->
+//
+//            list.clear()
+//            if(snapShot != null) {
+//                for (doc in snapShot) {
+//
+//                    var game = doc.toObject(Games::class.java)
+//                    list.add(game)
+//                }
+//
+////                if(category == AppConstants.logical) {
+////                    adapter.notifyDataSetChanged()
+////                } else if(category == AppConstants.memory) {
+////                    memoryAdapter.notifyDataSetChanged()
+////
+////                } else if(category == AppConstants.problemSolving) {
+////                    problemAdapter.notifyDataSetChanged()
+////                }
+//            }
+//
+//            if(error != null) {
+//                AppFunctions.showAlert(error.localizedMessage.toString(),requireContext())
+//            }
+//
+//        }
+//
+//        binding.pgBar.visibility = View.GONE
+//    }
 
-    fun  fillData() {
-//        problemsList.clear()
-////        memoryList.clear()
-//        problemsList.addAll(getStaticDataList())
-//        memoryList.addAll(getStaticDataList())
 
-        memoryAdapter.notifyDataSetChanged()
-        problemAdapter.notifyDataSetChanged()
-    }
 
-    fun getStaticDataList(): ArrayList<Games> {
-        return arrayListOf(
-            Games(1, "Home", "homeFragment", "https://example.com/home", "#00FF00", 1),
-            Games(2, "Profile", "profileFragment", "https://example.com/profile", "#FF5733", 1),
-            Games(3, "Settings", "settingsFragment", "https://example.com/settings", "#3498DB", 1),
-            Games(4, "Messages", "messagesFragment", "https://example.com/messages", "#9B59B6", 1),
-            Games(5, "Notifications", "notificationsFragment", "https://example.com/notifications", "#F1C40F", 1),
-            Games(6, "Search", "searchFragment", "https://example.com/search", "#1ABC9C", 1),
-            Games(7, "Favorites", "favoritesFragment", "https://example.com/favorites", "#E67E22", 1),
-            Games(8, "Help", "helpFragment", "https://example.com/help", "#E74C3C", 1)
-        )
-    }
+//    fun  fillData() {
+////        problemsList.clear()
+//////        memoryList.clear()
+////        problemsList.addAll(getStaticDataList())
+////        memoryList.addAll(getStaticDataList())
+//
+//        memoryAdapter.notifyDataSetChanged()
+//        problemAdapter.notifyDataSetChanged()
+//    }
+
 
 
     companion object {

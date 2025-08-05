@@ -18,14 +18,141 @@ import com.o7solutions.braingames.DataClasses.Auth.UserResponse
 import com.o7solutions.braingames.DataClasses.BestScore
 import com.o7solutions.braingames.DataClasses.Streak
 import com.o7solutions.braingames.DataClasses.Users
+import com.o7solutions.braingames.Model.RetrofitClient
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.R.layout.dialog_result
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import kotlin.random.Random
 
 object AppFunctions {
 
     var db = FirebaseFirestore.getInstance()
     var auth = FirebaseAuth.getInstance()
+
+
+    fun updateUserDataThroughApi(
+        score: Int,
+        win: Boolean,
+        time: Long,
+        id: String,
+        context: Context
+    ) {
+
+
+//        fetchUserData(getUserId(context).toString(),context)
+//        val userData = getUser(context)
+//        if (userData != null) {
+
+//             var games = if(userData.totalGames> 0) userData.totalGames else 1
+//            var winRate = ((userData.totalWins.toDouble() / games.toDouble()) * 100).toInt()
+//            var playTime = userData.playTime.toLong() + time
+//            var winStreak = if (win) userData.winStreak + 1 else 0
+//
+//            var list = arrayListOf<UserResponse.GameHistory>()
+//
+//            list.addAll(userData.gameHistory)
+//
+//            var item = list.find { it.gameId == id }
+//
+//            if (item != null) {
+//                // Update score if higher
+//                if (item.bestScore < score) {
+//                    item.bestScore = score
+//                }
+//            } else {
+//                // Add new game entry if not found
+//                list.add(UserResponse.GameHistory(gameId = id, bestScore = score,_id= ""))
+//            }
+//            item?.bestScore?.toInt()?.let {
+//                if(it < score) {
+//                        item.bestScore = score.toString()
+//                }
+//            }
+
+//            var bestScore = 0
+
+//
+////            getting best score from list
+//            for(i in list) {
+//                if(i.gameId == id) {
+////                    binding.bestScore.text = i.bestScore.toString()
+//
+//                    if(i.bestScore < score) {
+//                        bestScore = score
+//                    } else {
+//                        bestScore = i.bestScore
+//                    }
+//                    Log.d("Best Score",i.bestScore.toString())
+//                }
+//            }
+
+
+            CoroutineScope(Dispatchers.Main).launch {
+                val response = RetrofitClient.authInstance.getUser(getUserId(context).toString())
+                if (response.isSuccessful && response.body() != null) {
+
+                    val userData = response.body()!!.data as UserResponse.UserData
+
+                    var games = if(userData.totalGames> 0) userData.totalGames else 1
+                    var winRate = ((userData.totalWins.toDouble() / games.toDouble()) * 100).toInt()
+                    var playTime = userData.playTime.toLong() + time
+                    var winStreak = if (win) userData.winStreak + 1 else 0
+
+                    var list = arrayListOf<UserResponse.GameHistory>()
+
+                    list.addAll(userData.gameHistory)
+
+                    var item = list.find { it.gameId == id }
+
+                    if (item != null) {
+                        // Update score if higher
+                        if (item.bestScore < score) {
+                            item.bestScore = score
+                        }
+                    } else {
+                        // Add new game entry if not found
+                        list.add(UserResponse.GameHistory(gameId = id, bestScore = score,_id= ""))
+                    }
+
+
+                    val user = response.body()!!.data.copy(
+                        totalScore = userData.totalScore + score,  // change the score
+                        winRate = winRate,
+                        playTime = playTime.toInt(),
+                        winStreak = winStreak,// change win rate
+                        totalGames = userData.totalGames + 1,
+                        totalWins = if (win) userData.totalWins + 1 else userData.totalWins,
+                        gameHistory = list
+                    )
+
+                    updateUserData(user,context)
+//                updateUserData(user)
+                }
+            }
+        }
+
+
+    suspend fun updateUserData(user: UserResponse.UserData,context: Context) {
+        return try {
+            val response = RetrofitClient.authInstance.updateUser(user)
+            if (response.isSuccessful && response.body() != null) {
+
+                saveUser(context,response as UserResponse.UserData)
+            } else {
+//                StateClass.Error("Error updating user: ${response.message()}")
+            }
+        } catch (e: Exception) {
+//            StateClass.Error("Exception: ${e.localizedMessage}")
+        }
+
+        Log.d("User data",getUser(context).toString())
+
+    }
+
+
     fun showAlert(message: String, context: Context) {
 
         val alertDialog = AlertDialog.Builder(context)
@@ -73,6 +200,29 @@ object AppFunctions {
 //
 //    }
 
+    fun fetchUserData(userId: String, context: Context) {
+        CoroutineScope(Dispatchers.IO).launch {
+            try {
+                val response = RetrofitClient.authInstance.getUser(userId)
+                withContext(Dispatchers.Main) {
+                    if (response.isSuccessful && response.body() != null) {
+                        val userData = response.body()!!.data as UserResponse.UserData
+                        saveUser(context, userData)
+                        println("User Name: ${userData.name}")
+                        println("Total Wins: ${userData.totalWins}")
+                        println("Game History: ${userData.gameHistory}")
+                    } else {
+                        println("Error: ${response.message()}")
+                    }
+                }
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    println("Exception: ${e.localizedMessage}")
+                }
+            }
+        }
+    }
+
     fun getUserDataFromFirestore(userId: String, callback: (Users?) -> Unit) {
         val db = FirebaseFirestore.getInstance()
         val docRef = db.collection(AppConstants.user).document(userId)
@@ -90,7 +240,7 @@ object AppFunctions {
         }
     }
 
-    fun updateUserData(score: Int, win: Boolean, time: Long,id: Int) {
+    fun updateUserData(score: Int, win: Boolean, time: Long, id: Int) {
         val auth = FirebaseAuth.getInstance()
         var userData = Users()
 
@@ -134,124 +284,124 @@ object AppFunctions {
                 }
         }
 
-        updateBestScore(id,score)
+//        updateBestScore(id, score)
     }
 
-    fun getStreak(callback: (Streak) -> Unit) {
-        val email = auth.currentUser?.email.toString()
-        db.collection(AppConstants.streak).document(email)
-            .get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val streak = document.toObject(Streak::class.java)
-                    callback(streak ?: Streak())
-                } else {
-                    callback(Streak())
-                }
-            }
-            .addOnFailureListener {
-                callback(Streak())
-            }
-    }
+//    fun getStreak(callback: (Streak) -> Unit) {
+//        val email = auth.currentUser?.email.toString()
+//        db.collection(AppConstants.streak).document(email)
+//            .get()
+//            .addOnSuccessListener { document ->
+//                if (document.exists()) {
+//                    val streak = document.toObject(Streak::class.java)
+//                    callback(streak ?: Streak())
+//                } else {
+//                    callback(Streak())
+//                }
+//            }
+//            .addOnFailureListener {
+//                callback(Streak())
+//            }
+//    }
 
 
-    fun updateBestScore(gameId: Int, newScore: Int) {
-        val email = auth.currentUser?.email.toString()
-        val docRef = db.collection(AppConstants.games)
-            .document(gameId.toString())
-            .collection(gameId.toString())
-            .document(email)
-
-        docRef.get().addOnSuccessListener { document ->
-            val currentBest = if (document.exists()) {
-                document.toObject(BestScore::class.java)?.bestScore ?: 0
-            } else {
-                0
-            }
-
-            if (newScore > currentBest) {
-                val updatedScore = BestScore(email = email, bestScore = newScore)
-                docRef.set(updatedScore)
-            }
-        }.addOnFailureListener {
-            Log.e("UpdateBestScore", "Error getting document", it)
-        }
-    }
-
-
-    fun getBestScore(id: Int, callback: (Int?) -> Unit) {
-        val email = auth.currentUser?.email.toString()
-
-        db.collection(AppConstants.games)
-            .document(id.toString())
-            .collection(id.toString())
-            .document(email)
-            .get()
-            .addOnSuccessListener { document ->
-                if (document.exists()) {
-                    val bestScore = document.toObject(BestScore::class.java)?.bestScore
-                    callback(bestScore)
-                } else {
-                    callback(0) // or null, if you prefer
-                }
-            }
-            .addOnFailureListener {
-                callback(null)
-            }
-    }
+//    fun updateBestScore(gameId: Int, newScore: Int) {
+//        val email = auth.currentUser?.email.toString()
+//        val docRef = db.collection(AppConstants.games)
+//            .document(gameId.toString())
+//            .collection(gameId.toString())
+//            .document(email)
+//
+//        docRef.get().addOnSuccessListener { document ->
+//            val currentBest = if (document.exists()) {
+//                document.toObject(BestScore::class.java)?.bestScore ?: 0
+//            } else {
+//                0
+//            }
+//
+//            if (newScore > currentBest) {
+//                val updatedScore = BestScore(email = email, bestScore = newScore)
+//                docRef.set(updatedScore)
+//            }
+//        }.addOnFailureListener {
+//            Log.e("UpdateBestScore", "Error getting document", it)
+//        }
+//    }
 
 
-    fun updateDailyStreak() {
-        val email = auth.currentUser?.email.toString()
-        val streakRef = db.collection(AppConstants.streak).document(email)
+//    fun getBestScore(id: Int, callback: (Int?) -> Unit) {
+//        val email = auth.currentUser?.email.toString()
+//
+//        db.collection(AppConstants.games)
+//            .document(id.toString())
+//            .collection(id.toString())
+//            .document(email)
+//            .get()
+//            .addOnSuccessListener { document ->
+//                if (document.exists()) {
+//                    val bestScore = document.toObject(BestScore::class.java)?.bestScore
+//                    callback(bestScore)
+//                } else {
+//                    callback(0) // or null, if you prefer
+//                }
+//            }
+//            .addOnFailureListener {
+//                callback(null)
+//            }
+//    }
 
-        streakRef.get().addOnSuccessListener { document ->
-            val currentTime = System.currentTimeMillis()
-            val oneDayMillis = 24 * 60 * 60 * 1000L
 
-            if (document.exists()) {
-                val streak = document.toObject(Streak::class.java)
-                val lastTime = streak?.timestamp ?: 0
-                val diff = currentTime - lastTime
-
-                val newStreak = when {
-                    diff < oneDayMillis -> streak?.count ?: 1 // Already updated today
-                    diff < 2 * oneDayMillis -> (streak?.count ?: 0) + 1 // Daily streak continues
-                    else -> 1 // Reset streak
-                }
-
-                val updatedStreak = Streak(count = newStreak, timestamp = currentTime)
-                streakRef.set(updatedStreak)
-            } else {
-                val newStreak = Streak(count = 1, timestamp = currentTime)
-                streakRef.set(newStreak)
-            }
-        }.addOnFailureListener {
-        }
-    }
+//    fun updateDailyStreak() {
+//        val email = auth.currentUser?.email.toString()
+//        val streakRef = db.collection(AppConstants.streak).document(email)
+//
+//        streakRef.get().addOnSuccessListener { document ->
+//            val currentTime = System.currentTimeMillis()
+//            val oneDayMillis = 24 * 60 * 60 * 1000L
+//
+//            if (document.exists()) {
+//                val streak = document.toObject(Streak::class.java)
+//                val lastTime = streak?.timestamp ?: 0
+//                val diff = currentTime - lastTime
+//
+//                val newStreak = when {
+//                    diff < oneDayMillis -> streak?.count ?: 1 // Already updated today
+//                    diff < 2 * oneDayMillis -> (streak?.count ?: 0) + 1 // Daily streak continues
+//                    else -> 1 // Reset streak
+//                }
+//
+//                val updatedStreak = Streak(count = newStreak, timestamp = currentTime)
+//                streakRef.set(updatedStreak)
+//            } else {
+//                val newStreak = Streak(count = 1, timestamp = currentTime)
+//                streakRef.set(newStreak)
+//            }
+//        }.addOnFailureListener {
+//        }
+//    }
 
 
     fun showResultDialog(userAnswer: String, correctAnswer: String, context: Context) {
-    val dialogView = View.inflate(context, R.layout.dialog_result, null)
+        val dialogView = View.inflate(context, R.layout.dialog_result, null)
 
-    val wrongText = dialogView.findViewById<TextView>(R.id.wrongAnswerText)
-    val correctText = dialogView.findViewById<TextView>(R.id.correctAnswerText)
-    val okBtn = dialogView.findViewById<Button>(R.id.okButton)
+        val wrongText = dialogView.findViewById<TextView>(R.id.wrongAnswerText)
+        val correctText = dialogView.findViewById<TextView>(R.id.correctAnswerText)
+        val okBtn = dialogView.findViewById<Button>(R.id.okButton)
 
-    wrongText.text = "Your Answer: $userAnswer❌"
-    correctText.text = "Correct Answer: $correctAnswer✅"
+        wrongText.text = "Your Answer: $userAnswer❌"
+        correctText.text = "Correct Answer: $correctAnswer✅"
 
-    val dialog = AlertDialog.Builder(context)
-        .setView(dialogView)
-        .create()
+        val dialog = AlertDialog.Builder(context)
+            .setView(dialogView)
+            .create()
 
-    okBtn.setOnClickListener {
-        dialog.dismiss()
+        okBtn.setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.show()
     }
-
-    dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
-    dialog.show()
-}
 
 //    private fun showCustomDialog(message: String,context: Context,points: Int) {
 //        val dialogView = View.inflate(context,R.layout.time_finish, null)

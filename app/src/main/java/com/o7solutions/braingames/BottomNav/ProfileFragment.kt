@@ -61,7 +61,7 @@ class ProfileFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         auth = FirebaseAuth.getInstance()
-        binding.pgBar.visibility = View.VISIBLE
+//        binding.pgBar.visibility = View.VISIBLE
 
         binding.logOutBTN.setOnClickListener {
             showLogOutDialog()
@@ -72,6 +72,26 @@ class ProfileFragment : Fragment() {
         viewModel.getUserById(AppFunctions.getUserId(requireActivity()).toString())
 
 
+//        val user = AppFunctions.getUser(requireActivity())
+//        AppFunctions.saveUser(requireActivity(),user)
+//        Log.d("User Data",user.toString())
+
+
+//        if (user != null) {
+//            val playTimeMinutes = user.playTime / 60000  // Assuming playTime is in seconds
+//            binding.gamesPlayedValue.text = user.totalGames.toString()
+//            binding.winRateValue.text = "${user.winRate}%"
+//            binding.streakValue.text = user.winStreak.toString()
+//            binding.totalScoreValue.text = user.totalScore.toString()
+//            binding.playTimeValue.text = "$playTimeMinutes min"
+//            binding.totalWins.text = user.totalWins.toString()
+//            binding.usernameText.text = user.name
+//            binding.levelText.text = "Level ${user.level}"
+//
+//            Log.d("ProfileFragment", "User loaded: ${user.name}")
+//        } else {
+//            Log.e("ProfileFragment", "User data is null or incorrect format")
+//        }
         initView()
 //        Updating Streak
 //        AppFunctions.getStreak { streak->
@@ -120,7 +140,7 @@ class ProfileFragment : Fragment() {
 
 
                     if (user != null) {
-                        val playTimeMinutes = user.playTime / 60  // Assuming playTime is in seconds
+                        val playTimeMinutes = user.playTime / 60000  // Assuming playTime is in seconds
                         binding.gamesPlayedValue.text = user.totalGames.toString()
                         binding.winRateValue.text = "${user.winRate}%"
                         binding.streakValue.text = user.winStreak.toString()
