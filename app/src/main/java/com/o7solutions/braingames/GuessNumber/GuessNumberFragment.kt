@@ -42,6 +42,7 @@ class GuessNumberFragment : Fragment() {
     private var countDownTimer: CountDownTimer? = null
     var newMaxLength = 3
     private lateinit var game : GameFetchData.Data
+    var hint = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -189,7 +190,9 @@ class GuessNumberFragment : Fragment() {
 
     private fun setData() {
         lifecycleScope.launch {
+
             actualNumber = AppFunctions.returnRandom(lowRange, highRange)
+            hint = actualNumber
             binding.questionTV.visibility = View.VISIBLE
             newMaxLength = actualNumber.toString().length
             binding.numbers.filters = arrayOf(InputFilter.LengthFilter(newMaxLength))
@@ -261,5 +264,20 @@ class GuessNumberFragment : Fragment() {
             dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
             dialog.show()
         }
+    }
+
+    private fun showHintDialog(value: String) {
+        val builder = AlertDialog.Builder(requireContext())
+
+        builder.setTitle("Hint") // Set the title of the dialog
+        builder.setMessage("The value is: $value") // Set the message of the dialog, including the value
+
+        // Optional: Add a positive button to dismiss the dialog
+        builder.setPositiveButton("OK") { dialog, _ ->
+            dialog.dismiss() // Dismiss the dialog when the "OK" button is clicked
+        }
+
+        val dialog: AlertDialog = builder.create() // Create the AlertDialog instance
+        dialog.show() // Display the AlertDialog
     }
 }

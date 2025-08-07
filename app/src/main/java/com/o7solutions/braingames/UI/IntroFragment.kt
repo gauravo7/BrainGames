@@ -84,6 +84,7 @@ class IntroFragment : Fragment() {
 //            startGame.startAnimation(animationZoomOut)
             positiveScore.text = game.positiveScore.toString()
             negativeScore.text = game.negativeScore.toString()
+            description.text = game.description.toString()
             Glide.with(requireActivity())
                 .load(AppConstants.imageAddress + game.image) // game.url must be a valid image URL
                 .into(binding.imageViewGame)

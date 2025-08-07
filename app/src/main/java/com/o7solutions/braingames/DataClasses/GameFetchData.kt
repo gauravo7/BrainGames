@@ -22,6 +22,7 @@ data class GameFetchData(
         val image: String?,
         val initialTime: Int,
         val isBlocked: Boolean,
+        val description: String,
         val isDelete: Boolean,
         val name: String?,
         val negativeScore: Int,
