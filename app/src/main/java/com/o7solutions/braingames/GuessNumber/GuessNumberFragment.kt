@@ -2,10 +2,13 @@ package com.o7solutions.braingames.GuessNumber
 
 import android.app.AlertDialog
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.text.InputFilter
 import android.util.Log
+import android.view.Gravity
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +23,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.o7solutions.braingames.DataClasses.GameFetchData
 import com.o7solutions.braingames.DataClasses.Games
 import com.o7solutions.braingames.R
@@ -83,6 +87,10 @@ class GuessNumberFragment : Fragment() {
         moveDown = AnimationUtils.loadAnimation(requireContext(), R.anim.move_down)
 
 
+
+        binding.tipsCard.setOnClickListener {
+            showHintDialog(hint.toString())
+        }
 //        dynamically changing the length of numbers
         binding.numbers.filters = arrayOf(InputFilter.LengthFilter(newMaxLength))
 
@@ -267,17 +275,34 @@ class GuessNumberFragment : Fragment() {
     }
 
     private fun showHintDialog(value: String) {
-        val builder = AlertDialog.Builder(requireContext())
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("💡 Hint")
+            .setMessage("The value is: $value")
+            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+            .create()
 
-        builder.setTitle("Hint") // Set the title of the dialog
-        builder.setMessage("The value is: $value") // Set the message of the dialog, including the value
+        dialog.setOnShowListener {
+            // Set title style
+            val titleId = requireContext().resources.getIdentifier("alertTitle", "id", "android")
+            val titleTextView = dialog.findViewById<TextView>(titleId)
+            titleTextView?.apply {
+                textSize = 20f
+                setTextColor(Color.parseColor("#3F51B5")) // Indigo
+                gravity = Gravity.CENTER
+            }
 
-        // Optional: Add a positive button to dismiss the dialog
-        builder.setPositiveButton("OK") { dialog, _ ->
-            dialog.dismiss() // Dismiss the dialog when the "OK" button is clicked
+            // Set message style
+            val messageView = dialog.findViewById<TextView>(android.R.id.message)
+            messageView?.apply {
+                textSize = 18f
+                setTextColor(Color.DKGRAY)
+                gravity = Gravity.CENTER
+            }
+
+            // Optional: Set background with rounded corners manually (if needed)
+            dialog.window?.setBackgroundDrawable(ColorDrawable(Color.WHITE))
         }
 
-        val dialog: AlertDialog = builder.create() // Create the AlertDialog instance
-        dialog.show() // Display the AlertDialog
+        dialog.show()
     }
 }
