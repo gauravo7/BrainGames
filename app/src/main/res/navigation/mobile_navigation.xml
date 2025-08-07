@@ -43,4 +43,8 @@
         android:name="com.o7solutions.braingames.OddOut.OddOutFragment"
         android:label="fragment_odd_out"
         tools:layout="@layout/fragment_odd_out" />
+    <fragment
+        android:id="@+id/gameFragment"
+        android:name="com.o7solutions.braingames.FindTheWord.GameFragment"
+        android:label="GameFragment" />
 </navigation>

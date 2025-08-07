@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    >
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lottieBackground"
@@ -30,20 +31,21 @@
         android:background="@drawable/timer_bar_background"
         android:contentDescription="Pause"
         android:src="@drawable/ic_pause"
-        android:visibility="gone"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tint="@color/white" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/statusBar"
-        android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:layout_margin="12dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
         android:background="@drawable/timer_bar_background"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintBottom_toBottomOf="@id/pauseButton"
+        app:layout_constraintEnd_toStartOf="@id/bulbButton"
+        app:layout_constraintStart_toEndOf="@id/pauseButton"
+        app:layout_constraintTop_toTopOf="@id/pauseButton">
 
         <ProgressBar
             android:id="@+id/timerProgressBar"
@@ -82,7 +84,7 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.48"
+            app:layout_constraintHorizontal_bias="0.498"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="0/10" />
@@ -103,19 +105,50 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <ImageButton
+        android:id="@+id/bulbButton"
+        android:layout_width="31dp"
+        android:layout_height="31dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/timer_bar_background"
+        android:contentDescription="Hint"
+        android:src="@drawable/ic_bulb"
+        app:layout_constraintBottom_toBottomOf="@id/statusBar"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/statusBar"
+        app:tint="@color/white" />
+
+    <TextView
+        android:id="@+id/hintCounterTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/new_bg"
+        android:gravity="center"
+        android:minWidth="15dp"
+        android:minHeight="15dp"
+        android:text="3"
+        android:textColor="@color/white"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@id/bulbButton"
+        app:layout_constraintEnd_toEndOf="@id/bulbButton"
+        app:layout_constraintTop_toTopOf="@id/bulbButton"
+        app:layout_constraintVertical_bias="0.25" />
+
     <TextView
         android:id="@+id/progressFeedbackTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        android:layout_marginEnd="84dp"
+        android:layout_marginEnd="64dp"
         android:alpha="0"
         android:elevation="8dp"
         android:shadowDx="2"
         android:shadowDy="2"
         android:shadowRadius="4"
         android:textColor="@color/feedback_green"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@id/scoreFeedbackTextView"
         app:layout_constraintHorizontal_chainStyle="spread_inside"
@@ -133,11 +166,11 @@
         android:shadowDy="2"
         android:shadowRadius="4"
         android:textColor="@color/feedback_green"
-        android:textSize="20sp"
+        android:textSize="18sp"
         android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@id/instructionTextView"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.915"
+        app:layout_constraintHorizontal_bias="0.785"
         app:layout_constraintStart_toStartOf="parent"
         tools:text="+30" />
 

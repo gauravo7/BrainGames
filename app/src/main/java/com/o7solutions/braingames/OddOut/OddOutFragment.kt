@@ -309,7 +309,6 @@ class OddOutFragment : Fragment() {
         okButton.setOnClickListener {
             if(points < 200) {
 //                AppFunctions.updateUserData(points,false,60000,game._id!!.toInt())
-                AppFunctions.updateUserDataThroughApi(points,false,60000,game._id.toString(),requireContext())
             } else {
                 AppFunctions.updateUserDataThroughApi(points,true,60000,game._id.toString(),requireContext())
             }

@@ -7,6 +7,7 @@
     <color name="red">#E57373</color>
     <color name="green">#00FF00</color>
     <color name="teal_200">#FF03DAC5</color>
+    <color name="grid_background_color">#2C2F59</color>
 
     <color name="blue_500">#2196F3</color>
     <color name="blue_700">#1976D2</color>
@@ -42,4 +43,14 @@
     <color name="nav_item_inactive">#B3FFFFFF</color>
     <color name="ripple_color">#33FFFFFF</color>
 
+    <color name="game_background_dark_blue">#1F214A</color>
+    <color name="text_grey">#9D9DAF</color>
+    <color name="start_button_blue">#4A4DE6</color>
+    <color name="dialog_button_green">#34C759</color>
+    <color name="dialog_button_dark">#484C7A</color>
+    <color name="dialog_button_red">#E53935</color>
+    <color name="highlight_red">#A6FF3B30</color>
+    <color name="highlight_yellow">#FFEB3B</color>
+    <color name="highlight_green">#A634C759</color>
+    <color name="highlight_orange">#A6FF9500</color>
 </resources>

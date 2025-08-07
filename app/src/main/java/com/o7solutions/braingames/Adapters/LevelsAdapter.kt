@@ -24,7 +24,6 @@ class LevelsAdapter(var list: ArrayList<String>,var size: Int,var unlocked: Int)
     }
 
     override fun onBindViewHolder(holder: LevelsAdapter.ViewHolder, position: Int) {
-
         holder.apply {
 
             if(position <= unlocked) {
@@ -35,7 +34,6 @@ class LevelsAdapter(var list: ArrayList<String>,var size: Int,var unlocked: Int)
                 levelTV.visibility = View.GONE
             }
         }
-
     }
 
     override fun getItemCount(): Int {

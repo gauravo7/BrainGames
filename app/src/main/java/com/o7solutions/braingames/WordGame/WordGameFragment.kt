@@ -1,5 +1,6 @@
 package com.o7solutions.braingames.WordGame
 
+import android.content.Context
 import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.LayerDrawable
@@ -62,6 +63,8 @@ class WordGameFragment : Fragment() {
     private lateinit var progressFeedbackTextView: TextView
     private lateinit var scoreFeedbackTextView: TextView
     private var score = 0
+    private var hintCount = 3
+
     private var currentWord: String = ""
     private var correctAnswer: String = ""
     private var originalWordList: List<String> = listOf()
@@ -124,7 +127,7 @@ class WordGameFragment : Fragment() {
         )
         optionTextViews.forEach { it.setOnClickListener { view -> if (isAnswerable) checkAnswer(view as TextView) } }
         pauseButton.setOnClickListener { togglePause() }
-        initViews()
+//        initViews()
         setupOnBackPressed()
 
         if (isPaused) {
@@ -137,6 +140,12 @@ class WordGameFragment : Fragment() {
             }
         }
 
+        pauseButton.setOnClickListener { togglePause() }
+        binding.bulbButton.setOnClickListener { useHint() }
+
+        // Load hint count from SharedPreferences
+        loadHintCount()
+        updateHintCounter()
     }
 
     companion object {
@@ -186,10 +195,32 @@ class WordGameFragment : Fragment() {
         return true
     }
 
-    private fun initViews() {
-
-    }
-
+//    private fun initViews() {
+//        wordDisplayBox = findViewById(R.id.wordDisplayBox)
+//        wordTextView = findViewById(R.id.wordTextView)
+//        pauseButton = findViewById(R.id.pauseButton)
+//        timeTextView = findViewById(R.id.timeTextView)
+//        progressTextView = findViewById(R.id.progressTextView)
+//        scoreTextView = findViewById(R.id.scoreTextView)
+//        timerProgressBar = findViewById(R.id.timerProgressBar)
+//        progressFeedbackTextView = findViewById(R.id.progressFeedbackTextView)
+//        scoreFeedbackTextView = findViewById(R.id.scoreFeedbackTextView)
+//        bulbButton = findViewById(R.id.bulbButton)
+//        hintCounterTextView = findViewById(R.id.hintCounterTextView)
+//        optionTextViews = listOf(
+//            findViewById(R.id.option1TextView),
+//            findViewById(R.id.option2TextView),
+//            findViewById(R.id.option3TextView),
+//            findViewById(R.id.option4TextView)
+//        )
+//        optionTextViews.forEach { it.setOnClickListener { view -> if (isAnswerable) checkAnswer(view as TextView) } }
+//        pauseButton.setOnClickListener { togglePause() }
+//        bulbButton.setOnClickListener { useHint() }
+//
+//        // Load hint count from SharedPreferences
+//        loadHintCount()
+//        updateHintCounter()
+//    }
     private fun startGame() {
         correctAnswersCount = 0
         isPaused = false
@@ -428,9 +459,13 @@ class WordGameFragment : Fragment() {
         if (isPaused) {
             countDownTimer.cancel()
             pauseButton.setImageResource(R.drawable.ic_resume)
+            // Disable option selection when paused
+            isAnswerable = false
         } else {
             startTimer(timeLeftInMillis)
             pauseButton.setImageResource(R.drawable.ic_pause)
+            // Re-enable option selection when resumed
+            isAnswerable = true
         }
     }
 
@@ -503,6 +538,76 @@ class WordGameFragment : Fragment() {
                 }
             })
     }
+
+//    private fun updateProgress() {
+//        progressTextView.text = "$correctAnswersCount/10"
+//        scoreTextView.text = score.toString()
+//    }
+
+    private fun loadHintCount() {
+        val sharedPrefs = requireActivity().getSharedPreferences("GamePrefs", Context.MODE_PRIVATE)
+        hintCount = sharedPrefs.getInt("hint_count", 3)
+    }
+
+    private fun saveHintCount() {
+        val sharedPrefs = requireActivity().getSharedPreferences("GamePrefs", Context.MODE_PRIVATE)
+        sharedPrefs.edit().putInt("hint_count", hintCount).apply()
+    }
+
+    private fun updateHintCounter() {
+
+        binding.apply {
+
+
+        hintCounterTextView.text = hintCount.toString()
+        bulbButton.isEnabled = hintCount > 0
+        if (hintCount <= 0) {
+            bulbButton.alpha = 0.5f
+        } else {
+            bulbButton.alpha = 1.0f
+        }
+        }
+    }
+
+    private fun useHint() {
+        if (hintCount <= 0 || !isAnswerable || isPaused) return
+
+        hintCount--
+        saveHintCount()
+        updateHintCounter()
+
+        // Find the correct answer and highlight it
+        val correctOptionView = optionTextViews.find { it.text.toString() == correctAnswer }
+        correctOptionView?.let { correctView ->
+            // Mark as answered
+            isAnswerable = false
+
+            // Show correct answer in green
+            correctView.setBackgroundResource(R.drawable.correct_answer_background)
+            wordDisplayBox.setBackgroundResource(R.drawable.correct_answer_background)
+
+            // Add points and progress
+            correctAnswersCount++
+            score += 30
+
+            // Show feedback animations
+            showProgressAnimation(true)
+            showScoreAnimation(true)
+
+            // Update progress
+            updateProgress()
+
+            // Auto-advance to next question after 2 seconds
+            Handler(Looper.getMainLooper()).postDelayed({
+                if (correctAnswersCount == 10) {
+                    handleLevelCompletion()
+                } else {
+                    setupNewRound()
+                }
+            }, 2000)
+        }
+    }
+
 
     private fun showExitConfirmationDialog() {
 

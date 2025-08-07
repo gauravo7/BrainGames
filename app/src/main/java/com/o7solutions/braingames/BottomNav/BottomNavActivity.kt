@@ -47,8 +47,8 @@ class BottomNavActivity : AppCompatActivity() {
                     navController.navigate(R.id.homeFragment, null, navOptions)
                     true
                 }
-                R.id.oddOutFragment -> {
-                    navController.navigate(R.id.oddOutFragment, null, navOptions)
+                R.id.gameFragment -> {
+                    navController.navigate(R.id.gameFragment, null, navOptions)
                     true
                 }
                 R.id.profileFragment -> {
