@@ -149,6 +149,9 @@ class ProfileFragment : Fragment() {
                         binding.totalWins.text = user.totalWins.toString()
                         binding.usernameText.text = user.name
                         binding.levelText.text = "Level ${user.level}"
+                        binding.streakTV.text = user.streak.count.toString()
+
+
 
                         Log.d("ProfileFragment", "User loaded: ${user.name}")
                     } else {
@@ -167,6 +170,8 @@ class ProfileFragment : Fragment() {
             .setMessage("You are already logged out.")
             .setPositiveButton("OK") { dialog, _ ->
                 auth.signOut()
+                AppFunctions.deleteToken(requireActivity())
+                AppFunctions.deleteUserId(requireActivity())
                 val intent = Intent(requireActivity(), LoginActivity::class.java)
                 startActivity(intent)
                 requireActivity().finish()

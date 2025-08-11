@@ -2,6 +2,7 @@ package com.o7solutions.braingames.auth
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
@@ -79,7 +80,7 @@ class LoginActivity : AppCompatActivity() {
                         val token = loginResponse.token
                         val id = loginResponse.data._id
                         val userData = loginResponse.data
-                        AppFunctions.saveUser(this@LoginActivity,userData as UserResponse.UserData)
+//                        AppFunctions.saveUser(this@LoginActivity,userData as UserResponse.UserData)
 
                         // Save token if needed
 //                        val sharedPref = getSharedPreferences(AppConstants.userPref, MODE_PRIVATE)
@@ -87,7 +88,9 @@ class LoginActivity : AppCompatActivity() {
 
                         AppFunctions.saveToken(this@LoginActivity,token)
                         AppFunctions.saveUserId(this@LoginActivity,id)
+                        Log.d("User Token", AppFunctions.getToken(this@LoginActivity).toString())
 
+                        AppFunctions.fetchUserData(AppFunctions.getUserId(this@LoginActivity).toString(),this@LoginActivity)
                         // Show success message or navigate
                         Toast.makeText(this@LoginActivity, "Welcome ${userData.name}", Toast.LENGTH_SHORT).show()
 

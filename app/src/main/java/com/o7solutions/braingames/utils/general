@@ -55,3 +55,53 @@
 //
 //    }
 
+
+
+//        fetchUserData(getUserId(context).toString(),context)
+//        val userData = getUser(context)
+//        if (userData != null) {
+
+//             var games = if(userData.totalGames> 0) userData.totalGames else 1
+//            var winRate = ((userData.totalWins.toDouble() / games.toDouble()) * 100).toInt()
+//            var playTime = userData.playTime.toLong() + time
+//            var winStreak = if (win) userData.winStreak + 1 else 0
+//
+//            var list = arrayListOf<UserResponse.GameHistory>()
+//
+//            list.addAll(userData.gameHistory)
+//
+//            var item = list.find { it.gameId == id }
+//
+//            if (item != null) {
+//                // Update score if higher
+//                if (item.bestScore < score) {
+//                    item.bestScore = score
+//                }
+//            } else {
+//                // Add new game entry if not found
+//                list.add(UserResponse.GameHistory(gameId = id, bestScore = score,_id= ""))
+//            }
+//            item?.bestScore?.toInt()?.let {
+//                if(it < score) {
+//                        item.bestScore = score.toString()
+//                }
+//            }
+
+//            var bestScore = 0
+
+//
+////            getting best score from list
+//            for(i in list) {
+//                if(i.gameId == id) {
+////                    binding.bestScore.text = i.bestScore.toString()
+//
+//                    if(i.bestScore < score) {
+//                        bestScore = score
+//                    } else {
+//                        bestScore = i.bestScore
+//                    }
+//                    Log.d("Best Score",i.bestScore.toString())
+//                }
+//            }
+
+

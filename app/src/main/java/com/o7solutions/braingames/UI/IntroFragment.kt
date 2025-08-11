@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import androidx.activity.OnBackPressedCallback
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
@@ -108,13 +109,19 @@ class IntroFragment : Fragment() {
                 val bundle = Bundle().apply {
                     putSerializable("game_data", game)
                 }
+
                 val fragmentToGo = game.fragmentId
                 val context = requireContext()
-                val resId =
-                    context?.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
-                if (resId != null) {
-                    findNavController().navigate(resId, bundle)
+                val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
+
+                resId?.let { destinationId ->
+                    val navOptions = NavOptions.Builder()
+                        .setPopUpTo(R.id.introFragment, true) // clear backstack
+                        .build()
+
+                    findNavController().navigate(destinationId, bundle, navOptions)
                 }
+
             }
         }
     }

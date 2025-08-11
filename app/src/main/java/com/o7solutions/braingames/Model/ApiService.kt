@@ -6,6 +6,7 @@ import com.o7solutions.braingames.DataClasses.Auth.RegisterResponse
 import com.o7solutions.braingames.DataClasses.Auth.UserResponse
 import com.o7solutions.braingames.DataClasses.GameFetchData
 import okhttp3.RequestBody
+import okhttp3.ResponseBody
 import retrofit2.Call
 import retrofit2.Response
 import retrofit2.http.Body
@@ -47,5 +48,12 @@ interface ApiService {
     suspend fun updateUser(
         @Body userData: UserResponse.UserData
     ): Response<UserResponse>
+
+    @FormUrlEncoded
+    @POST("player/update")
+    suspend fun updateScoreUsingForm(
+        @Field("_id") userId: String,
+        @Field("gameHistory") gameHistory: String // must be a stringified JSON array
+    ): Response<ResponseBody>
 
 }

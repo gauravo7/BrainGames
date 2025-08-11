@@ -22,6 +22,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.o7solutions.braingames.DataClasses.GameFetchData
@@ -266,7 +267,23 @@ class GuessNumberFragment : Fragment() {
 //                AppFunctions.updateUserData(points,true,totalSeconds.toLong(),game._id!!.toInt())
                 AppFunctions.updateUserDataThroughApi(points,true,totalSeconds.toLong()*1000,game._id,requireActivity())
                 dialog.dismiss()
-                requireActivity().onBackPressed()
+                var bundle = Bundle().apply {
+                    putString("id", game._id)
+                    putString("score", points.toString())
+                }
+
+                val fragmentToGo = game.fragmentId
+                val context = requireContext()
+                val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
+
+                resId?.let { destinationId ->
+                    val navOptions = NavOptions.Builder()
+                        .setPopUpTo(destinationId, true) // clear backstack
+                        .build()
+
+                    findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
+
+                }
             }
 
             dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)

@@ -16,6 +16,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.google.firebase.Firebase
@@ -309,11 +310,29 @@ class OddOutFragment : Fragment() {
         okButton.setOnClickListener {
             if(points < 200) {
 //                AppFunctions.updateUserData(points,false,60000,game._id!!.toInt())
+                AppFunctions.updateUserDataThroughApi(points,true,60000,game._id.toString(),requireContext())
+
             } else {
                 AppFunctions.updateUserDataThroughApi(points,true,60000,game._id.toString(),requireContext())
             }
             dialog.dismiss()
-            findNavController().popBackStack()
+            var bundle = Bundle().apply {
+                putString("id",game._id)
+                putString("score",points.toString())
+            }
+
+            val fragmentToGo = game.fragmentId
+            val context = requireContext()
+            val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
+
+            resId?.let { destinationId ->
+                val navOptions = NavOptions.Builder()
+                    .setPopUpTo(destinationId, true) // clear backstack
+                    .build()
+
+                findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
+            }
+
         }
 
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)

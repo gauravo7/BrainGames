@@ -120,6 +120,28 @@
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/profileImageCard" />
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/usernameText"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                >
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:src="@drawable/streak"
+                    />
+                <TextView
+                    android:id="@+id/streakTV"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="24sp"
+                    android:textAlignment="center"
+                    android:fontFamily="@font/neut"
+                    />
+            </LinearLayout>
+
 
             <!-- User Level & XP -->
             <com.google.android.material.card.MaterialCardView

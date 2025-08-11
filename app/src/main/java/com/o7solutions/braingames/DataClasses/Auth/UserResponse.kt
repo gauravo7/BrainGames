@@ -38,13 +38,21 @@ data class UserResponse(
     data class GameHistory(
         val _id: String,
         var bestScore: Int,
-        val gameId: String
+        val gameId: String,
+        var scoreHistory: MutableList<ScoreHistory>
+    )
+
+    data class ScoreHistory(
+        val _id: String,
+        val date: String,
+        val score: Int
     )
 
     data class Streak(
         val count: Int,
         val timeStamp: String
     )
+
     data class RecentLogin(
         val userAgent: String,
         val ip: String,

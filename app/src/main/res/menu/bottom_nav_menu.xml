@@ -6,10 +6,15 @@
         android:icon="@drawable/ic_home_black_24dp"
         android:title="@string/title_home" />
 
-    <item
-        android:id="@+id/gameFragment"
-        android:icon="@android:drawable/ic_menu_add"
-        android:title="Practise" />
+<!--    <item-->
+<!--        android:id="@+id/gameFragment"-->
+<!--        android:icon="@android:drawable/ic_menu_add"-->
+<!--        android:title="Practise" />-->
+
+<!--    <item-->
+<!--        android:id="@+id/luckyWheelFragment"-->
+<!--        android:icon="@drawable/lucky_wheel"-->
+<!--        android:title="Spin and Win" />-->
 
 <!--    <item-->
 <!--        android:id="@+id/oddOutFragment"-->

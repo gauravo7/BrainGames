@@ -17,6 +17,7 @@ import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.firestore.FirebaseFirestore
 import com.o7solutions.braingames.DataClasses.GameFetchData
@@ -661,9 +662,24 @@ class FirstFragment : Fragment() {
                 )
             }
             dialog.dismiss()
-            findNavController().popBackStack()
-        }
+            var bundle = Bundle().apply {
+                putString("id", game._id)
+                putString("score", points.toString())
+            }
 
+            val fragmentToGo = game.fragmentId
+            val context = requireContext()
+            val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
+
+            resId?.let { destinationId ->
+                val navOptions = NavOptions.Builder()
+                    .setPopUpTo(destinationId, true) // clear backstack
+                    .build()
+
+                findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
+
+            }
+        }
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.show()
     }

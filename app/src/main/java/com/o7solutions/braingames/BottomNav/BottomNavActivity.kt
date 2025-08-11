@@ -51,6 +51,10 @@ class BottomNavActivity : AppCompatActivity() {
                     navController.navigate(R.id.gameFragment, null, navOptions)
                     true
                 }
+                R.id.luckyWheelFragment -> {
+                    navController.navigate(R.id.luckyWheelFragment, null, navOptions)
+                    true
+                }
                 R.id.profileFragment -> {
                     navController.navigate(R.id.profileFragment, null, navOptions)
                     true

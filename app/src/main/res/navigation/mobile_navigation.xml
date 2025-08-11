@@ -47,4 +47,14 @@
         android:id="@+id/gameFragment"
         android:name="com.o7solutions.braingames.FindTheWord.GameFragment"
         android:label="GameFragment" />
+    <fragment
+        android:id="@+id/gameEndFragment"
+        android:name="com.o7solutions.braingames.UI.GameEndFragment"
+        android:label="fragment_game_end"
+        tools:layout="@layout/fragment_game_end" />
+    <fragment
+        android:id="@+id/luckyWheelFragment"
+        android:name="com.o7solutions.braingames.BottomNav.LuckyWheelFragment"
+        android:label="fragment_lucky_wheel"
+        tools:layout="@layout/fragment_lucky_wheel" />
 </navigation>

@@ -28,6 +28,7 @@ import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.FragmentWordGameBinding
 import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavOptions
 import com.example.game.RetrofitInstance
 import com.example.game.WordRepository
 import com.o7solutions.braingames.DataClasses.GameFetchData
@@ -490,7 +491,23 @@ class WordGameFragment : Fragment() {
         AppFunctions.updateUserDataThroughApi(score,false,totalGameTime - timeLeftInMillis,game._id,requireActivity())
 
 //        AppFunctions.updateUserData(score, false, totalGameTime,game._id!!.toInt())
-        findNavController().popBackStack()
+        var bundle = Bundle().apply {
+            putString("id", game._id)
+            putString("score", score.toString())
+        }
+
+        val fragmentToGo = game.fragmentId
+        val context = requireContext()
+        val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
+
+        resId?.let { destinationId ->
+            val navOptions = NavOptions.Builder()
+                .setPopUpTo(destinationId, true) // clear backstack
+                .build()
+
+            findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
+
+        }
     }
 
     private fun handleLevelCompletion() {
