@@ -480,11 +480,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             >
+
             <ImageView
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@drawable/tips"
-                />
+                android:src="@drawable/tips" />
         </LinearLayout>
 
 
@@ -494,7 +494,7 @@
         android:layout_width="@dimen/_16sdp"
         android:layout_height="@dimen/_16sdp"
         app:cardCornerRadius="@dimen/_8sdp"
-        app:cardElevation=""
+        app:cardElevation="20dp"
         app:cardBackgroundColor="@color/white"
         app:layout_constraintTop_toTopOf="@id/tipsCard"
         app:layout_constraintEnd_toEndOf="@id/tipsCard"

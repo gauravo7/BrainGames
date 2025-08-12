@@ -28,7 +28,7 @@ private const val ARG_LEVEL_NUMBER = "level_number"
 private const val GRID_SIZE = 8
 
 class GameFragment : Fragment() {
-    private var levelNumber: Int? = null
+    private var levelNumber: Int = 1
     private lateinit var pauseButton: ImageView
     private lateinit var hintButton: ImageView
     private lateinit var hintCounter: TextView
@@ -42,7 +42,7 @@ class GameFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            levelNumber = it.getInt("level")
+//            levelNumber = it.getInt("level")
         }
     }
 
@@ -56,6 +56,7 @@ class GameFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+//        Log.d("level",)
         val levelHeadingTextView = view.findViewById<TextView>(R.id.tv_level_heading)
         levelHeadingTextView.text = "Level $levelNumber"
 
@@ -341,7 +342,7 @@ class GameFragment : Fragment() {
         if (nextLevelExists) {
             val nextLevelFragment = GameFragment.newInstance(nextLevelNumber)
             parentFragmentManager.beginTransaction()
-                .replace(R.id.mobile_navigation, nextLevelFragment)
+                .replace(R.id.gameFragment, nextLevelFragment)
                 .addToBackStack(null)
                 .commit()
         } else {

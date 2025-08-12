@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:foreground="?attr/selectableItemBackground"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="6dp">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp">
+
+        <!-- Image -->
+        <ImageView
+            android:id="@+id/itemImage"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:scaleType="centerCrop"
+            android:contentDescription="@string/app_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Title -->
+        <TextView
+            android:id="@+id/itemName"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Game Name"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            app:layout_constraintStart_toEndOf="@id/itemImage"
+            app:layout_constraintTop_toTopOf="@id/itemImage"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="12dp" />
+
+        <!-- Description -->
+        <TextView
+            android:id="@+id/itemDescription"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="This is a sample description of the game."
+            android:textSize="14sp"
+            android:textColor="#555"
+            app:layout_constraintStart_toStartOf="@id/itemName"
+            app:layout_constraintTop_toBottomOf="@id/itemName"
+            app:layout_constraintEnd_toEndOf="@id/itemName" />
+
+        <!-- Category -->
+        <TextView
+            android:id="@+id/itemCategory"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Category: Puzzle"
+            android:textSize="12sp"
+            android:textColor="@color/primary"
+            app:layout_constraintStart_toStartOf="@id/itemDescription"
+            app:layout_constraintTop_toBottomOf="@id/itemDescription"
+            android:layout_marginTop="4dp" />
+
+        <!-- Scores -->
+        <LinearLayout
+            android:id="@+id/itemScoresLayout"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            app:layout_constraintStart_toStartOf="@id/itemCategory"
+            app:layout_constraintTop_toBottomOf="@id/itemCategory"
+            android:layout_marginTop="6dp">
+
+            <TextView
+                android:id="@+id/itemPositiveScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="+10"
+                android:textColor="@android:color/holo_green_dark"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="8dp"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:id="@+id/itemNegativeScore"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="-5"
+                android:textColor="@android:color/holo_red_dark"
+                android:textStyle="bold" />
+        </LinearLayout>
+
+        <!-- Date -->
+        <TextView
+            android:id="@+id/itemCreatedAt"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Created: 2025-08-12"
+            android:textSize="12sp"
+            android:textColor="#888"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/itemScoresLayout" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</androidx.cardview.widget.CardView>

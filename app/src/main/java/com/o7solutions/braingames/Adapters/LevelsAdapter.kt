@@ -22,8 +22,7 @@ class LevelsAdapter(
     private val listener: OnLevelClickListener
 ) : RecyclerView.Adapter<LevelsAdapter.ViewHolder>() {
 
-    private var selectedPosition: Int = RecyclerView.NO_POSITION
-
+    private var selectedPosition: Int = if (0 <= unlocked) 0 else RecyclerView.NO_POSITION
     inner class ViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
         var image: ImageView = view.findViewById(R.id.level_image)
         var levelTV: TextView = view.findViewById(R.id.level_TV)

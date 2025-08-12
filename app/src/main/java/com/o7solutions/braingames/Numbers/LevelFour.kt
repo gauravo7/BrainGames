@@ -13,8 +13,8 @@ object LevelFour {
         val operand1 = returnRandom(1, 100)
         val operand2 = returnRandom(1, 100)
         var operand3 = returnRandom(1,100)
-        var operatorPosition = returnRandom(0,1)
-        var operatorPosition2 = returnRandom(0,1)
+        var operatorPosition = returnRandom(0,4)
+        var operatorPosition2 = returnRandom(0,4)
         var operator1 = ""
         var operator2 = ""
         var answer = 0
@@ -28,8 +28,16 @@ object LevelFour {
                 operator1 = "x"
             }
             1-> {
-                answer = operand1 / operand2
+                tempAnswer = operand1 / operand2
                 operator1 = "/"
+            }
+            2-> {
+                tempAnswer = operand1 + operand2
+                operator1 = "+"
+            }
+            3-> {
+                tempAnswer = operand1 - operand2
+                operator1 = "-"
             }
         }
         when(operatorPosition) {
@@ -41,8 +49,15 @@ object LevelFour {
                 answer = tempAnswer - operand3
                 operator2 = "-"
             }
+            2-> {
+                answer = tempAnswer / operand3
+                operator2 = "/"
+            }
+            3-> {
+                answer = tempAnswer * operand3
+                operator2 = "x"
+            }
         }
-
 
 
         returnList.add(operand1.toString())

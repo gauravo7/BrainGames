@@ -131,10 +131,10 @@ class GuessNumberFragment : Fragment() {
 
     fun updateTipData() {
         tips = AppFunctions.getTips(requireActivity())
-        if(tips <1) {
-            Toast.makeText(requireContext(), "No tips available", Toast.LENGTH_SHORT).show()
-            return
-        }
+//        if(tips <1) {
+//            Toast.makeText(requireContext(), "No tips available", Toast.LENGTH_SHORT).show()
+//            return
+//        }
         binding.tipsTV.text = tips.toString()
     }
 
@@ -322,6 +322,11 @@ class GuessNumberFragment : Fragment() {
     }
 
     private fun showHintDialog(value: String) {
+
+        if (tips<1) {
+            Toast.makeText(requireContext(), "No tips available!", Toast.LENGTH_SHORT).show()
+            return
+        }
         val dialog = MaterialAlertDialogBuilder(requireContext())
             .setTitle("💡 Hint")
             .setMessage("The value is: $value")

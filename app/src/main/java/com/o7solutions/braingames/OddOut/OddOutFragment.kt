@@ -49,9 +49,12 @@ class OddOutFragment : Fragment() {
     private var countDownTimer: CountDownTimer? = null
     private lateinit var game: GameFetchData.Data
     var level = 1
+    var answerIndex = -1
     lateinit var controller : LayoutAnimationController
     lateinit var moveUp: Animation
     lateinit var moveDown: Animation
+    var answerIndexImage = -1
+    var tips = 0
 
 
 
@@ -86,7 +89,13 @@ class OddOutFragment : Fragment() {
         startTimer()
         binding.pointsText.text = "$points"
 
+        updateTipData()
 
+        binding.tipsCard.setOnClickListener {
+            showTips()
+            AppFunctions.updateTips(requireActivity(),-1)
+            updateTipData()
+        }
 
 //        Show dialog on back click
         val callback = requireActivity().onBackPressedDispatcher.addCallback(
@@ -114,6 +123,42 @@ class OddOutFragment : Fragment() {
                 }
             }
         )
+    }
+    fun updateTipData() {
+        tips = AppFunctions.getTips(requireActivity())
+//        if(tips <1) {
+//            Toast.makeText(requireContext(), "No tips available", Toast.LENGTH_SHORT).show()
+//            return
+//        }
+        binding.tipsTV.text = tips.toString()
+    }
+
+    fun showTips() {
+
+        if (tips < 1) {
+            Toast.makeText(requireContext(), "No tips available", Toast.LENGTH_SHORT).show()
+            return
+        }
+        when(answerIndexImage) {
+            0-> {
+                Toast.makeText(requireContext(), "Hint: Rectangle", Toast.LENGTH_SHORT).show()
+            }
+            1-> {
+                Toast.makeText(requireContext(), "Hint: Circle", Toast.LENGTH_SHORT).show()
+
+            }
+            2-> {
+                Toast.makeText(requireContext(), "Hint: Star", Toast.LENGTH_SHORT).show()
+
+            }
+            3-> {
+                Toast.makeText(requireContext(), "Hint: Cone", Toast.LENGTH_SHORT).show()
+
+            }
+            4-> {
+                Toast.makeText(requireContext(), "Hint: Pentagon", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     companion object {
@@ -157,22 +202,19 @@ class OddOutFragment : Fragment() {
 //        val answerIndex = 1 // Assume the odd one is at index 1
 //        val itemCount = images.size
 
-        lateinit var listOfIndexes : List<Int>
-        if(level == 1) {
-            listOfIndexes = GameLib.getUniqueRandomNumbers(0, 15, 5)
-        } else if(level == 2) {
-            listOfIndexes = GameLib.getUniqueRandomNumbers(0, 15, 7)
-        } else if(level == 3) {
-            listOfIndexes = GameLib.getUniqueRandomNumbers(0, 15, 9)
-        } else if(level == 4) {
-            listOfIndexes = GameLib.getUniqueRandomNumbers(0, 15, 11)
-
+        val listOfIndexes: List<Int> = when (level) {
+            1 -> GameLib.getUniqueRandomNumbers(0, 15, 5)
+            2 -> GameLib.getUniqueRandomNumbers(0, 15, 7)
+            3 -> GameLib.getUniqueRandomNumbers(0, 15, 9)
+            4 -> GameLib.getUniqueRandomNumbers(0, 15, 11)
+            else -> GameLib.getUniqueRandomNumbers(0, 15, 5) // fallback
         }
-        var answerIndex = GameLib.getRandomNumberFromList(listOfIndexes)
+
+        answerIndex = GameLib.getRandomNumberFromList(listOfIndexes)
 //        val images = listOf(
 //            R.drawable.rectangle, R.drawable.circle, R.drawable.star, R.drawable.cone
 //        )
-        var answerIndexImage = AppFunctions.returnRandom(0, 4)
+       answerIndexImage = AppFunctions.returnRandom(0, 4)
 //        Log.d("Answer Index", answerIndexImage.toString())
 
         Log.d("Level",level.toString())
