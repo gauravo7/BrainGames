@@ -36,7 +36,8 @@ data class LoginRequest(
         val status: Boolean,
         val recentLogins: List<UserResponse.RecentLogin>,
         val createdAt: String,
-        val gameHistory: List<Any>
+        val gameHistory: List<Any>,
+        val tips: Int
     )
 
 

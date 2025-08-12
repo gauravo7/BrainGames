@@ -61,6 +61,7 @@ class OddOutFragment : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
             game = it.getSerializable("game_data") as GameFetchData.Data
+            level = it.getInt("level")
 
         }
     }
@@ -88,19 +89,31 @@ class OddOutFragment : Fragment() {
 
 
 //        Show dialog on back click
-        val callback = requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                AlertDialog.Builder(requireContext())
-                    .setTitle("Exit?")
-                    .setMessage("Do you want to go back?")
-                    .setPositiveButton("Yes") { _, _ ->
+        val callback = requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    val dialogView = LayoutInflater.from(requireContext())
+                        .inflate(R.layout.custom_exit_dialog, null)
+
+                    val dialog = AlertDialog.Builder(requireContext())
+                        .setView(dialogView)
+                        .setCancelable(false)
+                        .create()
+
+                    dialogView.findViewById<Button>(R.id.btnYes).setOnClickListener {
+                        dialog.dismiss()
                         findNavController().popBackStack()
                     }
-                    .setNegativeButton("No", null)
-                    .show()
-            }
 
-        })
+                    dialogView.findViewById<Button>(R.id.btnNo).setOnClickListener {
+                        dialog.dismiss()
+                    }
+
+                    dialog.show()
+                }
+            }
+        )
     }
 
     companion object {
@@ -173,7 +186,6 @@ class OddOutFragment : Fragment() {
                 override fun onImageClick(isCorrect: Boolean) {
                     if (isCorrect) {
 
-                        points += 20
                         binding.movePoints.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
                         binding.movePoints.text = "+20"
                         binding.movePoints.visibility = View.VISIBLE
@@ -195,7 +207,6 @@ class OddOutFragment : Fragment() {
                         })
 
                     } else {
-                        points -= 10
                         binding.movePoints.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
                         binding.movePoints.text = "-10"
                         binding.movePoints.visibility = View.VISIBLE

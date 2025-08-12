@@ -8,12 +8,15 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
+import android.widget.Button
+import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.o7solutions.braingames.Adapters.LevelsAdapter
+import com.o7solutions.braingames.Adapters.OnLevelClickListener
 import com.o7solutions.braingames.DataClasses.Auth.UserResponse
 import com.o7solutions.braingames.DataClasses.GameFetchData
 import com.o7solutions.braingames.DataClasses.Games
@@ -32,7 +35,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [IntroFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class IntroFragment : Fragment() {
+class IntroFragment : Fragment(), OnLevelClickListener {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -41,6 +44,7 @@ class IntroFragment : Fragment() {
     private lateinit var adapter: LevelsAdapter
     var levelsList = arrayListOf<String>()
     var bestScored = 0
+    var level = 0
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -66,17 +70,27 @@ class IntroFragment : Fragment() {
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    AlertDialog.Builder(requireContext())
-                        .setTitle("Exit?")
-                        .setMessage("Do you want to go back?")
-                        .setPositiveButton("Yes") { _, _ ->
-                            findNavController().popBackStack()
-                        }
-                        .setNegativeButton("No", null)
-                        .show()
-                }
+                    val dialogView = LayoutInflater.from(requireContext())
+                        .inflate(R.layout.custom_exit_dialog, null)
 
-            })
+                    val dialog = AlertDialog.Builder(requireContext())
+                        .setView(dialogView)
+                        .setCancelable(false)
+                        .create()
+
+                    dialogView.findViewById<Button>(R.id.btnYes).setOnClickListener {
+                        dialog.dismiss()
+                        findNavController().popBackStack()
+                    }
+
+                    dialogView.findViewById<Button>(R.id.btnNo).setOnClickListener {
+                        dialog.dismiss()
+                    }
+
+                    dialog.show()
+                }
+            }
+        )
 
         getBestScores()
         binding.apply {
@@ -100,7 +114,7 @@ class IntroFragment : Fragment() {
             )
             var unlocked = (bestScored / 200)
             Log.d("Unlocked",unlocked.toString())
-            adapter = LevelsAdapter(levelsList, game.maxLevels,unlocked)
+            adapter = LevelsAdapter(levelsList, game.maxLevels,unlocked,this@IntroFragment)
             levelsRecyclerView.adapter = adapter
             adapter.notifyDataSetChanged()
 //            gameName.text = game.name
@@ -108,6 +122,7 @@ class IntroFragment : Fragment() {
 
                 val bundle = Bundle().apply {
                     putSerializable("game_data", game)
+                    putInt("level",level)
                 }
 
                 val fragmentToGo = game.fragmentId
@@ -146,6 +161,11 @@ class IntroFragment : Fragment() {
                 Log.d("Best Score", i.bestScore.toString())
             }
         }
+    }
+
+    override fun onLevelClicked(levelNumber: Int) {
+//        Toast.makeText(requireActivity(), "${levelNumber}", Toast.LENGTH_SHORT).show()
+        level = levelNumber
     }
 
     companion object {

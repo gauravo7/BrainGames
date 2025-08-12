@@ -56,4 +56,12 @@ interface ApiService {
         @Field("gameHistory") gameHistory: String // must be a stringified JSON array
     ): Response<ResponseBody>
 
+
+    @FormUrlEncoded
+    @POST("player/update")
+    suspend fun updateTips(
+        @Field("_id") userId: String,
+        @Field("tips") tips: Int // must be a stringified JSON array
+    ): Response<ResponseBody>
+
 }

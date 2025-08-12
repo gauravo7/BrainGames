@@ -13,6 +13,9 @@ object AppConstants {
     var token = "token"
     var userId = "USER_ID"
 
+    const val KEY_TIPS = "tips"
+
+
     const val PREFS_NAME = "user_prefs"
     const val USER_KEY = "user_data"
     const val imageAddress = "http://192.168.10.65:6006/public/"

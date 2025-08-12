@@ -48,11 +48,13 @@ class GuessNumberFragment : Fragment() {
     var newMaxLength = 3
     private lateinit var game : GameFetchData.Data
     var hint = 0
+    var tips = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             game = it.getSerializable("game_data") as GameFetchData.Data
+            level = it.getInt("level")
         }
     }
 
@@ -69,19 +71,34 @@ class GuessNumberFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
-        val callback = requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner,object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                AlertDialog.Builder(requireContext())
-                    .setTitle("Exit?")
-                    .setMessage("Do you want to go back?")
-                    .setPositiveButton("Yes") { _, _ ->
+
+
+        val callback = requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    val dialogView = LayoutInflater.from(requireContext())
+                        .inflate(R.layout.custom_exit_dialog, null)
+
+                    val dialog = AlertDialog.Builder(requireContext())
+                        .setView(dialogView)
+                        .setCancelable(false)
+                        .create()
+
+                    dialogView.findViewById<Button>(R.id.btnYes).setOnClickListener {
+                        dialog.dismiss()
                         findNavController().popBackStack()
                     }
-                    .setNegativeButton("No", null)
-                    .show()
-            }
 
-        })
+                    dialogView.findViewById<Button>(R.id.btnNo).setOnClickListener {
+                        dialog.dismiss()
+                    }
+
+                    dialog.show()
+                }
+            }
+        )
+
         binding.points.text = "0"
 //        binding.level.text = "Level $level"
         moveUp = AnimationUtils.loadAnimation(requireContext(), R.anim.move_up)
@@ -89,8 +106,12 @@ class GuessNumberFragment : Fragment() {
 
 
 
+        updateTipData()
+
         binding.tipsCard.setOnClickListener {
             showHintDialog(hint.toString())
+            AppFunctions.updateTips(requireActivity(),-1)
+            updateTipData()
         }
 //        dynamically changing the length of numbers
         binding.numbers.filters = arrayOf(InputFilter.LengthFilter(newMaxLength))
@@ -106,6 +127,15 @@ class GuessNumberFragment : Fragment() {
 
         setData()
         startTimer()
+    }
+
+    fun updateTipData() {
+        tips = AppFunctions.getTips(requireActivity())
+        if(tips <1) {
+            Toast.makeText(requireContext(), "No tips available", Toast.LENGTH_SHORT).show()
+            return
+        }
+        binding.tipsTV.text = tips.toString()
     }
 
     private fun startTimer() {

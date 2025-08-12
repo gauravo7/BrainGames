@@ -14,36 +14,25 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
+import com.google.android.material.button.MaterialButton
+import kotlin.random.Random
+import com.example.zigzag.WordRepository
+import androidx.constraintlayout.widget.ConstraintLayout
+import androidx.constraintlayout.helper.widget.Flow
 import com.example.zigzag.GridCellView
 import com.example.zigzag.LevelCache
 import com.example.zigzag.WordSearchGridView
-import com.google.android.material.button.MaterialButton
 import com.o7solutions.braingames.R
-import kotlin.random.Random
-
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [GameFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 
 private const val ARG_LEVEL_NUMBER = "level_number"
-private const val GRID_SIZE = 6
+private const val GRID_SIZE = 8
 
 class GameFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-    private var levelNumber = 1
+    private var levelNumber: Int? = null
     private lateinit var pauseButton: ImageView
     private lateinit var hintButton: ImageView
     private lateinit var hintCounter: TextView
-    private lateinit var wordsContainer: LinearLayout
+    private lateinit var wordsContainer: ConstraintLayout
     private lateinit var wordSearchGrid: WordSearchGridView
     private var targetWords = mutableListOf<String>()
     private var foundWords = mutableSetOf<String>()
@@ -53,7 +42,7 @@ class GameFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-            levelNumber = it.getInt(ARG_LEVEL_NUMBER)
+            levelNumber = it.getInt("level")
         }
     }
 
@@ -61,12 +50,12 @@ class GameFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_game, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val levelHeadingTextView = view.findViewById<TextView>(R.id.tv_level_heading)
         levelHeadingTextView.text = "Level $levelNumber"
 
@@ -102,21 +91,28 @@ class GameFragment : Fragment() {
     }
 
     private fun loadLevelDataFromCache() {
-        if (levelNumber == null) return
-        val currentLevel = LevelCache.levels?.find { it.levelNumber == levelNumber }
-        if (currentLevel != null) {
-            targetWords = currentLevel.words.shuffled().take(4).toMutableList()
-            displayWordsInContainer(targetWords)
-            val gridCharacters = generateGrid(targetWords)
-            populateGridUI(gridCharacters)
-            wordSearchGrid.setTargetWords(targetWords)
-
-            // Restore hinted word if exists
-            if (hintedWord.isNotEmpty() && targetWords.contains(hintedWord)) {
-                wordSearchGrid.highlightWordPermanent(hintedWord)
-            }
-            updateWordsDisplay()
+        targetWords = when (levelNumber) {
+            1 -> WordRepository.getRandomWords3(4).toMutableList()
+            2 -> (WordRepository.getRandomWords4(2) + WordRepository.getRandomWords3(2)).shuffled().toMutableList()
+            3 -> WordRepository.getRandomWords4(5).toMutableList()
+            4 -> (WordRepository.getRandomWords5(1) + WordRepository.getRandomWords4(3) + WordRepository.getRandomWords3(1)).shuffled().toMutableList()
+            5 -> (WordRepository.getRandomWords5(3) + WordRepository.getRandomWords4(2) + WordRepository.getRandomWords3(1)).shuffled().toMutableList()
+            6 -> (WordRepository.getRandomWords4(4) + WordRepository.getRandomWords5(2)).shuffled().toMutableList()
+            7 -> (WordRepository.getRandomWords5(5) + WordRepository.getRandomWords3(1)).shuffled().toMutableList()
+            8 -> (WordRepository.getRandomWords4(4) + WordRepository.getRandomWords5(1) + WordRepository.getRandomWords4(2) + WordRepository.getRandomWords3(1)).shuffled().take(7).toMutableList()
+            9 -> (WordRepository.getRandomWords5(5) + WordRepository.getRandomWords4(2)).shuffled().toMutableList()
+            10 -> (WordRepository.getRandomWords5(4) + WordRepository.getRandomWords3(3)).shuffled().toMutableList()
+            else -> WordRepository.getRandomWords3(4).toMutableList()
         }
+        displayWordsInContainer(targetWords)
+        val gridCharacters = generateGrid(targetWords)
+        populateGridUI(gridCharacters)
+        wordSearchGrid.setTargetWords(targetWords)
+
+        if (hintedWord.isNotEmpty() && targetWords.contains(hintedWord)) {
+            wordSearchGrid.highlightWordPermanent(hintedWord)
+        }
+        updateWordsDisplay()
     }
 
     private fun generateGrid(words: List<String>): Array<Array<Char>> {
@@ -142,12 +138,10 @@ class GameFragment : Fragment() {
             if (!placed) {
                 for (attempt in 1..100) {
                     val direction = Random.nextInt(2)
-
                     val maxRow = if (direction == 1) GRID_SIZE - word.length else GRID_SIZE - 1
                     val maxCol = if (direction == 0) GRID_SIZE - word.length else GRID_SIZE - 1
 
                     if (maxRow < 0 || maxCol < 0) continue
-
                     val row = Random.nextInt(maxRow + 1)
                     val col = Random.nextInt(maxCol + 1)
 
@@ -179,7 +173,6 @@ class GameFragment : Fragment() {
         for (i in word.indices) {
             val r = row + if (direction == 1) i else 0
             val c = col + if (direction == 0) i else 0
-
             if (r >= GRID_SIZE || c >= GRID_SIZE) return false
             if (grid[r][c] != ' ' && grid[r][c] != word[i]) return false
         }
@@ -204,7 +197,6 @@ class GameFragment : Fragment() {
                 val cell = GridCellView(requireContext()).apply {
                     text = gridChars[r][c].toString()
                 }
-
                 val params = GridLayout.LayoutParams(
                     GridLayout.spec(r, 1f),
                     GridLayout.spec(c, 1f)
@@ -219,22 +211,23 @@ class GameFragment : Fragment() {
     }
 
     private fun displayWordsInContainer(words: List<String>) {
-        wordsContainer.removeAllViews()
+        val container = view?.findViewById<ConstraintLayout>(R.id.ll_words_container) ?: return
+        val flow = container.findViewById<Flow>(R.id.flow_words) ?: return
+        container.removeAllViews()
+        container.addView(flow)
+        val wordIds = mutableListOf<Int>()
         for (word in words) {
             val textView = TextView(context).apply {
                 text = word
                 textSize = 16f
                 setTextColor(Color.WHITE)
-                val params = LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-                ).apply {
-                    marginEnd = 24
-                }
-                layoutParams = params
+                id = View.generateViewId()
+                setPadding(24, 8, 24, 8)
             }
-            wordsContainer.addView(textView)
+            container.addView(textView)
+            wordIds.add(textView.id)
         }
+        flow.referencedIds = wordIds.toIntArray()
     }
 
     private fun handleWordFound(word: String, colorIndex: Int) {
@@ -248,7 +241,6 @@ class GameFragment : Fragment() {
             }
 
             Toast.makeText(context, "Great You have Found: $word!", Toast.LENGTH_SHORT).show()
-
             if (foundWords.size == targetWords.size) {
                 showLevelCompleteDialog()
             }
@@ -263,24 +255,28 @@ class GameFragment : Fragment() {
 
     private fun updateWordsDisplay() {
         for (i in 0 until wordsContainer.childCount) {
-            val textView = wordsContainer.getChildAt(i) as TextView
-            val word = textView.text.toString()
-            if (foundWords.contains(word)) {
-                textView.setTextColor(Color.GREEN)
-            } else if (word == hintedWord) {
-                textView.setTextColor(Color.GREEN)
-            } else {
-                textView.setTextColor(Color.WHITE)
+            val child = wordsContainer.getChildAt(i)
+            if (child is TextView) {
+                val word = child.text.toString()
+                if (foundWords.contains(word)) {
+                    child.setTextColor(Color.GREEN)
+                } else if (word == hintedWord) {
+                    child.setTextColor(Color.GREEN)
+                } else {
+                    child.setTextColor(Color.WHITE)
+                }
             }
         }
     }
 
     private fun updateWordDisplay(foundWord: String) {
         for (i in 0 until wordsContainer.childCount) {
-            val textView = wordsContainer.getChildAt(i) as TextView
-            if (textView.text == foundWord) {
-                textView.setTextColor(Color.GREEN)
-                break
+            val child = wordsContainer.getChildAt(i)
+            if (child is TextView) {
+                if (child.text == foundWord) {
+                    child.setTextColor(Color.GREEN)
+                    break
+                }
             }
         }
     }
@@ -341,13 +337,11 @@ class GameFragment : Fragment() {
 
     private fun startNextLevelOrGoHome() {
         val nextLevelNumber = (levelNumber ?: 1) + 1
-
         val nextLevelExists = LevelCache.levels?.any { it.levelNumber == nextLevelNumber } == true
-
         if (nextLevelExists) {
             val nextLevelFragment = GameFragment.newInstance(nextLevelNumber)
             parentFragmentManager.beginTransaction()
-                .replace(R.id.fragment_container, nextLevelFragment)
+                .replace(R.id.mobile_navigation, nextLevelFragment)
                 .addToBackStack(null)
                 .commit()
         } else {
@@ -414,6 +408,11 @@ class GameFragment : Fragment() {
 
     private fun updateHintCounter() {
         hintCounter.text = totalHintsRemaining.toString()
+    }
+
+    private fun getRandomWords3or4(count: Int): List<String> {
+        val combined = (WordRepository.words + WordRepository.words4).shuffled()
+        return combined.take(count)
     }
 
     companion object {

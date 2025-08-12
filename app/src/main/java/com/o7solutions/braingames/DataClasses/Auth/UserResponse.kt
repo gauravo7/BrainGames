@@ -32,7 +32,8 @@ data class UserResponse(
         val status: Boolean,
         val recentLogins: List<RecentLogin>,
         val createdAt: String,
-        val gameHistory: List<GameHistory>
+        val gameHistory: List<GameHistory>,
+        val tips: Int
     )
 
     data class GameHistory(

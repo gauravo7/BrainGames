@@ -36,6 +36,7 @@ class BottomNavActivity : AppCompatActivity() {
 //        AppFunctions.updateDailyStreak()
         Log.d("Auth Token =", AppFunctions.getToken(this).toString())
 
+
         navView.setOnItemSelectedListener { item ->
             val navOptions = NavOptions.Builder()
                 .setLaunchSingleTop(true)

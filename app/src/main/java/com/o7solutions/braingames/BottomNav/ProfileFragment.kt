@@ -151,6 +151,7 @@ class ProfileFragment : Fragment() {
                         binding.levelText.text = "Level ${user.level}"
                         binding.streakTV.text = user.streak.count.toString()
 
+                        AppFunctions.saveTips(requireActivity(),user.tips)
 
 
                         Log.d("ProfileFragment", "User loaded: ${user.name}")

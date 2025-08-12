@@ -2,6 +2,7 @@ package com.o7solutions.braingames.utils
 
 import android.app.AlertDialog
 import android.content.Context
+import android.content.SharedPreferences
 import android.util.Log
 import android.view.View
 import android.view.animation.AnimationUtils
@@ -19,9 +20,11 @@ import com.o7solutions.braingames.DataClasses.Auth.UserResponse.GameHistory
 import com.o7solutions.braingames.DataClasses.BestScore
 import com.o7solutions.braingames.DataClasses.Streak
 import com.o7solutions.braingames.DataClasses.Users
+import com.o7solutions.braingames.Model.ApiService
 import com.o7solutions.braingames.Model.RetrofitClient
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.R.layout.dialog_result
+import com.o7solutions.braingames.utils.AppConstants.KEY_TIPS
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -498,52 +501,52 @@ suspend fun updateUserData(user: UserResponse.UserData, context: Context) {
         }
     }
 
-    fun updateUserData(score: Int, win: Boolean, time: Long, id: Int) {
-        val auth = FirebaseAuth.getInstance()
-        var userData = Users()
-
-
-        getUserDataFromFirestore(auth.currentUser?.email.toString()) { user ->
-            userData = user!!
-
-            val totalScore = userData.totalScore?.plus(score)
-            val wins = userData.totalWins ?: 0
-            val totalGames = userData.totalGames ?: 0
-            val newTotalGames = totalGames + 1
-            val newWins = if (win) wins + 1 else wins
-            var newPlayTime = user.playTime?.plus(time)
-
-            val winRate = if (newTotalGames > 0) {
-                (newWins.toDouble() / newTotalGames.toDouble() * 100).toInt()
-            } else {
-                0
-            }
-
-            val newUser = Users(
-                userData.name,
-                userData.email,
-                winRate,
-                if (win) (userData.winStreak ?: 0) + 1 else 0,
-                totalScore,
-                newPlayTime,
-                newTotalGames,
-                newWins,
-                0,
-                0,
-                ArrayList()
-            )
-
-            FirebaseFirestore.getInstance()
-                .collection(AppConstants.user)
-                .document(auth.currentUser?.email.toString())
-                .set(newUser)
-                .addOnSuccessListener {
-                    Log.d("User data", "user data updated successfully")
-                }
-        }
-
-//        updateBestScore(id, score)
-    }
+//    fun updateUserData(score: Int, win: Boolean, time: Long, id: Int) {
+//        val auth = FirebaseAuth.getInstance()
+//        var userData = Users()
+//
+//
+//        getUserDataFromFirestore(auth.currentUser?.email.toString()) { user ->
+//            userData = user!!
+//
+//            val totalScore = userData.totalScore?.plus(score)
+//            val wins = userData.totalWins ?: 0
+//            val totalGames = userData.totalGames ?: 0
+//            val newTotalGames = totalGames + 1
+//            val newWins = if (win) wins + 1 else wins
+//            var newPlayTime = user.playTime?.plus(time)
+//
+//            val winRate = if (newTotalGames > 0) {
+//                (newWins.toDouble() / newTotalGames.toDouble() * 100).toInt()
+//            } else {
+//                0
+//            }
+//
+//            val newUser = Users(
+//                userData.name,
+//                userData.email,
+//                winRate,
+//                if (win) (userData.winStreak ?: 0) + 1 else 0,
+//                totalScore,
+//                newPlayTime,
+//                newTotalGames,
+//                newWins,
+//                0,
+//                0,
+//                ArrayList()
+//            )
+//
+//            FirebaseFirestore.getInstance()
+//                .collection(AppConstants.user)
+//                .document(auth.currentUser?.email.toString())
+//                .set(newUser)
+//                .addOnSuccessListener {
+//                    Log.d("User data", "user data updated successfully")
+//                }
+//        }
+//
+////        updateBestScore(id, score)
+//    }
 
 //    fun getStreak(callback: (Streak) -> Unit) {
 //        val email = auth.currentUser?.email.toString()
@@ -751,6 +754,44 @@ suspend fun updateUserData(user: UserResponse.UserData, context: Context) {
     fun clearUser(context: Context) {
         val sharedPref = context.getSharedPreferences(AppConstants.PREFS_NAME, Context.MODE_PRIVATE)
         sharedPref.edit().remove(AppConstants.USER_KEY).apply()
+    }
+
+
+    private fun getPrefs(context: Context): SharedPreferences {
+        return context.getSharedPreferences(AppConstants.PREFS_NAME, Context.MODE_PRIVATE)
+    }
+
+
+    fun saveTips(context: Context, tips: Int) {
+        getPrefs(context).edit().putInt(AppConstants.KEY_TIPS, tips).apply()
+    }
+
+
+    fun getTips(context: Context): Int {
+        return getPrefs(context).getInt(AppConstants.KEY_TIPS, 0)
+    }
+
+
+    fun updateTips(context: Context, newTips: Int) {
+        val current = getTips(context)
+        saveTips(context, current + newTips)
+        CoroutineScope(Dispatchers.Main).launch {
+            val userId = getUserId(context).toString()
+            val response = RetrofitClient.authInstance.updateTips(userId,current+newTips)
+            if (response.isSuccessful) {
+                Log.e("Response",response.toString())
+            } else {
+                Log.e("Response",response.toString())
+            }
+        }
+
+
+
+    }
+
+    /** Delete tips value */
+    fun deleteTips(context: Context) {
+        getPrefs(context).edit().remove(AppConstants.KEY_TIPS).apply()
     }
 
 }

@@ -80,6 +80,7 @@ class LoginActivity : AppCompatActivity() {
                         val token = loginResponse.token
                         val id = loginResponse.data._id
                         val userData = loginResponse.data
+                        val tips = userData.tips
 //                        AppFunctions.saveUser(this@LoginActivity,userData as UserResponse.UserData)
 
                         // Save token if needed
@@ -88,6 +89,7 @@ class LoginActivity : AppCompatActivity() {
 
                         AppFunctions.saveToken(this@LoginActivity,token)
                         AppFunctions.saveUserId(this@LoginActivity,id)
+                        AppFunctions.saveTips(this@LoginActivity,tips)
                         Log.d("User Token", AppFunctions.getToken(this@LoginActivity).toString())
 
                         AppFunctions.fetchUserData(AppFunctions.getUserId(this@LoginActivity).toString(),this@LoginActivity)
@@ -95,11 +97,15 @@ class LoginActivity : AppCompatActivity() {
                         Toast.makeText(this@LoginActivity, "Welcome ${userData.name}", Toast.LENGTH_SHORT).show()
 
 
+                        binding.progressContainer.visibility = View.GONE
                          startActivity(Intent(this@LoginActivity, BottomNavActivity::class.java))
+                        finish()
                     } else {
+                        binding.progressContainer.visibility = View.GONE
                         Toast.makeText(this@LoginActivity, "Login failed: ${loginResponse?.message}", Toast.LENGTH_SHORT).show()
                     }
                 } else {
+                    binding.progressContainer.visibility = View.GONE
                     Toast.makeText(this@LoginActivity, "Server Error: ${response.code()}", Toast.LENGTH_SHORT).show()
                 }
             }

@@ -46,7 +46,8 @@
     <fragment
         android:id="@+id/gameFragment"
         android:name="com.o7solutions.braingames.FindTheWord.GameFragment"
-        android:label="GameFragment" />
+        android:label="Game Fragment" />
+
     <fragment
         android:id="@+id/gameEndFragment"
         android:name="com.o7solutions.braingames.UI.GameEndFragment"

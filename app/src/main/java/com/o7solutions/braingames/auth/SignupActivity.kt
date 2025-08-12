@@ -86,13 +86,16 @@ class SignupActivity : AppCompatActivity() {
                     val res = response.body()
                     Toast.makeText(this@SignupActivity, "Registered: ${res?.message}", Toast.LENGTH_SHORT).show()
 
-                    val intent = Intent(this@SignupActivity, BottomNavActivity::class.java)
+                    binding.progressContainer.visibility = View.GONE
+                    val intent = Intent(this@SignupActivity, LoginActivity::class.java)
                     startActivity(intent)
                     finish()
 
 
                     Log.d("REGISTER", "Token: ${res?.token}")
                 } else {
+                    binding.progressContainer.visibility = View.GONE
+
                     Toast.makeText(this@SignupActivity, "Failed: ${response.code()}", Toast.LENGTH_SHORT).show()
                     Log.e("Register Error",response.code().toString())
                 }

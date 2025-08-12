@@ -1,6 +1,5 @@
 package com.o7solutions.braingames.WordGame
 
-import android.content.Context
 import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.LayerDrawable
@@ -32,7 +31,6 @@ import androidx.navigation.NavOptions
 import com.example.game.RetrofitInstance
 import com.example.game.WordRepository
 import com.o7solutions.braingames.DataClasses.GameFetchData
-import com.o7solutions.braingames.DataClasses.Games
 import com.o7solutions.braingames.utils.AppFunctions
 import kotlinx.coroutines.launch
 import kotlin.math.max
@@ -86,8 +84,7 @@ class WordGameFragment : Fragment() {
         arguments?.let {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
-            currentLevel = it.getInt("SELECTED_LEVEL", 1)
-//            game = it.getSerializable("game_data") as Games
+            currentLevel = it.getInt("level", 1)
             game = it.getSerializable("game_data") as GameFetchData.Data
 
 
@@ -106,11 +103,16 @@ class WordGameFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+//        countDownTimer = object : CountDownTimer(0, 0) {
+//            override fun onTick(millisUntilFinished: Long) {}
+//            override fun onFinish() {}
+//        }
+        startGame()
         if (savedInstanceState == null) {
             if (currentLevel == 1) score = 0
         }
 
+        updateTipData()
         wordDisplayBox = view.findViewById(R.id.wordDisplayBox)
         wordTextView = view.findViewById(R.id.wordTextView)
         pauseButton = view.findViewById(R.id.pauseButton)
@@ -142,11 +144,24 @@ class WordGameFragment : Fragment() {
         }
 
         pauseButton.setOnClickListener { togglePause() }
-        binding.bulbButton.setOnClickListener { useHint() }
+        binding.bulbButton.setOnClickListener { useHint()
+            AppFunctions.updateTips(requireActivity(),-1)
+            updateTipData()
+        }
 
-        // Load hint count from SharedPreferences
-        loadHintCount()
+
+    }
+
+    fun updateTipData() {
+        hintCount = AppFunctions.getTips(requireActivity())
+        if(hintCount <1) {
+
+            Toast.makeText(requireContext(), "No tips available", Toast.LENGTH_SHORT).show()
+            return
+        }
+
         updateHintCounter()
+        binding.hintCounterTextView.text = hintCount.toString()
     }
 
     companion object {
@@ -561,15 +576,15 @@ class WordGameFragment : Fragment() {
 //        scoreTextView.text = score.toString()
 //    }
 
-    private fun loadHintCount() {
-        val sharedPrefs = requireActivity().getSharedPreferences("GamePrefs", Context.MODE_PRIVATE)
-        hintCount = sharedPrefs.getInt("hint_count", 3)
-    }
-
-    private fun saveHintCount() {
-        val sharedPrefs = requireActivity().getSharedPreferences("GamePrefs", Context.MODE_PRIVATE)
-        sharedPrefs.edit().putInt("hint_count", hintCount).apply()
-    }
+//    private fun loadHintCount() {
+//        val sharedPrefs = requireActivity().getSharedPreferences("GamePrefs", Context.MODE_PRIVATE)
+//        hintCount = sharedPrefs.getInt("hint_count", 3)
+//    }
+//
+//    private fun saveHintCount() {
+//        val sharedPrefs = requireActivity().getSharedPreferences("GamePrefs", Context.MODE_PRIVATE)
+//        sharedPrefs.edit().putInt("hint_count", hintCount).apply()
+//    }
 
     private fun updateHintCounter() {
 
@@ -589,9 +604,8 @@ class WordGameFragment : Fragment() {
     private fun useHint() {
         if (hintCount <= 0 || !isAnswerable || isPaused) return
 
-        hintCount--
-        saveHintCount()
-        updateHintCounter()
+//        hintCount--
+//        updateHintCounter()
 
         // Find the correct answer and highlight it
         val correctOptionView = optionTextViews.find { it.text.toString() == correctAnswer }

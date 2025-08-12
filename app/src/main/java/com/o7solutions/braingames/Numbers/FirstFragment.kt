@@ -48,6 +48,7 @@ class FirstFragment : Fragment() {
     var totalQuestions = 0
     var rightQuestions = 0
     var totalSeconds = 60
+    var tips = 0
 
     // For level 3+ tracking
     var selectedOperator1 = ""
@@ -63,6 +64,7 @@ class FirstFragment : Fragment() {
         arguments?.let {
 
             game = it.getSerializable("game_data") as GameFetchData.Data
+            level = it.getInt("level")
         }
     }
 
@@ -84,6 +86,7 @@ class FirstFragment : Fragment() {
 
         var blinkAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.blink)
 
+        updateTipData()
         binding.operator1.startAnimation(blinkAnimation)
         binding.operator2.startAnimation(blinkAnimation)
 
@@ -91,24 +94,35 @@ class FirstFragment : Fragment() {
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
                 override fun handleOnBackPressed() {
-                    AlertDialog.Builder(requireContext())
-                        .setTitle("Exit?")
-                        .setMessage("Do you want to go back?")
-                        .setPositiveButton("Yes") { _, _ ->
-                            findNavController().popBackStack()
-                        }
-                        .setNegativeButton("No", null)
-                        .show()
+                    val dialogView = LayoutInflater.from(requireContext())
+                        .inflate(R.layout.custom_exit_dialog, null)
+
+                    val dialog = AlertDialog.Builder(requireContext())
+                        .setView(dialogView)
+                        .setCancelable(false)
+                        .create()
+
+                    dialogView.findViewById<Button>(R.id.btnYes).setOnClickListener {
+                        dialog.dismiss()
+                        findNavController().popBackStack()
+                    }
+
+                    dialogView.findViewById<Button>(R.id.btnNo).setOnClickListener {
+                        dialog.dismiss()
+                    }
+
+                    dialog.show()
                 }
-
-            })
-
+            }
+        )
 //
         binding.points.text = points.toString()
 
 
         binding.tipsCard.setOnClickListener {
             performTipsFunctionality()
+            AppFunctions.updateTips(requireActivity(), -1)
+            updateTipData()
         }
 
         binding.apply {
@@ -185,119 +199,99 @@ class FirstFragment : Fragment() {
         }
     }
 
-//    fun performTipsFunctionality() {
-//
-//        if (operator == "+") {
-//
-//            binding.plus.setCardBackgroundColor(
-//                ContextCompat.getColor(requireContext(), R.color.green)
-//            )
-//
-//        }
-//        else if (operator == "-") {
-//
-//            binding.minus.setCardBackgroundColor(
-//                ContextCompat.getColor(requireContext(), R.color.green)
-//            )
-////            binding.minus.setStrokeColor(
-////                ColorStateList.valueOf(ContextCompat.getColor(requireContext(), R.color.green))
-////            )
-//        }
-//        else if (operator == "x") {
-//
-//            binding.multiply.setCardBackgroundColor(
-//                ContextCompat.getColor(requireContext(), R.color.green)
-//            )
-//
-//        } else if (operator == "/") {
-//
-//            binding.division.setCardBackgroundColor(
-//                ContextCompat.getColor(requireContext(), R.color.green)
-//            )
-//
-//        }
-////        binding.operator1.text = " "
-////        binding.operator2.text = " "
-////        binding.operand1.text = " "
-////        binding.operand2.text = " "
-////        binding.operand3.text = " "
-////        binding.answer.text = " "
-//////        binding.equalTo.text = " "
-////
-////        Toast.makeText(requireContext(), "Question solved!", Toast.LENGTH_SHORT).show()
-//////        if(level < 3) {
-////            rightQuestions++
-////            updateQuestions()
-//////            Toast.makeText(requireContext(), "Correct answer!", Toast.LENGTH_SHORT).show()
-////            index++
-////            binding.questionCard.setStrokeColor(
-////                ContextCompat.getColor(
-////                    requireContext(),
-////                    R.color.green
-////                )
-////            )
-////
-////            binding.movePoints.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
-////            binding.movePoints.text = "+20"
-////            binding.movePoints.visibility = View.VISIBLE
-////            binding.movePoints.startAnimation(moveUp)
-////            points = points + 20
-////            binding.points.text = points.toString()
-////            moveUp.setAnimationListener(object : Animation.AnimationListener {
-////                override fun onAnimationStart(animation: Animation?) {}
-////
-////                override fun onAnimationEnd(animation: Animation?) {
-////                    binding.movePoints.text = ""
-////                    binding.movePoints.visibility = View.INVISIBLE
-////                }
-////
-////                override fun onAnimationRepeat(animation: Animation?) {}
-////            })
-////            setData()
-////
-////
-////        if(points >= 200 && level == 1) {
-////            level = 2
-////            totalSeconds = totalSeconds + 60
-////            startTimer()
-////            Toast.makeText(requireContext(), "Level 2 Unlocked! +60 seconds", Toast.LENGTH_LONG).show()
-////        } else if(points >= 400 && level == 2) {
-////            level = 3
-////            totalSeconds = totalSeconds + 60
-////            startTimer()
-////            Toast.makeText(requireContext(), "Level 3 Unlocked! Now guess both operators! +60 seconds", Toast.LENGTH_LONG).show()
-////        } else if(points >= 600 && level == 3) {
-////            level = 4
-////            totalSeconds = totalSeconds + 60
-////            startTimer()
-////            Toast.makeText(requireContext(), "Level 4 Unlocked! +60 seconds", Toast.LENGTH_LONG).show()
-////        }
-//
-//    }
 
     fun performTipsFunctionality() {
         if (level < 3) {
             // Levels 1 and 2: Single operator
             when (operator) {
-                "+" -> binding.plus.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green))
-                "-" -> binding.minus.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green))
-                "x" -> binding.multiply.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green))
-                "/" -> binding.division.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green))
+                "+" -> binding.plus.setCardBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.green
+                    )
+                )
+
+                "-" -> binding.minus.setCardBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.green
+                    )
+                )
+
+                "x" -> binding.multiply.setCardBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.green
+                    )
+                )
+
+                "/" -> binding.division.setCardBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.green
+                    )
+                )
             }
         } else {
             // Levels 3 and 4: Two operators
             when (operator) {
-                "+" -> binding.plus.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green))
-                "-" -> binding.minus.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green))
-                "x" -> binding.multiply.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green))
-                "/" -> binding.division.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green))
+                "+" -> binding.plus.setCardBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.green
+                    )
+                )
+
+                "-" -> binding.minus.setCardBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.green
+                    )
+                )
+
+                "x" -> binding.multiply.setCardBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.green
+                    )
+                )
+
+                "/" -> binding.division.setCardBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.green
+                    )
+                )
             }
 
             when (operator2) {
-                "+" -> binding.plus.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green))
-                "-" -> binding.minus.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green))
-                "x" -> binding.multiply.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green))
-                "/" -> binding.division.setCardBackgroundColor(ContextCompat.getColor(requireContext(), R.color.green))
+                "+" -> binding.plus.setCardBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.green
+                    )
+                )
+
+                "-" -> binding.minus.setCardBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.green
+                    )
+                )
+
+                "x" -> binding.multiply.setCardBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.green
+                    )
+                )
+
+                "/" -> binding.division.setCardBackgroundColor(
+                    ContextCompat.getColor(
+                        requireContext(),
+                        R.color.green
+                    )
+                )
             }
         }
     }
@@ -683,4 +677,14 @@ class FirstFragment : Fragment() {
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.show()
     }
+
+    fun updateTipData() {
+        tips = AppFunctions.getTips(requireActivity())
+        if (tips < 1) {
+            Toast.makeText(requireContext(), "No tips available", Toast.LENGTH_SHORT).show()
+            return
+        }
+        binding.tipsTV.text = tips.toString()
+    }
+
 }
