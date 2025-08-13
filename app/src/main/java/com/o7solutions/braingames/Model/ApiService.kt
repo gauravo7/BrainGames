@@ -5,6 +5,8 @@ import com.o7solutions.braingames.DataClasses.Auth.LoginRequest.LoginResponse
 import com.o7solutions.braingames.DataClasses.Auth.RegisterResponse
 import com.o7solutions.braingames.DataClasses.Auth.UserResponse
 import com.o7solutions.braingames.DataClasses.GameFetchData
+import com.o7solutions.braingames.DataClasses.OtpResponse
+import com.o7solutions.braingames.DataClasses.OtpVerification
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -64,4 +66,23 @@ interface ApiService {
         @Field("tips") tips: Int // must be a stringified JSON array
     ): Response<ResponseBody>
 
+    @FormUrlEncoded
+    @POST("sendOtp")
+    suspend fun requestOTP(
+        @Field("email") email: String,
+    ): Response<OtpResponse>
+
+    @FormUrlEncoded
+    @POST("verifyOtp")
+    suspend fun verifyOTP(
+        @Field("email") email: String,
+        @Field("otp") otp: Int,
+    ): Response<OtpVerification>
+
+    @FormUrlEncoded
+    @POST("changeForgottenPassword")
+    suspend fun changePassword(
+        @Field("_id") id: String,
+        @Field("password") password: String
+    ): Response<ResponseBody>
 }

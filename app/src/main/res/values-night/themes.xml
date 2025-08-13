@@ -2,7 +2,7 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.BrainGames" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your dark theme here. -->
-         <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimary">@color/primary</item>
         <item name="android:textColorPrimary">#FFFFFF</item> <!-- Title text color -->
         <item name="actionBarTheme">@style/MyCustomActionBar</item>
     </style>
@@ -12,7 +12,9 @@
             @color/primary
         </item>
     </style>
+
     <style name="MyCustomActionBar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="android:textColorPrimary">@color/white</item> <!-- Change to your desired color -->
+        <item name="android:textColorPrimary">@color/white
+        </item> <!-- Change to your desired color -->
     </style>
 </resources>

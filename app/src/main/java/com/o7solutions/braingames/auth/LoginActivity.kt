@@ -16,6 +16,7 @@ import com.o7solutions.braingames.DataClasses.Auth.LoginRequest.LoginResponse
 import com.o7solutions.braingames.DataClasses.Auth.UserResponse
 import com.o7solutions.braingames.Model.RetrofitClient
 import com.o7solutions.braingames.R
+import com.o7solutions.braingames.UI.ForgotPasswordActivity
 import com.o7solutions.braingames.databinding.ActivityLoginBinding
 import com.o7solutions.braingames.utils.AppConstants
 import com.o7solutions.braingames.utils.AppFunctions
@@ -41,6 +42,10 @@ class LoginActivity : AppCompatActivity() {
 
         firebaseAuth = FirebaseAuth.getInstance()
 
+        binding.textViewForgotPassword.setOnClickListener {
+            val intent = Intent(this, ForgotPasswordActivity::class.java)
+            startActivity(intent)
+        }
         binding.buttonLogin.setOnClickListener {
 //            val intent = Intent(this, BottomNavActivity::class.java)
 //            startActivity(intent)
@@ -88,6 +93,7 @@ class LoginActivity : AppCompatActivity() {
 //                        sharedPref.edit().putString(AppConstants.token, token).apply()
 
                         AppFunctions.saveToken(this@LoginActivity,token)
+                        Log.d("Token",token.toString())
                         AppFunctions.saveUserId(this@LoginActivity,id)
                         AppFunctions.saveTips(this@LoginActivity,tips)
                         Log.d("User Token", AppFunctions.getToken(this@LoginActivity).toString())

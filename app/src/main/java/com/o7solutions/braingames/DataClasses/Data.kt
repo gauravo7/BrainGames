@@ -1,0 +1,30 @@
+package com.o7solutions.braingames.DataClasses
+
+data class Data(
+    val __v: Int,
+    val _id: String,
+    val addedById: Any,
+    val autoId: Int,
+    val createdAt: String,
+    val email: String,
+    val gameHistory: List<GameHistory>,
+    val isBlocked: Boolean,
+    val isDelete: Boolean,
+    val level: Int,
+    val name: String,
+    val otp: Int,
+    val password: String,
+    val playTime: Int,
+    val recentLogins: List<RecentLogin>,
+    val status: Boolean,
+    val streak: StreakX,
+    val tips: Int,
+    val totalGames: Int,
+    val totalScore: Int,
+    val totalWins: Int,
+    val updatedAt: String,
+    val updatedById: String,
+    val winRate: Int,
+    val winStreak: Int,
+    val xp: Int
+)

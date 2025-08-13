@@ -2,22 +2,24 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.BrainGames" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your light theme here. -->
-         <item name="colorPrimary">@color/primary</item>
+        <item name="colorPrimary">@color/primary</item>
         <item name="android:textColorPrimary">#FFFFFF</item> <!-- Title text color -->
         <item name="colorControlHighlight">@color/white</item>
 
         <item name="actionBarTheme">@style/MyCustomActionBar</item>
     </style>
-    
+
     <style name="App.Custom.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
         <item name="android:color">
-         @color/primary
+            @color/primary
         </item>
     </style>
 
     <style name="MyCustomActionBar" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
-        <item name="android:textColorPrimary">@color/white</item> <!-- Change to your desired color -->
+        <item name="android:textColorPrimary">@color/white
+        </item> <!-- Change to your desired color -->
     </style>
+
     <style name="Theme.BrainGames" parent="Base.Theme.BrainGames" />
 
 
