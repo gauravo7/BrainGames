@@ -32,6 +32,7 @@ import androidx.navigation.NavOptions
 import com.example.game.RetrofitInstance
 import com.example.game.WordRepository
 import com.o7solutions.braingames.DataClasses.GameFetchData
+import com.o7solutions.braingames.DataClasses.Wordresponse
 import com.o7solutions.braingames.Model.RetrofitClient
 import com.o7solutions.braingames.utils.AppFunctions
 import kotlinx.coroutines.launch
@@ -80,12 +81,16 @@ class WordGameFragment : Fragment() {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
             currentLevel = it.getInt("level", 1)
-            Log.d("Current level",currentLevel.toString())
+            Log.d("Current level", currentLevel.toString())
             game = it.getSerializable("game_data") as GameFetchData.Data
         }
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = FragmentWordGameBinding.inflate(layoutInflater)
         return binding.root
     }
@@ -116,15 +121,21 @@ class WordGameFragment : Fragment() {
         pauseButton.setOnClickListener { togglePause() }
         setupOnBackPressed()
 
-        if (isPaused) {
-            Toast.makeText(requireActivity(), "Please resume the timer!", Toast.LENGTH_SHORT).show()
-        } else {
-            if (loadLevelData(currentLevel)) {
-                startGame()
+        lifecycleScope.launch {
+
+
+            if (isPaused) {
+                Toast.makeText(requireActivity(), "Please resume the timer!", Toast.LENGTH_SHORT)
+                    .show()
             } else {
-                // No words available → exit gracefully
-                findNavController().popBackStack()
+                if (loadLevelData(currentLevel)) {
+                    startGame()
+                } else {
+                    // No words available → exit gracefully
+//                findNavController().popBackStack()
+                }
             }
+
         }
 
         binding.bulbButton.setOnClickListener {
@@ -146,17 +157,47 @@ class WordGameFragment : Fragment() {
         binding.hintCounterTextView.text = hintCount.toString()
     }
 
-    companion object {
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) = WordGameFragment().apply {
-            arguments = Bundle().apply {
-                putString(ARG_PARAM1, param1)
-                putString(ARG_PARAM2, param2)
-            }
-        }
-    }
+//    private fun loadLevelData(level: Int) {
+//        totalGameTime = when (level) {
+//            1 -> 120000L
+//            2 -> 110000L
+//            3 -> 100000L
+//            4 -> 90000L
+//            else -> 120000L
+//        }
+//        timeLeftInMillis = totalGameTime
+//
+//        lifecycleScope.launch {
+//            try {
+//                val response = RetrofitClient.authInstance.getRandomWords(length = 5, count = 50, minLength = 5)
+//
+//                if (response.isSuccessful) {
+//                    val data = response.body()?.data ?: emptyList()
+//                    WordRepository.wordList.clear()
+//                    WordRepository.wordList.addAll(data)
+//
+//                    if (WordRepository.wordList.size < 10) {
+//                        Toast.makeText(requireActivity(), "Not enough words for Level $level.", Toast.LENGTH_LONG).show()
+//                        findNavController().popBackStack()
+//                        return@launch
+//                    }
+//
+//                    originalWordList = WordRepository.wordList
+//                    remainingWords = originalWordList.shuffled().toMutableList()
+//
+//                    startGame()   // 🔥 Start only after words are loaded
+//                } else {
+//                    Toast.makeText(requireActivity(), "Failed to load words.", Toast.LENGTH_LONG).show()
+//                    findNavController().popBackStack()
+//                }
+//            } catch (e: Exception) {
+//                Toast.makeText(requireActivity(), "Error: ${e.message}", Toast.LENGTH_LONG).show()
+//                findNavController().popBackStack()
+//            }
+//        }
+//    }
 
-    private fun loadLevelData(level: Int): Boolean {
+    private suspend fun loadLevelData(level: Int): Boolean {
         totalGameTime = when (level) {
             1 -> 120000L
             2 -> 110000L
@@ -166,17 +207,40 @@ class WordGameFragment : Fragment() {
         }
         timeLeftInMillis = totalGameTime
 
-        val wordsForLevel = WordRepository.wordList
-        if (wordsForLevel.size < 10) {
-            Toast.makeText(requireActivity(), "Not enough words were loaded for Level $level.", Toast.LENGTH_LONG).show()
-            originalWordList = emptyList()
-            remainingWords.clear()
-            return false
-        }
+        return try {
+            val response = RetrofitClient.authInstance.getRandomWords(
+                length = 5,
+                count = 50,
+                minLength = 5
+            )
 
-        originalWordList = wordsForLevel
-        remainingWords = originalWordList.shuffled().toMutableList()
-        return true
+            if (response.isSuccessful) {
+                WordRepository.wordList.clear()
+                WordRepository.wordList.addAll(response.body()?.data ?: emptyList())
+
+                val wordsForLevel = WordRepository.wordList
+
+                if (wordsForLevel.size < 10) {
+                    Toast.makeText(
+                        requireActivity(),
+                        "Not enough words were loaded for Level $level.",
+                        Toast.LENGTH_LONG
+                    ).show()
+                    originalWordList = emptyList()
+                    remainingWords.clear()
+                    false
+                } else {
+                    originalWordList = wordsForLevel
+                    remainingWords = originalWordList.shuffled().toMutableList()
+                    true
+                }
+            } else {
+                false
+            }
+        } catch (e: Exception) {
+            Log.e("loadLevelData", "Error: ${e.message}")
+            false
+        }
     }
 
     private fun startGame() {
@@ -186,7 +250,11 @@ class WordGameFragment : Fragment() {
 
         // Safety: ensure pool is ready before first round
         if (!ensureWordPoolReady()) {
-            Toast.makeText(requireActivity(), "No words available to start the game.", Toast.LENGTH_SHORT).show()
+            Toast.makeText(
+                requireActivity(),
+                "No words available to start the game.",
+                Toast.LENGTH_SHORT
+            ).show()
             findNavController().popBackStack()
             return
         }
@@ -216,16 +284,34 @@ class WordGameFragment : Fragment() {
 
         viewLifecycleOwner.lifecycleScope.launch {
             try {
-                val wordsForLevel = RetrofitClient.authInstance.getRandomWords(length = requiredLength, count = 50, minLength = requiredLength)
+                val wordsResponse = RetrofitClient.authInstance.getRandomWords(
+                    length = requiredLength,
+                    count = 50,
+                    minLength = requiredLength
+                )
+
+
+                var wordsForLevel = emptyList<String>()
+                if (wordsResponse.isSuccessful) {
+                    wordsForLevel = wordsResponse.body()!!.data
+                }
                 if (wordsForLevel.size < 10) {
-                    Toast.makeText(requireActivity(), "API did not provide enough words for the next level.", Toast.LENGTH_SHORT).show()
-                    findNavController().popBackStack()
+                    Toast.makeText(
+                        requireActivity(),
+                        "API did not provide enough words for the next level.",
+                        Toast.LENGTH_SHORT
+                    ).show()
+//                    findNavController().popBackStack()
                     return@launch
                 }
-                WordRepository.wordList = wordsForLevel
+                WordRepository.wordList.addAll(wordsForLevel)
 
                 if (isPaused) {
-                    Toast.makeText(requireActivity(), "Please resume the Timer!", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireActivity(),
+                        "Please resume the Timer!",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     return@launch
                 }
                 if (loadLevelData(currentLevel)) {
@@ -234,7 +320,11 @@ class WordGameFragment : Fragment() {
                     findNavController().popBackStack()
                 }
             } catch (e: Exception) {
-                Toast.makeText(requireActivity(), "Failed to load words: ${e.message}", Toast.LENGTH_LONG).show()
+                Toast.makeText(
+                    requireActivity(),
+                    "Failed to load words: ${e.message}",
+                    Toast.LENGTH_LONG
+                ).show()
                 findNavController().popBackStack()
             } finally {
                 loadingDialog?.dismiss()
@@ -295,7 +385,7 @@ class WordGameFragment : Fragment() {
 
         if (isCorrect) {
             correctAnswersCount++
-            score += 30
+            score += 20
             wordDisplayBox.setBackgroundResource(R.drawable.correct_answer_background)
             selectedView.setBackgroundResource(R.drawable.correct_answer_background)
         } else {
@@ -337,7 +427,7 @@ class WordGameFragment : Fragment() {
     private fun showScoreAnimation(isCorrect: Boolean) {
         val view = scoreFeedbackTextView
         if (isCorrect) {
-            view.text = "+30"
+            view.text = "+20"
             view.setTextColor(ContextCompat.getColor(requireActivity(), R.color.feedback_green))
         } else {
             if (score > 0) {
@@ -386,9 +476,20 @@ class WordGameFragment : Fragment() {
         val progressDrawable = timerProgressBar.progressDrawable as LayerDrawable
         val clipDrawable = progressDrawable.findDrawableByLayerId(android.R.id.progress)
         when {
-            progress < 25 -> clipDrawable.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.feedback_red), PorterDuff.Mode.SRC_IN)
+            progress < 25 -> clipDrawable.setColorFilter(
+                ContextCompat.getColor(
+                    requireActivity(),
+                    R.color.feedback_red
+                ), PorterDuff.Mode.SRC_IN
+            )
+
             progress < 50 -> clipDrawable.setColorFilter(Color.YELLOW, PorterDuff.Mode.SRC_IN)
-            else -> clipDrawable.setColorFilter(ContextCompat.getColor(requireActivity(), R.color.feedback_green), PorterDuff.Mode.SRC_IN)
+            else -> clipDrawable.setColorFilter(
+                ContextCompat.getColor(
+                    requireActivity(),
+                    R.color.feedback_green
+                ), PorterDuff.Mode.SRC_IN
+            )
         }
     }
 
@@ -406,7 +507,8 @@ class WordGameFragment : Fragment() {
     }
 
     private fun showLoadingDialog() {
-        val dialogView = LayoutInflater.from(requireActivity()).inflate(R.layout.dialog_loading, null)
+        val dialogView =
+            LayoutInflater.from(requireActivity()).inflate(R.layout.dialog_loading, null)
         loadingDialog = MaterialAlertDialogBuilder(requireActivity())
             .setView(dialogView)
             .setCancelable(false)
@@ -421,7 +523,13 @@ class WordGameFragment : Fragment() {
         GameResult.finalScore = score
         GameResult.allLevelsCompleted = false
         GameResult.timePlayedMillis = totalGameTime
-        AppFunctions.updateUserDataThroughApi(score, false, totalGameTime - timeLeftInMillis, game._id, requireActivity())
+        AppFunctions.updateUserDataThroughApi(
+            score,
+            false,
+            totalGameTime - timeLeftInMillis,
+            game._id,
+            requireActivity()
+        )
 
         val bundle = Bundle().apply {
             putString("id", game._id)
@@ -442,7 +550,8 @@ class WordGameFragment : Fragment() {
 
     private fun handleLevelCompletion() {
         if (currentLevel < 4) {
-            val dialogView = LayoutInflater.from(requireActivity()).inflate(R.layout.dialog_level_complete, null)
+            val dialogView =
+                LayoutInflater.from(requireActivity()).inflate(R.layout.dialog_level_complete, null)
             val title = dialogView.findViewById<TextView>(R.id.levelCompleteTitle)
             title.text = "Level ${currentLevel} Cleared!"
             val dialog = MaterialAlertDialogBuilder(requireActivity())
@@ -459,7 +568,13 @@ class WordGameFragment : Fragment() {
             GameResult.finalScore = score
             GameResult.allLevelsCompleted = true
             GameResult.timePlayedMillis = totalGameTime - timeLeftInMillis
-            AppFunctions.updateUserDataThroughApi(score, true, totalGameTime - timeLeftInMillis, game._id, requireActivity())
+            AppFunctions.updateUserDataThroughApi(
+                score,
+                true,
+                totalGameTime - timeLeftInMillis,
+                game._id,
+                requireActivity()
+            )
             findNavController().popBackStack()
         }
     }

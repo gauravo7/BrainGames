@@ -139,28 +139,28 @@ class DashboardFragment : Fragment() {
             else -> 0
         }
 
-        lifecycleScope.launch {
-            try {
-                val wordsForLevel = RetrofitInstance.api.getRandomWords(length = requiredLength, count = 50)
-
-                if (wordsForLevel.size < 10) {
-                    Toast.makeText(requireActivity(), "API did not provide enough words.", Toast.LENGTH_SHORT).show()
-                    loadingDialog?.dismiss()
-                    return@launch
-                }
-
-                WordRepository.wordList = wordsForLevel
-
-                val bundle = Bundle()
-                bundle.putInt("SELECTED_LEVEL",level)
-                bundle.putSerializable("game_data", game)
-                findNavController().navigate(R.id.wordGameFragment,bundle)
-
-            } catch (e: Exception) {
-                Toast.makeText(requireActivity(), "Failed to load words: ${e.message}", Toast.LENGTH_LONG).show()
-                loadingDialog?.dismiss()
-            }
-        }
+//        lifecycleScope.launch {
+//            try {
+////                val wordsForLevel = RetrofitInstance.api.getRandomWords(length = requiredLength, count = 50)
+//
+//                if (wordsForLevel.size < 10) {
+//                    Toast.makeText(requireActivity(), "API did not provide enough words.", Toast.LENGTH_SHORT).show()
+//                    loadingDialog?.dismiss()
+//                    return@launch
+//                }
+//
+//                WordRepository.wordList = wordsForLevel
+//
+//                val bundle = Bundle()
+//                bundle.putInt("SELECTED_LEVEL",level)
+//                bundle.putSerializable("game_data", game)
+//                findNavController().navigate(R.id.wordGameFragment,bundle)
+//
+//            } catch (e: Exception) {
+//                Toast.makeText(requireActivity(), "Failed to load words: ${e.message}", Toast.LENGTH_LONG).show()
+//                loadingDialog?.dismiss()
+//            }
+//        }
     }
 
     override fun onResume() {

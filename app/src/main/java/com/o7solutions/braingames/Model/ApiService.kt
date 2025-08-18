@@ -88,11 +88,11 @@ interface ApiService {
         @Field("password") password: String
     ): Response<ResponseBody>
 
-
-    @GET("random-words")
+    @FormUrlEncoded
+    @POST("random-words")
     suspend fun getRandomWords(
-        @Query("maxLength") length: Int,
-        @Query("count") count: Int,
-        @Query("minLength") minLength: Int
+        @Field("maxLength") length: Int,
+        @Field("count") count: Int,
+        @Field("minLength") minLength: Int
     ): Response<Wordresponse>
 }
