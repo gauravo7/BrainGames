@@ -35,18 +35,7 @@
         </com.google.android.material.card.MaterialCardView>
 
         <!-- Game Description -->
-        <TextView
-            android:id="@+id/description"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginBottom="32dp"
-            android:fontFamily="@font/neut"
-            android:gravity="center"
-            android:lineSpacingExtra="4dp"
-            android:textColor="#F8FAFC"
-            android:textSize="18sp"
-            android:alpha="0.95" />
+
 
         <!-- Best Score Card with Enhanced Design -->
         <com.google.android.material.card.MaterialCardView
@@ -214,6 +203,19 @@
             </LinearLayout>
 
         </com.google.android.material.card.MaterialCardView>
+
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginBottom="32dp"
+            android:fontFamily="@font/neut"
+            android:gravity="center"
+            android:lineSpacingExtra="4dp"
+            android:textColor="#F8FAFC"
+            android:textSize="18sp"
+            android:alpha="0.95" />
 
         <!-- Elegant Divider -->
         <LinearLayout

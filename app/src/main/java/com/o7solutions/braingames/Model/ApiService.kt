@@ -7,6 +7,7 @@ import com.o7solutions.braingames.DataClasses.Auth.UserResponse
 import com.o7solutions.braingames.DataClasses.GameFetchData
 import com.o7solutions.braingames.DataClasses.OtpResponse
 import com.o7solutions.braingames.DataClasses.OtpVerification
+import com.o7solutions.braingames.DataClasses.Wordresponse
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
@@ -16,6 +17,7 @@ import retrofit2.http.Field
 import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
 import retrofit2.http.POST
+import retrofit2.http.Query
 
 interface ApiService {
 
@@ -85,4 +87,12 @@ interface ApiService {
         @Field("_id") id: String,
         @Field("password") password: String
     ): Response<ResponseBody>
+
+
+    @GET("random-words")
+    suspend fun getRandomWords(
+        @Query("maxLength") length: Int,
+        @Query("count") count: Int,
+        @Query("minLength") minLength: Int
+    ): Response<Wordresponse>
 }

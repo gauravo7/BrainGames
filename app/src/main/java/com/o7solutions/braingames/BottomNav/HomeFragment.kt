@@ -99,6 +99,8 @@ class HomeFragment : Fragment(), GamesAdapter.OnClick {
 //            binding.streakTV.text = user.streak.count.toString()
 //        }
 //        Logical games
+
+        Log.d("Token", AppFunctions.getToken(requireContext()).toString())
         adapter = GamesAdapter(logicalList,this)
         binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.recyclerView.adapter = adapter

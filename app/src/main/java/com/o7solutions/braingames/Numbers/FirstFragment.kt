@@ -87,6 +87,7 @@ class FirstFragment : Fragment() {
         var blinkAnimation = AnimationUtils.loadAnimation(requireContext(), R.anim.blink)
 
         updateTipData()
+        binding.tipsTV.text = tips.toString()
         binding.operator1.startAnimation(blinkAnimation)
         binding.operator2.startAnimation(blinkAnimation)
 
@@ -120,7 +121,11 @@ class FirstFragment : Fragment() {
 
 
         binding.tipsCard.setOnClickListener {
-            performTipsFunctionality()
+
+            if(tips> 0) {
+                performTipsFunctionality()
+
+            }
             AppFunctions.updateTips(requireActivity(), -1)
             updateTipData()
         }

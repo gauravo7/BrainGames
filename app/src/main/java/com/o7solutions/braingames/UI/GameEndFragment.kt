@@ -107,6 +107,7 @@ class GameEndFragment : Fragment() {
         xAxis.position = XAxis.XAxisPosition.BOTTOM
         xAxis.valueFormatter = IndexAxisValueFormatter(sortedList.map { it.date.substring(0, 10) }) // show only date
 
+        xAxis.labelRotationAngle = -45f 
         chart.invalidate() // refresh
     }
 

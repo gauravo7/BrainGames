@@ -23,6 +23,7 @@ import com.example.zigzag.GridCellView
 import com.example.zigzag.LevelCache
 import com.example.zigzag.WordSearchGridView
 import com.o7solutions.braingames.R
+import com.o7solutions.braingames.databinding.FragmentGameBinding
 
 private const val ARG_LEVEL_NUMBER = "level_number"
 private const val GRID_SIZE = 8
@@ -38,6 +39,7 @@ class GameFragment : Fragment() {
     private var foundWords = mutableSetOf<String>()
     private var totalHintsRemaining = 1
     private var hintedWord = ""
+    private lateinit var binding: FragmentGameBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,7 +52,9 @@ class GameFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_game, container, false)
+
+        binding = FragmentGameBinding.inflate(layoutInflater)
+        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -84,25 +88,46 @@ class GameFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
-        requireActivity().onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                showLeaveConfirmationDialog()
-            }
-        })
+        requireActivity().onBackPressedDispatcher.addCallback(
+            this,
+            object : androidx.activity.OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    showLeaveConfirmationDialog()
+                }
+            })
     }
 
     private fun loadLevelDataFromCache() {
         targetWords = when (levelNumber) {
             1 -> WordRepository.getRandomWords3(4).toMutableList()
-            2 -> (WordRepository.getRandomWords4(2) + WordRepository.getRandomWords3(2)).shuffled().toMutableList()
+            2 -> (WordRepository.getRandomWords4(2) + WordRepository.getRandomWords3(2)).shuffled()
+                .toMutableList()
+
             3 -> WordRepository.getRandomWords4(5).toMutableList()
-            4 -> (WordRepository.getRandomWords5(1) + WordRepository.getRandomWords4(3) + WordRepository.getRandomWords3(1)).shuffled().toMutableList()
-            5 -> (WordRepository.getRandomWords5(3) + WordRepository.getRandomWords4(2) + WordRepository.getRandomWords3(1)).shuffled().toMutableList()
-            6 -> (WordRepository.getRandomWords4(4) + WordRepository.getRandomWords5(2)).shuffled().toMutableList()
-            7 -> (WordRepository.getRandomWords5(5) + WordRepository.getRandomWords3(1)).shuffled().toMutableList()
-            8 -> (WordRepository.getRandomWords4(4) + WordRepository.getRandomWords5(1) + WordRepository.getRandomWords4(2) + WordRepository.getRandomWords3(1)).shuffled().take(7).toMutableList()
-            9 -> (WordRepository.getRandomWords5(5) + WordRepository.getRandomWords4(2)).shuffled().toMutableList()
-            10 -> (WordRepository.getRandomWords5(4) + WordRepository.getRandomWords3(3)).shuffled().toMutableList()
+            4 -> (WordRepository.getRandomWords5(1) + WordRepository.getRandomWords4(3) + WordRepository.getRandomWords3(
+                1
+            )).shuffled().toMutableList()
+
+            5 -> (WordRepository.getRandomWords5(3) + WordRepository.getRandomWords4(2) + WordRepository.getRandomWords3(
+                1
+            )).shuffled().toMutableList()
+
+            6 -> (WordRepository.getRandomWords4(4) + WordRepository.getRandomWords5(2)).shuffled()
+                .toMutableList()
+
+            7 -> (WordRepository.getRandomWords5(5) + WordRepository.getRandomWords3(1)).shuffled()
+                .toMutableList()
+
+            8 -> (WordRepository.getRandomWords4(4) + WordRepository.getRandomWords5(1) + WordRepository.getRandomWords4(
+                2
+            ) + WordRepository.getRandomWords3(1)).shuffled().take(7).toMutableList()
+
+            9 -> (WordRepository.getRandomWords5(5) + WordRepository.getRandomWords4(2)).shuffled()
+                .toMutableList()
+
+            10 -> (WordRepository.getRandomWords5(4) + WordRepository.getRandomWords3(3)).shuffled()
+                .toMutableList()
+
             else -> WordRepository.getRandomWords3(4).toMutableList()
         }
         displayWordsInContainer(targetWords)
@@ -164,7 +189,13 @@ class GameFragment : Fragment() {
         return grid
     }
 
-    private fun canPlaceWord(grid: Array<Array<Char>>, word: String, row: Int, col: Int, direction: Int): Boolean {
+    private fun canPlaceWord(
+        grid: Array<Array<Char>>,
+        word: String,
+        row: Int,
+        col: Int,
+        direction: Int
+    ): Boolean {
         if (direction == 0) {
             if (col + word.length > GRID_SIZE) return false
         } else {
@@ -180,7 +211,13 @@ class GameFragment : Fragment() {
         return true
     }
 
-    private fun placeWord(grid: Array<Array<Char>>, word: String, row: Int, col: Int, direction: Int) {
+    private fun placeWord(
+        grid: Array<Array<Char>>,
+        word: String,
+        row: Int,
+        col: Int,
+        direction: Int
+    ) {
         for (i in word.indices) {
             val r = row + if (direction == 1) i else 0
             val c = col + if (direction == 0) i else 0
@@ -253,7 +290,6 @@ class GameFragment : Fragment() {
     }
 
 
-
     private fun updateWordsDisplay() {
         for (i in 0 until wordsContainer.childCount) {
             val child = wordsContainer.getChildAt(i)
@@ -318,7 +354,8 @@ class GameFragment : Fragment() {
     }
 
     private fun showLevelCompleteDialog() {
-        val dialogView = LayoutInflater.from(requireContext()).inflate(R.layout.dialog_level_complete, null)
+        val dialogView =
+            LayoutInflater.from(requireContext()).inflate(R.layout.dialog_level_complete, null)
         val builder = AlertDialog.Builder(requireContext())
         builder.setView(dialogView)
         builder.setCancelable(false)
@@ -337,18 +374,44 @@ class GameFragment : Fragment() {
     }
 
     private fun startNextLevelOrGoHome() {
-        val nextLevelNumber = (levelNumber ?: 1) + 1
-        val nextLevelExists = LevelCache.levels?.any { it.levelNumber == nextLevelNumber } == true
-        if (nextLevelExists) {
-            val nextLevelFragment = GameFragment.newInstance(nextLevelNumber)
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.gameFragment, nextLevelFragment)
-                .addToBackStack(null)
-                .commit()
+        levelNumber++
+
+        binding.tvLevelHeading.text = "Level $levelNumber"
+
+        if (levelNumber <= 10) {
+            foundWords.clear()
+            wordSearchGrid.resetSelection()
+            loadLevelDataFromCache()   // ✅ load words/grid for the new level
         } else {
-            parentFragmentManager.popBackStack(null, 0)
+            Toast.makeText(requireActivity(), "Game Finished", Toast.LENGTH_SHORT).show()
         }
     }
+
+//    private fun startNextLevelOrGoHome() {
+////        val nextLevelNumber = (levelNumber ?: 1) + 1
+////        val nextLevelExists = LevelCache.levels?.any { it.levelNumber == nextLevelNumber } == true
+////        if (nextLevelExists) {
+////            val nextLevelFragment = GameFragment.newInstance(nextLevelNumber)
+////            parentFragmentManager.beginTransaction()
+////                .replace(R.id.gameFragment, nextLevelFragment)
+////                .addToBackStack(null)
+////                .commit()
+//
+//
+//        levelNumber++
+//
+//
+//
+//        binding.tvLevelHeading.text =  "Level $levelNumber"
+//        if(levelNumber <= 10) {
+//            loadLevelDataFromCache()
+//        } else {
+//            Toast.makeText(requireActivity(), "Game Finished", Toast.LENGTH_SHORT).show()
+//        }
+////        } else {
+////            parentFragmentManager.popBackStack(null, 0)
+////        }
+//    }
 
     private fun showLeaveConfirmationDialog() {
         AlertDialog.Builder(requireContext())
@@ -416,13 +479,5 @@ class GameFragment : Fragment() {
         return combined.take(count)
     }
 
-    companion object {
-        @JvmStatic
-        fun newInstance(levelNumber: Int) =
-            GameFragment().apply {
-                arguments = Bundle().apply {
-                    putInt(ARG_LEVEL_NUMBER, levelNumber)
-                }
-            }
-    }
+
 }

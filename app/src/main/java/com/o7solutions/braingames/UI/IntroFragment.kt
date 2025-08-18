@@ -44,7 +44,7 @@ class IntroFragment : Fragment(), OnLevelClickListener {
     private lateinit var adapter: LevelsAdapter
     var levelsList = arrayListOf<String>()
     var bestScored = 0
-    var level = 0
+    var level = 1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -124,6 +124,9 @@ class IntroFragment : Fragment(), OnLevelClickListener {
                     putSerializable("game_data", game)
                     putInt("level",level)
                 }
+
+                Log.d("Level",level.toString())
+
 
                 val fragmentToGo = game.fragmentId
                 val context = requireContext()
