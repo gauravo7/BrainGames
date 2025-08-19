@@ -122,7 +122,7 @@ class IntroFragment : Fragment(), OnLevelClickListener {
 
                 val bundle = Bundle().apply {
                     putSerializable("game_data", game)
-                    putInt("level",level)
+                    putInt("level",unlocked+1)
                 }
 
                 Log.d("Level",level.toString())

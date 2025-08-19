@@ -1,5 +1,6 @@
 package com.o7solutions.braingames.WordGame
 
+import android.app.AlertDialog
 import android.graphics.PorterDuff
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.LayerDrawable
@@ -14,6 +15,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
+import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageButton
 import android.widget.ProgressBar
@@ -575,8 +577,23 @@ class WordGameFragment : Fragment() {
                 game._id,
                 requireActivity()
             )
-            findNavController().popBackStack()
-        }
+            var bundle = Bundle().apply {
+                putString("id", game._id)
+                putString("score", score.toString())
+            }
+
+            val fragmentToGo = game.fragmentId
+            val context = requireContext()
+            val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
+
+            resId?.let { destinationId ->
+                val navOptions = NavOptions.Builder()
+                    .setPopUpTo(destinationId, true) // clear backstack
+                    .build()
+
+                findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
+
+            }        }
     }
 
     private fun resetBoxBackgrounds() {
@@ -631,13 +648,25 @@ class WordGameFragment : Fragment() {
 
     private fun showExitConfirmationDialog() {
         if (!isAdded) return
-        MaterialAlertDialogBuilder(requireActivity())
-            .setTitle("Exit Game?")
-            .setMessage("Are you sure you want to exit?")
-            .setNegativeButton("No") { _, _ -> if (isPaused) togglePause() }
-            .setPositiveButton("Yes") { _, _ -> findNavController().popBackStack() }
-            .setOnCancelListener { if (isPaused) togglePause() }
-            .show()
+        val dialogView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.custom_exit_dialog, null)
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+
+        dialogView.findViewById<Button>(R.id.btnYes).setOnClickListener {
+            dialog.dismiss()
+            findNavController().popBackStack()
+        }
+
+        dialogView.findViewById<Button>(R.id.btnNo).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+
     }
 
     override fun onPause() {

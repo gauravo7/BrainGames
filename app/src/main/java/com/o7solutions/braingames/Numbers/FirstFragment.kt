@@ -125,10 +125,12 @@ class FirstFragment : Fragment() {
 
             if(tips> 0) {
                 performTipsFunctionality()
-
+                AppFunctions.updateTips(requireActivity(), -1)
+                updateTipData()
+            } else {
+                Toast.makeText(requireContext(), "No tips available", Toast.LENGTH_SHORT).show()
             }
-            AppFunctions.updateTips(requireActivity(), -1)
-            updateTipData()
+
         }
 
         binding.apply {

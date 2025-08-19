@@ -22,7 +22,7 @@ class LevelsAdapter(
     private val listener: OnLevelClickListener
 ) : RecyclerView.Adapter<LevelsAdapter.ViewHolder>() {
 
-    private var selectedPosition: Int = if (0 <= unlocked) 0 else RecyclerView.NO_POSITION
+    private var selectedPosition: Int = if (0 <= unlocked) unlocked else RecyclerView.NO_POSITION
     inner class ViewHolder(var view: View) : RecyclerView.ViewHolder(view) {
         var image: ImageView = view.findViewById(R.id.level_image)
         var levelTV: TextView = view.findViewById(R.id.level_TV)
@@ -43,7 +43,7 @@ class LevelsAdapter(
                 levelTV.visibility = View.VISIBLE
                 levelTV.text = "${position + 1}"
 
-                // Show play icon if selected
+                // Show play icon only for selected (latest unlocked by default)
                 if (position == selectedPosition) {
                     image.setImageResource(R.drawable.ic_play_arrow)
                     image.visibility = View.VISIBLE
@@ -59,24 +59,19 @@ class LevelsAdapter(
             }
         }
 
-        // Set the click listener on the entire item view
+        // Set the click listener
         holder.view.setOnClickListener {
-            // Get the current position of the item in the adapter
-            val currentPosition = holder.getAdapterPosition()
-
-            // Check if the position is valid and the level is unlocked
+            val currentPosition = holder.adapterPosition
             if (currentPosition != RecyclerView.NO_POSITION && currentPosition <= unlocked) {
                 val oldPosition = selectedPosition
                 selectedPosition = currentPosition
 
-                // Refresh the old and new items to update their views efficiently
                 if (oldPosition != RecyclerView.NO_POSITION) {
                     notifyItemChanged(oldPosition)
                 }
                 notifyItemChanged(selectedPosition)
 
-                // Notify the listener that a level has been clicked
-                listener.onLevelClicked(currentPosition + 1) // Pass the 1-based level number
+                listener.onLevelClicked(currentPosition + 1)
             }
         }
     }

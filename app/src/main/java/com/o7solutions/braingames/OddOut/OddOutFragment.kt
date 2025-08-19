@@ -92,9 +92,15 @@ class OddOutFragment : Fragment() {
         updateTipData()
 
         binding.tipsCard.setOnClickListener {
-            showTips()
-            AppFunctions.updateTips(requireActivity(),-1)
-            updateTipData()
+
+            if(tips>0) {
+                showTips()
+                AppFunctions.updateTips(requireActivity(),-1)
+                updateTipData()
+            } else {
+                Toast.makeText(requireContext(), "No tips available", Toast.LENGTH_SHORT).show()
+            }
+
         }
 
 //        Show dialog on back click

@@ -44,12 +44,13 @@ class GameFragment : Fragment() {
     private lateinit var wordSearchGrid: WordSearchGridView
     private var targetWords = mutableListOf<String>()
     private var foundWords = mutableSetOf<String>()
-    private var totalHintsRemaining = 1
     private var hintedWord = ""
     private lateinit var binding: FragmentGameBinding
     var points = 0
+    private var currentRemainingSeconds = 0
     private var countDownTimer: CountDownTimer? = null
     var totalSeconds = 60
+    var totalHintsRemaining = 0
     private lateinit var game: GameFetchData.Data
 
 
@@ -91,12 +92,14 @@ class GameFragment : Fragment() {
 //            showPauseDialog()
 //        }
 
+        updateTipData()
+        binding.tvHintCounter.text = totalHintsRemaining.toString()
         hintButton.setOnClickListener {
             useHint()
         }
 
+        updateTipData()
         startTimer()
-        loadHintState()
         updateHintCounter()
         loadLevelDataFromCache()
         wordSearchGrid.setOnWordFoundListener { word, colorIndex ->
@@ -286,6 +289,8 @@ class GameFragment : Fragment() {
         countDownTimer = object : CountDownTimer(totalSeconds * 1000L, 1000L) {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsLeft = (millisUntilFinished / 1000).toInt()
+//                val secondsLeft = (millisUntilFinished / 1000).toInt()
+                currentRemainingSeconds = secondsLeft
                 binding.timerProgressBar.progress = secondsLeft
                 binding.timeTextView.text = "\u23F3 $secondsLeft"
             }
@@ -293,6 +298,7 @@ class GameFragment : Fragment() {
             override fun onFinish() {
                 if (!isAdded) return
                 binding.timerProgressBar.progress = 0
+                currentRemainingSeconds = 0
                 Toast.makeText(requireActivity(), "Time's up!", Toast.LENGTH_SHORT).show()
                 showCustomDialog("Time Up", "Total Points=${points}")
             }
@@ -491,29 +497,40 @@ class GameFragment : Fragment() {
 
     private fun startNextLevelOrGoHome() {
         levelNumber++
-        totalSeconds =+ 30
+        totalSeconds = currentRemainingSeconds + 30
 
         binding.tvLevelHeading.text = "Level $levelNumber"
 
         if (levelNumber <= 10) {
             foundWords.clear()
             wordSearchGrid.resetSelection()
-            loadLevelDataFromCache()   // ✅ load words/grid for the new level
+            loadLevelDataFromCache()
+            startTimer()
         } else {
             Toast.makeText(requireActivity(), "Game Finished", Toast.LENGTH_SHORT).show()
         }
     }
 
     private fun showLeaveConfirmationDialog() {
-        AlertDialog.Builder(requireContext())
-            .setTitle("Leave Game")
-            .setMessage("Are you sure you want to leave? Your progress will be lost.")
-            .setPositiveButton("Yes") { _, _ ->
-                resetLevelProgress()
-                parentFragmentManager.popBackStack(null, 0)
-            }
-            .setNegativeButton("No", null)
-            .show()
+        val dialogView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.custom_exit_dialog, null)
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+
+        dialogView.findViewById<Button>(R.id.btnYes).setOnClickListener {
+            dialog.dismiss()
+            findNavController().popBackStack()
+        }
+
+        dialogView.findViewById<Button>(R.id.btnNo).setOnClickListener {
+            dialog.dismiss()
+        }
+
+        dialog.show()
+
     }
 
     private fun resetLevelProgress() {
@@ -526,7 +543,7 @@ class GameFragment : Fragment() {
 
     private fun useHint() {
         if (totalHintsRemaining <= 0) {
-            Toast.makeText(context, "No hints remaining!", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "No tips remaining!", Toast.LENGTH_SHORT).show()
             return
         }
 
@@ -536,7 +553,8 @@ class GameFragment : Fragment() {
             hintedWord = randomWord
             revealWordInGrid(randomWord)
             totalHintsRemaining--
-            saveHintState()
+            updateTipData()
+//            saveHintState()
             updateHintCounter()
             updateWordsDisplay()
             Toast.makeText(context, "Hint used! Find: $randomWord", Toast.LENGTH_SHORT).show()
@@ -549,19 +567,19 @@ class GameFragment : Fragment() {
         wordSearchGrid.highlightWord(word)
     }
 
-    private fun loadHintState() {
-        val sharedPrefs = requireContext().getSharedPreferences("game_prefs", Context.MODE_PRIVATE)
-        totalHintsRemaining = sharedPrefs.getInt("total_hints_remaining", 1)
-        hintedWord = sharedPrefs.getString("hinted_word", "") ?: ""
-    }
+//    private fun loadHintState() {
+//        val sharedPrefs = requireContext().getSharedPreferences("game_prefs", Context.MODE_PRIVATE)
+//        totalHintsRemaining = sharedPrefs.getInt("total_hints_remaining", 1)
+//        hintedWord = sharedPrefs.getString("hinted_word", "") ?: ""
+//    }
 
-    private fun saveHintState() {
-        val sharedPrefs = requireContext().getSharedPreferences("game_prefs", Context.MODE_PRIVATE)
-        sharedPrefs.edit()
-            .putInt("total_hints_remaining", totalHintsRemaining)
-            .putString("hinted_word", hintedWord)
-            .apply()
-    }
+//    private fun saveHintState() {
+//        val sharedPrefs = requireContext().getSharedPreferences("game_prefs", Context.MODE_PRIVATE)
+//        sharedPrefs.edit()
+//            .putInt("total_hints_remaining", totalHintsRemaining)
+//            .putString("hinted_word", hintedWord)
+//            .apply()
+//    }
 
     private fun updateHintCounter() {
         hintCounter.text = totalHintsRemaining.toString()
@@ -570,6 +588,15 @@ class GameFragment : Fragment() {
     private fun getRandomWords3or4(count: Int): List<String> {
         val combined = (WordRepository.words + WordRepository.words4).shuffled()
         return combined.take(count)
+    }
+
+    fun updateTipData() {
+        totalHintsRemaining = AppFunctions.getTips(requireActivity())
+        if (totalHintsRemaining < 1) {
+            Toast.makeText(requireContext(), "No tips available", Toast.LENGTH_SHORT).show()
+            return
+        }
+        binding.tvHintCounter.text = totalHintsRemaining.toString()
     }
 
 

@@ -1,6 +1,7 @@
 package com.o7solutions.braingames.BottomNav
 
 import android.app.AlertDialog
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -20,6 +21,7 @@ import com.o7solutions.braingames.Model.StateClass
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.auth.LoginActivity
 import com.o7solutions.braingames.databinding.FragmentProfileBinding
+import com.o7solutions.braingames.utils.AppConstants
 import com.o7solutions.braingames.utils.AppFunctions
 
 /**
@@ -36,7 +38,8 @@ class ProfileFragment : Fragment() {
     val viewModel: ProfileViewModel by lazy {
         val factory = object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                val repo = Repository(RetrofitClient.authInstance) // Use your singleton Repository instance
+                val repo =
+                    Repository(RetrofitClient.authInstance) // Use your singleton Repository instance
                 return ProfileViewModel(repo) as T // <-- pass repo instead of apiService
             }
         }
@@ -135,12 +138,13 @@ class ProfileFragment : Fragment() {
                     binding.pgBar.visibility = View.GONE
 
                     val user = state.data as UserResponse.UserData
-                    AppFunctions.saveUser(requireActivity(),user)
-                    Log.d("User Data",user.toString())
+                    AppFunctions.saveUser(requireActivity(), user)
+                    Log.d("User Data", user.toString())
 
 
                     if (user != null) {
-                        val playTimeMinutes = user.playTime / 60000  // Assuming playTime is in seconds
+                        val playTimeMinutes =
+                            user.playTime / 60000  // Assuming playTime is in seconds
                         binding.gamesPlayedValue.text = user.totalGames.toString()
                         binding.winRateValue.text = "${user.winRate}%"
                         binding.streakValue.text = user.winStreak.toString()
@@ -151,7 +155,7 @@ class ProfileFragment : Fragment() {
                         binding.levelText.text = "Level ${user.level}"
                         binding.streakTV.text = user.streak.count.toString()
 
-                        AppFunctions.saveTips(requireActivity(),user.tips)
+                        AppFunctions.saveTips(requireActivity(), user.tips)
 
 
                         Log.d("ProfileFragment", "User loaded: ${user.name}")
@@ -170,17 +174,25 @@ class ProfileFragment : Fragment() {
             .setTitle("Logged Out")
             .setMessage("You are already logged out.")
             .setPositiveButton("OK") { dialog, _ ->
-                auth.signOut()
                 AppFunctions.deleteToken(requireActivity())
                 AppFunctions.deleteUserId(requireActivity())
-                val intent = Intent(requireActivity(), LoginActivity::class.java)
-                startActivity(intent)
-                requireActivity().finish()
+                clearAllSharedPreferences(requireActivity())
                 dialog.dismiss()
+
             }
             .show()
 
     }
+
+    fun clearAllSharedPreferences(context: Context) {
+        val sharedPrefs = context.getSharedPreferences(AppConstants.userPref, Context.MODE_PRIVATE)
+        sharedPrefs.edit().clear().apply()
+        val intent = Intent(requireActivity(), LoginActivity::class.java)
+        startActivity(intent)
+        requireActivity().finish()
+
+    }
+
 
     companion object {
         /**
