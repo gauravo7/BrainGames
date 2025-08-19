@@ -44,11 +44,12 @@ class FirstFragment : Fragment() {
     var points = 0
     var level = 1
     var questionList = arrayListOf<String>()
-    private var countDownTimer: CountDownTimer? = null
     var totalQuestions = 0
     var rightQuestions = 0
     var totalSeconds = 60
     var tips = 0
+    private var countDownTimer: CountDownTimer? = null
+
 
     // For level 3+ tracking
     var selectedOperator1 = ""

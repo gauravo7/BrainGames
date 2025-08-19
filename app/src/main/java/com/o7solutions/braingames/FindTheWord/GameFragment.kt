@@ -5,10 +5,13 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.CountDownTimer
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
+import android.widget.Button
 import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -19,11 +22,15 @@ import kotlin.random.Random
 import com.example.zigzag.WordRepository
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.helper.widget.Flow
+import androidx.navigation.NavOptions
+import androidx.navigation.fragment.findNavController
 import com.example.zigzag.GridCellView
 import com.example.zigzag.LevelCache
 import com.example.zigzag.WordSearchGridView
+import com.o7solutions.braingames.DataClasses.GameFetchData
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.FragmentGameBinding
+import com.o7solutions.braingames.utils.AppFunctions
 
 private const val ARG_LEVEL_NUMBER = "level_number"
 private const val GRID_SIZE = 8
@@ -40,11 +47,19 @@ class GameFragment : Fragment() {
     private var totalHintsRemaining = 1
     private var hintedWord = ""
     private lateinit var binding: FragmentGameBinding
+    var points = 0
+    private var countDownTimer: CountDownTimer? = null
+    var totalSeconds = 60
+    private lateinit var game: GameFetchData.Data
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
-//            levelNumber = it.getInt("level")
+            levelNumber = it.getInt("level")
+            game = it.getSerializable("game_data") as GameFetchData.Data
+
         }
     }
 
@@ -64,20 +79,23 @@ class GameFragment : Fragment() {
         val levelHeadingTextView = view.findViewById<TextView>(R.id.tv_level_heading)
         levelHeadingTextView.text = "Level $levelNumber"
 
-        pauseButton = view.findViewById(R.id.iv_pause)
+//        pauseButton = view.findViewById(R.id.iv_pause)
         hintButton = view.findViewById(R.id.iv_hint)
         hintCounter = view.findViewById(R.id.tv_hint_counter)
         wordsContainer = view.findViewById(R.id.ll_words_container)
         wordSearchGrid = view.findViewById(R.id.word_search_grid)
+        binding.scoreTextView.text = points.toString()
 
-        pauseButton.setOnClickListener {
-            showPauseDialog()
-        }
+
+//        pauseButton.setOnClickListener {
+//            showPauseDialog()
+//        }
 
         hintButton.setOnClickListener {
             useHint()
         }
 
+        startTimer()
         loadHintState()
         updateHintCounter()
         loadLevelDataFromCache()
@@ -96,6 +114,74 @@ class GameFragment : Fragment() {
                 }
             })
     }
+
+    private fun showCustomDialog(title: String, message: String) {
+        val dialogView = layoutInflater.inflate(R.layout.time_finish, null)
+
+        var winingMessage = ""
+        if (points > 200) {
+            winingMessage = "You won \uD83D\uDE00 "
+        } else {
+            winingMessage = "You lose \uD83D\uDE22"
+        }
+
+        val animation = AnimationUtils.loadAnimation(requireContext(), R.anim.fade)
+        val titleView = dialogView.findViewById<TextView>(R.id.dialogTitle)
+        val messageView = dialogView.findViewById<TextView>(R.id.dialogMessage)
+        val okButton = dialogView.findViewById<Button>(R.id.okButton)
+
+        titleView.startAnimation(animation)
+        titleView.text = "\u23F3 Time Up"
+
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .setCancelable(false)
+            .create()
+
+        okButton.setOnClickListener {
+            if (points < 200) {
+
+                AppFunctions.updateUserDataThroughApi(
+                    points,
+                    false,
+                    totalSeconds.toLong() * 1000,
+                    game._id.toString(),
+                    requireContext()
+                )
+
+//                AppFunctions.updateUserData(points,false,60000,game._id!!.toInt())
+            } else {
+                AppFunctions.updateUserDataThroughApi(
+                    points,
+                    false,
+                    totalSeconds.toLong() * 1000,
+                    game._id.toString(),
+                    requireContext()
+                )
+            }
+            dialog.dismiss()
+            var bundle = Bundle().apply {
+                putString("id", game._id)
+                putString("score", points.toString())
+            }
+
+            val fragmentToGo = game.fragmentId
+            val context = requireContext()
+            val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
+
+            resId?.let { destinationId ->
+                val navOptions = NavOptions.Builder()
+                    .setPopUpTo(destinationId, true) // clear backstack
+                    .build()
+
+                findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
+
+            }
+        }
+        dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
+        dialog.show()
+    }
+
 
     private fun loadLevelDataFromCache() {
         targetWords = when (levelNumber) {
@@ -189,6 +275,34 @@ class GameFragment : Fragment() {
         return grid
     }
 
+
+//    Timer Functionality
+    private fun startTimer() {
+        countDownTimer?.cancel()
+
+        binding.timerProgressBar.max = totalSeconds
+        binding.timerProgressBar.progress = totalSeconds
+
+        countDownTimer = object : CountDownTimer(totalSeconds * 1000L, 1000L) {
+            override fun onTick(millisUntilFinished: Long) {
+                val secondsLeft = (millisUntilFinished / 1000).toInt()
+                binding.timerProgressBar.progress = secondsLeft
+                binding.timeTextView.text = "\u23F3 $secondsLeft"
+            }
+
+            override fun onFinish() {
+                if (!isAdded) return
+                binding.timerProgressBar.progress = 0
+                Toast.makeText(requireActivity(), "Time's up!", Toast.LENGTH_SHORT).show()
+                showCustomDialog("Time Up", "Total Points=${points}")
+            }
+        }.start()
+    }
+
+
+//    Timer functionality ends
+
+
     private fun canPlaceWord(
         grid: Array<Array<Char>>,
         word: String,
@@ -279,6 +393,8 @@ class GameFragment : Fragment() {
             }
 
             Toast.makeText(context, "Great You have Found: $word!", Toast.LENGTH_SHORT).show()
+            points +=20
+            binding.scoreTextView.text = points.toString()
             if (foundWords.size == targetWords.size) {
                 showLevelCompleteDialog()
             }
@@ -375,6 +491,7 @@ class GameFragment : Fragment() {
 
     private fun startNextLevelOrGoHome() {
         levelNumber++
+        totalSeconds =+ 30
 
         binding.tvLevelHeading.text = "Level $levelNumber"
 
@@ -386,32 +503,6 @@ class GameFragment : Fragment() {
             Toast.makeText(requireActivity(), "Game Finished", Toast.LENGTH_SHORT).show()
         }
     }
-
-//    private fun startNextLevelOrGoHome() {
-////        val nextLevelNumber = (levelNumber ?: 1) + 1
-////        val nextLevelExists = LevelCache.levels?.any { it.levelNumber == nextLevelNumber } == true
-////        if (nextLevelExists) {
-////            val nextLevelFragment = GameFragment.newInstance(nextLevelNumber)
-////            parentFragmentManager.beginTransaction()
-////                .replace(R.id.gameFragment, nextLevelFragment)
-////                .addToBackStack(null)
-////                .commit()
-//
-//
-//        levelNumber++
-//
-//
-//
-//        binding.tvLevelHeading.text =  "Level $levelNumber"
-//        if(levelNumber <= 10) {
-//            loadLevelDataFromCache()
-//        } else {
-//            Toast.makeText(requireActivity(), "Game Finished", Toast.LENGTH_SHORT).show()
-//        }
-////        } else {
-////            parentFragmentManager.popBackStack(null, 0)
-////        }
-//    }
 
     private fun showLeaveConfirmationDialog() {
         AlertDialog.Builder(requireContext())
@@ -430,6 +521,8 @@ class GameFragment : Fragment() {
         wordSearchGrid.resetSelection()
         loadLevelDataFromCache()
     }
+
+//    Hint
 
     private fun useHint() {
         if (totalHintsRemaining <= 0) {
@@ -481,3 +574,31 @@ class GameFragment : Fragment() {
 
 
 }
+
+
+
+//    private fun startNextLevelOrGoHome() {
+////        val nextLevelNumber = (levelNumber ?: 1) + 1
+////        val nextLevelExists = LevelCache.levels?.any { it.levelNumber == nextLevelNumber } == true
+////        if (nextLevelExists) {
+////            val nextLevelFragment = GameFragment.newInstance(nextLevelNumber)
+////            parentFragmentManager.beginTransaction()
+////                .replace(R.id.gameFragment, nextLevelFragment)
+////                .addToBackStack(null)
+////                .commit()
+//
+//
+//        levelNumber++
+//
+//
+//
+//        binding.tvLevelHeading.text =  "Level $levelNumber"
+//        if(levelNumber <= 10) {
+//            loadLevelDataFromCache()
+//        } else {
+//            Toast.makeText(requireActivity(), "Game Finished", Toast.LENGTH_SHORT).show()
+//        }
+////        } else {
+////            parentFragmentManager.popBackStack(null, 0)
+////        }
+//    }
