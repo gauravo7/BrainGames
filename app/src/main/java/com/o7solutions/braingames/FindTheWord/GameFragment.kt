@@ -27,7 +27,9 @@ import androidx.navigation.fragment.findNavController
 import com.example.zigzag.GridCellView
 import com.example.zigzag.LevelCache
 import com.example.zigzag.WordSearchGridView
+import com.google.firebase.firestore.FirebaseFirestore
 import com.o7solutions.braingames.DataClasses.GameFetchData
+import com.o7solutions.braingames.DataClasses.StreakX
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.FragmentGameBinding
 import com.o7solutions.braingames.utils.AppFunctions
@@ -598,6 +600,21 @@ class GameFragment : Fragment() {
         }
         binding.tvHintCounter.text = totalHintsRemaining.toString()
     }
+
+//    fun addData() {
+//
+//        var db = FirebaseFirestore.getInstance()
+//
+//        var streak = StreakX(12,"ncsiucsb")
+//        db.collection("streak").document().set(streak)
+//            .addOnSuccessListener {
+//
+//            }
+//            .addOnFailureListener { e->
+//                Toast.makeText(requireContext(), e.message.toString(), Toast.LENGTH_SHORT).show()
+//
+//            }
+//    }
 
 
 }

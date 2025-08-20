@@ -109,9 +109,15 @@ class GuessNumberFragment : Fragment() {
         updateTipData()
 
         binding.tipsCard.setOnClickListener {
-            showHintDialog(hint.toString())
-            AppFunctions.updateTips(requireActivity(),-1)
-            updateTipData()
+
+            if(tips> 0) {
+                showHintDialog(hint.toString())
+                AppFunctions.updateTips(requireActivity(),-1)
+                updateTipData()
+            } else {
+                Toast.makeText(requireContext(), "No tips available!", Toast.LENGTH_SHORT).show()
+            }
+
         }
 //        dynamically changing the length of numbers
         binding.numbers.filters = arrayOf(InputFilter.LengthFilter(newMaxLength))
