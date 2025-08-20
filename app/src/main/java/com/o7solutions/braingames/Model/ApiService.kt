@@ -95,4 +95,20 @@ interface ApiService {
         @Field("count") count: Int,
         @Field("minLength") minLength: Int
     ): Response<Wordresponse>
+
+
+    @FormUrlEncoded
+    @POST("game/update")
+    suspend fun updateViewCount(
+        @Field("_id") _id: String,
+        @Field("playCount") playCount: Int,
+    ): Response<ResponseBody>
+
+    @FormUrlEncoded
+    @POST("game/update")
+    suspend fun updatePlayCount(
+        @Field("_id") _id: String,
+        @Field("viewCount") playCount: Int,
+    ): Response<ResponseBody>
+
 }

@@ -62,6 +62,7 @@ class WordGameFragment : Fragment() {
 
     private var score = 0
     private var hintCount = 3
+    var playedSecond = 0
 
     private var currentWord: String = ""
     private var correctAnswer: String = ""
@@ -71,7 +72,7 @@ class WordGameFragment : Fragment() {
     private var correctAnswersCount = 0
     private var currentLevel = 1
     private lateinit var countDownTimer: CountDownTimer
-    private var totalGameTime: Long = 120000L
+    private var totalGameTime: Long = 60000L
     private var timeLeftInMillis: Long = totalGameTime
     private var isPaused = false
     private var loadingDialog: androidx.appcompat.app.AlertDialog? = null
@@ -99,6 +100,13 @@ class WordGameFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        lifecycleScope.launch{
+            val response =   RetrofitClient.authInstance.updatePlayCount(game._id,game.playCount + 1)
+            if (response.isSuccessful) {
+                Log.d("Play Count", "Updated")
+            }
+        }
 
         if (savedInstanceState == null && currentLevel == 1) score = 0
 
@@ -201,10 +209,10 @@ class WordGameFragment : Fragment() {
 
     private suspend fun loadLevelData(level: Int): Boolean {
         totalGameTime = when (level) {
-            1 -> 120000L
-            2 -> 110000L
-            3 -> 100000L
-            4 -> 90000L
+            1 -> 30000L
+            2 -> 30000L
+            3 -> 30000L
+            4 -> 30000L
             else -> 120000L
         }
         timeLeftInMillis = totalGameTime
@@ -458,6 +466,7 @@ class WordGameFragment : Fragment() {
             override fun onTick(millisUntilFinished: Long) {
                 timeLeftInMillis = millisUntilFinished
                 updateTimerUI()
+                playedSecond = totalGameTime.toInt() - (timeLeftInMillis * 1000).toInt()
             }
 
             override fun onFinish() {
@@ -593,7 +602,8 @@ class WordGameFragment : Fragment() {
 
                 findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
 
-            }        }
+            }
+        }
     }
 
     private fun resetBoxBackgrounds() {
@@ -659,6 +669,10 @@ class WordGameFragment : Fragment() {
         dialogView.findViewById<Button>(R.id.btnYes).setOnClickListener {
             dialog.dismiss()
             findNavController().popBackStack()
+//            AppFunctions.updateUserDataThroughApi(score,true,playedSecond.toLong(),game._id,requireActivity())
+//
+//            gameExit()
+
         }
 
         dialogView.findViewById<Button>(R.id.btnNo).setOnClickListener {
@@ -667,6 +681,12 @@ class WordGameFragment : Fragment() {
 
         dialog.show()
 
+    }
+
+    fun gameExit() {
+        timeLeftInMillis = 0
+        updateTimerUI()
+        gameOver()
     }
 
     override fun onPause() {

@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.res.ColorStateList
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +23,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.firebase.firestore.FirebaseFirestore
 import com.o7solutions.braingames.DataClasses.GameFetchData
 import com.o7solutions.braingames.DataClasses.Games
+import com.o7solutions.braingames.Model.RetrofitClient
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.R.layout.dialog_result
 import com.o7solutions.braingames.databinding.FragmentFirstBinding
@@ -49,6 +51,7 @@ class FirstFragment : Fragment() {
     var totalSeconds = 60
     var tips = 0
     private var countDownTimer: CountDownTimer? = null
+    var playedSecond= 0
 
 
     // For level 3+ tracking
@@ -82,6 +85,13 @@ class FirstFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        lifecycleScope.launch{
+            val response =   RetrofitClient.authInstance.updatePlayCount(game._id,game.playCount + 1)
+            if (response.isSuccessful) {
+                Log.d("Play Count", "Updated")
+            }
+        }
+
         moveUp = AnimationUtils.loadAnimation(requireContext(), R.anim.move_up)
         moveDown = AnimationUtils.loadAnimation(requireContext(), R.anim.move_down)
 
@@ -105,7 +115,18 @@ class FirstFragment : Fragment() {
                         .create()
 
                     dialogView.findViewById<Button>(R.id.btnYes).setOnClickListener {
+//                        AppFunctions.updateUserDataThroughApi(points,false,playedSecond.toLong(),game._id,requireActivity())
+
                         dialog.dismiss()
+//                        gameExit()
+
+//                        if (!isAdded)
+//                        {
+//
+//                        } else {
+//
+//                        }
+
                         findNavController().popBackStack()
                     }
 
@@ -165,6 +186,12 @@ class FirstFragment : Fragment() {
         }
         setData()
         startTimer()
+    }
+
+    fun gameExit() {
+        binding.seekBarBrightness.progress = 0
+//                        Toast.makeText(requireActivity(), "Time's up!", Toast.LENGTH_SHORT).show()
+        showCustomDialog("Game Finished!", "Total Points=${points}")
     }
 
     private fun handleOperatorClick(operatorChoice: String) {
@@ -315,6 +342,7 @@ class FirstFragment : Fragment() {
                 val secondsLeft = (millisUntilFinished / 1000).toInt()
                 binding.seekBarBrightness.progress = secondsLeft
                 binding.time.text = "\u23F3 $secondsLeft"
+                playedSecond = totalSeconds-secondsLeft
             }
 
             override fun onFinish() {
@@ -413,13 +441,13 @@ class FirstFragment : Fragment() {
 
         if (points >= 200 && level == 1) {
             level = 2
-            totalSeconds = totalSeconds + 60
+            totalSeconds = (totalSeconds - playedSecond) + 30
             startTimer()
             Toast.makeText(requireContext(), "Level 2 Unlocked! +60 seconds", Toast.LENGTH_LONG)
                 .show()
         } else if (points >= 400 && level == 2) {
             level = 3
-            totalSeconds = totalSeconds + 60
+            totalSeconds = (totalSeconds - playedSecond) + 30
             startTimer()
             Toast.makeText(
                 requireContext(),
@@ -428,7 +456,7 @@ class FirstFragment : Fragment() {
             ).show()
         } else if (points >= 600 && level == 3) {
             level = 4
-            totalSeconds = totalSeconds + 60
+            totalSeconds = (totalSeconds - playedSecond) + 30
             startTimer()
             Toast.makeText(requireContext(), "Level 4 Unlocked! +60 seconds", Toast.LENGTH_LONG)
                 .show()
@@ -508,93 +536,190 @@ class FirstFragment : Fragment() {
         binding.answer.text = answer
     }
 
+//    private fun checkAnswerHigherLevel(op1: String, op2: String) {
+//        // Convert display operators back to actual operators for comparison
+//        val actualOp1 = when (operator) {
+//            "/" -> "/"
+//            "*" -> "*"
+//            "+" -> "+"
+//            "-" -> "-"
+//            else -> operator
+//        }
+//
+//        val actualOp2 = when (operator2) {
+//            "/" -> "/"
+//            "*" -> "*"
+//            "+" -> "+"
+//            "-" -> "-"
+//            else -> operator2
+//        }
+//
+//        if (op1 == actualOp1 && op2 == actualOp2) {
+//            rightQuestions++
+//            updateQuestions()
+//            Toast.makeText(requireContext(), "Correct answer!", Toast.LENGTH_SHORT).show()
+//            index++
+//            binding.questionCard.setStrokeColor(
+//                ContextCompat.getColor(
+//                    requireContext(),
+//                    R.color.green
+//                )
+//            )
+//
+//            binding.movePoints.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
+//            binding.movePoints.text = "+20"
+//            binding.movePoints.visibility = View.VISIBLE
+//            binding.movePoints.startAnimation(moveUp)
+//            points = points + 20
+//            binding.points.text = points.toString()
+//            moveUp.setAnimationListener(object : Animation.AnimationListener {
+//                override fun onAnimationStart(animation: Animation?) {}
+//
+//                override fun onAnimationEnd(animation: Animation?) {
+//                    binding.movePoints.text = ""
+//                    binding.movePoints.visibility = View.INVISIBLE
+//                }
+//
+//                override fun onAnimationRepeat(animation: Animation?) {}
+//            })
+//        } else {
+//            binding.questionCard.setStrokeColor(
+//                ContextCompat.getColor(
+//                    requireContext(),
+//                    R.color.red
+//                )
+//            )
+//
+//            binding.movePoints.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
+//            binding.movePoints.text = "-10"
+//            binding.movePoints.visibility = View.VISIBLE
+//            binding.movePoints.startAnimation(moveDown)
+//            points = points - 10
+//            binding.points.text = points.toString()
+//            moveDown.setAnimationListener(object : Animation.AnimationListener {
+//                override fun onAnimationStart(animation: Animation?) {}
+//
+//                override fun onAnimationEnd(animation: Animation?) {
+//                    binding.movePoints.text = ""
+//                    binding.movePoints.visibility = View.INVISIBLE
+//                }
+//
+//                override fun onAnimationRepeat(animation: Animation?) {}
+//            })
+//
+//            val correctAnswer =
+//                "${operand1} ${if (operator == "/") "\u00F7" else if (operator == "*") "x" else operator} ${operand2} ${if (operator2 == "/") "\u00F7" else if (operator2 == "*") "x" else operator2} ${operand3} = ${answer}"
+//            val wrongAnswer =
+//                "${operand1} ${if (op1 == "/") "\u00F7" else if (op1 == "*") "x" else op1} ${operand2} ${if (op2 == "/") "\u00F7" else if (op2 == "*") "x" else op2} ${operand3} = ${answer}"
+//            showResultDialog(wrongAnswer, correctAnswer)
+//        }
+//
+//        // Level progression logic for higher levels
+//        if (points >= 600 && level == 3) {
+//            level = 4
+//            totalSeconds = totalSeconds + 60
+//            startTimer() // Restart timer with new time
+//            Toast.makeText(requireContext(), "Level 4 Unlocked! +60 seconds", Toast.LENGTH_LONG)
+//                .show()
+//        }
+//    }
+
     private fun checkAnswerHigherLevel(op1: String, op2: String) {
-        // Convert display operators back to actual operators for comparison
-        val actualOp1 = when (operator) {
-            "/" -> "/"
-            "*" -> "*"
-            "+" -> "+"
-            "-" -> "-"
-            else -> operator
+        // Replace display operators with actual math operators
+        val chosenOp1 = when (op1) {
+            "÷" -> "/"
+            "x" -> "*"
+            else -> op1
+        }
+        val chosenOp2 = when (op2) {
+            "÷" -> "/"
+            "x" -> "*"
+            else -> op2
         }
 
-        val actualOp2 = when (operator2) {
-            "/" -> "/"
-            "*" -> "*"
-            "+" -> "+"
-            "-" -> "-"
-            else -> operator2
-        }
+        // Solve the expression based on user’s choice
+        val userAnswer = evaluateExpression(operand1.toInt(), chosenOp1, operand2.toInt(), chosenOp2, operand3.toInt())
 
-        if (op1 == actualOp1 && op2 == actualOp2) {
+        // Solve the expression for actual correct operators
+        val correctAnswer = evaluateExpression(operand1.toInt(), operator, operand2.toInt(), operator2, operand3.toInt())
+
+        if (userAnswer == correctAnswer) {
             rightQuestions++
             updateQuestions()
             Toast.makeText(requireContext(), "Correct answer!", Toast.LENGTH_SHORT).show()
             index++
             binding.questionCard.setStrokeColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.green
-                )
+                ContextCompat.getColor(requireContext(), R.color.green)
             )
 
             binding.movePoints.setTextColor(ContextCompat.getColor(requireContext(), R.color.green))
             binding.movePoints.text = "+20"
             binding.movePoints.visibility = View.VISIBLE
             binding.movePoints.startAnimation(moveUp)
-            points = points + 20
+            points += 20
             binding.points.text = points.toString()
             moveUp.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationStart(animation: Animation?) {}
-
                 override fun onAnimationEnd(animation: Animation?) {
                     binding.movePoints.text = ""
                     binding.movePoints.visibility = View.INVISIBLE
                 }
-
                 override fun onAnimationRepeat(animation: Animation?) {}
             })
         } else {
             binding.questionCard.setStrokeColor(
-                ContextCompat.getColor(
-                    requireContext(),
-                    R.color.red
-                )
+                ContextCompat.getColor(requireContext(), R.color.red)
             )
 
             binding.movePoints.setTextColor(ContextCompat.getColor(requireContext(), R.color.red))
             binding.movePoints.text = "-10"
             binding.movePoints.visibility = View.VISIBLE
             binding.movePoints.startAnimation(moveDown)
-            points = points - 10
+            points -= 10
             binding.points.text = points.toString()
             moveDown.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationStart(animation: Animation?) {}
-
                 override fun onAnimationEnd(animation: Animation?) {
                     binding.movePoints.text = ""
                     binding.movePoints.visibility = View.INVISIBLE
                 }
-
                 override fun onAnimationRepeat(animation: Animation?) {}
             })
 
-            val correctAnswer =
-                "${operand1} ${if (operator == "/") "\u00F7" else if (operator == "*") "x" else operator} ${operand2} ${if (operator2 == "/") "\u00F7" else if (operator2 == "*") "x" else operator2} ${operand3} = ${answer}"
-            val wrongAnswer =
-                "${operand1} ${if (op1 == "/") "\u00F7" else if (op1 == "*") "x" else op1} ${operand2} ${if (op2 == "/") "\u00F7" else if (op2 == "*") "x" else op2} ${operand3} = ${answer}"
-            showResultDialog(wrongAnswer, correctAnswer)
+            val correctExpr =
+                "$operand1 $operator $operand2 $operator2 $operand3 = $correctAnswer"
+            val wrongExpr =
+                "$operand1 $chosenOp1 $operand2 $chosenOp2 $operand3 = $userAnswer"
+            showResultDialog(wrongExpr, correctExpr)
         }
 
-        // Level progression logic for higher levels
+        // Level progression
         if (points >= 600 && level == 3) {
             level = 4
-            totalSeconds = totalSeconds + 60
-            startTimer() // Restart timer with new time
-            Toast.makeText(requireContext(), "Level 4 Unlocked! +60 seconds", Toast.LENGTH_LONG)
-                .show()
+            totalSeconds += 60
+            startTimer()
+            Toast.makeText(requireContext(), "Level 4 Unlocked! +60 seconds", Toast.LENGTH_LONG).show()
         }
     }
+
+    private fun evaluateExpression(op1: Int, operator1: String, op2: Int, operator2: String, op3: Int): Int {
+        val first = when (operator1) {
+            "+" -> op1 + op2
+            "-" -> op1 - op2
+            "*" -> op1 * op2
+            "/" -> if (op2 != 0) op1 / op2 else 0
+            else -> 0
+        }
+
+        return when (operator2) {
+            "+" -> first + op3
+            "-" -> first - op3
+            "*" -> first * op3
+            "/" -> if (op3 != 0) first / op3 else 0
+            else -> first
+        }
+    }
+
 
     private fun showResultDialog(userAnswer: String, correctAnswer: String) {
         val dialogView = layoutInflater.inflate(dialog_result, null)
@@ -657,7 +782,7 @@ class FirstFragment : Fragment() {
             } else {
                 AppFunctions.updateUserDataThroughApi(
                     points,
-                    false,
+                    true,
                     totalSeconds.toLong() * 1000,
                     game._id.toString(),
                     requireContext()

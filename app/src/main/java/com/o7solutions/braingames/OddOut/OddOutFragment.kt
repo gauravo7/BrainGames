@@ -16,6 +16,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
@@ -24,9 +25,11 @@ import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.o7solutions.braingames.DataClasses.GameFetchData
 import com.o7solutions.braingames.DataClasses.Games
+import com.o7solutions.braingames.Model.RetrofitClient
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.FragmentOddOutBinding
 import com.o7solutions.braingames.utils.AppFunctions
+import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -55,6 +58,7 @@ class OddOutFragment : Fragment() {
     lateinit var moveDown: Animation
     var answerIndexImage = -1
     var tips = 0
+    var playedSecond = 0
 
 
 
@@ -79,6 +83,12 @@ class OddOutFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        lifecycleScope.launch{
+            val response =   RetrofitClient.authInstance.updatePlayCount(game._id,game.playCount + 1)
+            if (response.isSuccessful) {
+                Log.d("Play Count", "Updated")
+            }
+        }
 
         moveUp = AnimationUtils.loadAnimation(requireContext(), R.anim.move_up)
         moveDown = AnimationUtils.loadAnimation(requireContext(), R.anim.move_down)
@@ -118,7 +128,11 @@ class OddOutFragment : Fragment() {
 
                     dialogView.findViewById<Button>(R.id.btnYes).setOnClickListener {
                         dialog.dismiss()
+//                        AppFunctions.updateUserDataThroughApi(points,false,playedSecond.toLong(),game._id,requireActivity())
+//
+//                        gameExit()
                         findNavController().popBackStack()
+
                     }
 
                     dialogView.findViewById<Button>(R.id.btnNo).setOnClickListener {
@@ -129,6 +143,19 @@ class OddOutFragment : Fragment() {
                 }
             }
         )
+    }
+
+    fun gameExit() {
+        binding.timeText.text = "\u23F3 0"
+        Toast.makeText(
+            requireContext(),
+            "Game Finished!\nScore: $points",
+            Toast.LENGTH_LONG
+        )
+            .show()
+        binding.recyclerView.isEnabled = false
+        binding.seekBarBrightness.progress = 0
+        showGameOverDialog()
     }
     fun updateTipData() {
         tips = AppFunctions.getTips(requireActivity())
@@ -303,6 +330,7 @@ class OddOutFragment : Fragment() {
                 val secondsLeft = (millisUntilFinished / 1000).toInt()
                 binding.timeText.text = "\u23F3 $secondsLeft"
                 binding.seekBarBrightness.progress = secondsLeft
+                playedSecond = totalSeconds - secondsLeft
             }
 
             override fun onFinish() {

@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -22,6 +23,7 @@ import kotlin.random.Random
 import com.example.zigzag.WordRepository
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.helper.widget.Flow
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import com.example.zigzag.GridCellView
@@ -30,9 +32,11 @@ import com.example.zigzag.WordSearchGridView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.o7solutions.braingames.DataClasses.GameFetchData
 import com.o7solutions.braingames.DataClasses.StreakX
+import com.o7solutions.braingames.Model.RetrofitClient
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.FragmentGameBinding
 import com.o7solutions.braingames.utils.AppFunctions
+import kotlinx.coroutines.launch
 
 private const val ARG_LEVEL_NUMBER = "level_number"
 private const val GRID_SIZE = 8
@@ -54,6 +58,7 @@ class GameFragment : Fragment() {
     var totalSeconds = 60
     var totalHintsRemaining = 0
     private lateinit var game: GameFetchData.Data
+    var playedSecond = 0
 
 
 
@@ -77,6 +82,13 @@ class GameFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        lifecycleScope.launch{
+            val response =   RetrofitClient.authInstance.updatePlayCount(game._id,game.playCount + 1)
+            if (response.isSuccessful) {
+                Log.d("Play Count", "Updated")
+            }
+        }
 
 //        Log.d("level",)
         val levelHeadingTextView = view.findViewById<TextView>(R.id.tv_level_heading)
@@ -295,6 +307,7 @@ class GameFragment : Fragment() {
                 currentRemainingSeconds = secondsLeft
                 binding.timerProgressBar.progress = secondsLeft
                 binding.timeTextView.text = "\u23F3 $secondsLeft"
+                playedSecond = totalSeconds - secondsLeft
             }
 
             override fun onFinish() {
@@ -525,6 +538,15 @@ class GameFragment : Fragment() {
         dialogView.findViewById<Button>(R.id.btnYes).setOnClickListener {
             dialog.dismiss()
             findNavController().popBackStack()
+////            AppFunctions.updateUserDataThroughApi(
+////                points,
+////                false,
+////                playedSecond.toLong(),
+////                game._id.toString(),
+////                requireContext()
+////            )
+//            gameExit()
+
         }
 
         dialogView.findViewById<Button>(R.id.btnNo).setOnClickListener {
@@ -541,6 +563,12 @@ class GameFragment : Fragment() {
         loadLevelDataFromCache()
     }
 
+    fun gameExit() {
+        binding.timerProgressBar.progress = 0
+        currentRemainingSeconds = 0
+//            Toast.makeText(requireActivity(), "Time's up!", Toast.LENGTH_SHORT).show()
+        showCustomDialog("Game Finished!", "Total Points=${points}")
+    }
 //    Hint
 
     private fun useHint() {

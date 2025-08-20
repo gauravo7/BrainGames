@@ -11,6 +11,7 @@ import android.view.animation.AnimationUtils
 import android.widget.Button
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavOptions
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,10 +21,12 @@ import com.o7solutions.braingames.Adapters.OnLevelClickListener
 import com.o7solutions.braingames.DataClasses.Auth.UserResponse
 import com.o7solutions.braingames.DataClasses.GameFetchData
 import com.o7solutions.braingames.DataClasses.Games
+import com.o7solutions.braingames.Model.RetrofitClient
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.FragmentIntroBinding
 import com.o7solutions.braingames.utils.AppConstants
 import com.o7solutions.braingames.utils.AppFunctions
+import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -65,6 +68,13 @@ class IntroFragment : Fragment(), OnLevelClickListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        lifecycleScope.launch{
+          val response =   RetrofitClient.authInstance.updateViewCount(game._id,game.viewCount + 1)
+            if (response.isSuccessful) {
+                Log.d("View Count", "Updated")
+            }
+        }
 
         val callback = requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,

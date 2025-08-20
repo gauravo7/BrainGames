@@ -27,6 +27,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.o7solutions.braingames.DataClasses.GameFetchData
 import com.o7solutions.braingames.DataClasses.Games
+import com.o7solutions.braingames.Model.RetrofitClient
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.FragmentGuessNumberBinding
 import com.o7solutions.braingames.utils.AppFunctions
@@ -49,6 +50,7 @@ class GuessNumberFragment : Fragment() {
     private lateinit var game : GameFetchData.Data
     var hint = 0
     var tips = 0
+    var playedSecond = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -71,7 +73,12 @@ class GuessNumberFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
-
+        lifecycleScope.launch{
+            val response =   RetrofitClient.authInstance.updatePlayCount(game._id,game.playCount + 1)
+            if (response.isSuccessful) {
+                Log.d("Play Count", "Updated")
+            }
+        }
 
         val callback = requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -88,6 +95,10 @@ class GuessNumberFragment : Fragment() {
                     dialogView.findViewById<Button>(R.id.btnYes).setOnClickListener {
                         dialog.dismiss()
                         findNavController().popBackStack()
+//                        AppFunctions.updateUserDataThroughApi(points,true,playedSecond.toLong(),game._id,requireActivity())
+//
+//                        gameExit()
+
                     }
 
                     dialogView.findViewById<Button>(R.id.btnNo).setOnClickListener {
@@ -135,6 +146,11 @@ class GuessNumberFragment : Fragment() {
         startTimer()
     }
 
+    fun gameExit() {
+        showCustomDialog("Game Finished", "Your Score: $points\nLevel: $level")
+
+    }
+
     fun updateTipData() {
         tips = AppFunctions.getTips(requireActivity())
 //        if(tips <1) {
@@ -154,6 +170,7 @@ class GuessNumberFragment : Fragment() {
                 val secondsLeft = (millisUntilFinished / 1000).toInt()
                 binding.timeProgress.progress = secondsLeft
                 binding.time.text = "\u23F3 $secondsLeft"
+                playedSecond = totalSeconds - secondsLeft
             }
 
             override fun onFinish() {
@@ -199,7 +216,7 @@ class GuessNumberFragment : Fragment() {
 
             if (points >= level * 100) {
                 level++
-                totalSeconds += 30
+                totalSeconds = (totalSeconds- playedSecond) + 30
                 lowRange = highRange*10
                 highRange = highRange * 100
 //                binding.level.text = "Level $level"
@@ -300,8 +317,11 @@ class GuessNumberFragment : Fragment() {
                 .create()
 
             okButton.setOnClickListener {
-//                AppFunctions.updateUserData(points,true,totalSeconds.toLong(),game._id!!.toInt())
-                AppFunctions.updateUserDataThroughApi(points,true,totalSeconds.toLong()*1000,game._id,requireActivity())
+                lifecycleScope.launch {
+
+                        AppFunctions.updateUserDataThroughApi(points,true,playedSecond.toLong(),game._id,requireActivity())
+//                    AppFunctions.updateUserData(points,true,totalSeconds.toLong(),game._id!!.toInt())
+                }
                 dialog.dismiss()
                 var bundle = Bundle().apply {
                     putString("id", game._id)

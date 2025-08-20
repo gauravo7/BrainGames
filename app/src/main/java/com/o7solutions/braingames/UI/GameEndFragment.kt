@@ -79,13 +79,21 @@ class GameEndFragment : Fragment() {
     fun setupLineChart(scoreList: List<UserResponse.ScoreHistory>, chart: LineChart) {
         val entries = ArrayList<Entry>()
 
-        // Sort by date to make sure the line progresses in time
+        // Sort by date
         val sortedList = scoreList.sortedBy { it.date }
 
-        // Use index for X-axis, or parse date if you want accurate labels
+        // Create entries
         sortedList.forEachIndexed { index, scoreHistory ->
             entries.add(Entry(index.toFloat(), scoreHistory.score.toFloat()))
         }
+
+        // Add new entry with label "Now"
+        val newIndex = sortedList.size
+        entries.add(Entry(newIndex.toFloat(), score.toFloat()))
+
+        // Labels
+        val labels = sortedList.map { it.date.substring(0, 10) }.toMutableList()
+        labels.add("Now")
 
         val lineDataSet = LineDataSet(entries, "Scores Over Time")
         lineDataSet.color = Color.BLUE
@@ -95,20 +103,20 @@ class GameEndFragment : Fragment() {
         val lineData = LineData(lineDataSet)
         chart.data = lineData
 
-        // Customize chart appearance
+        // Chart appearance
         chart.description.isEnabled = false
         chart.setTouchEnabled(true)
         chart.setPinchZoom(true)
         chart.animateX(1000)
 
-        // Optional: set date labels
+        // X-Axis formatting
         val xAxis = chart.xAxis
         xAxis.granularity = 1f
         xAxis.position = XAxis.XAxisPosition.BOTTOM
-        xAxis.valueFormatter = IndexAxisValueFormatter(sortedList.map { it.date.substring(0, 10) }) // show only date
+        xAxis.valueFormatter = IndexAxisValueFormatter(labels)
+        xAxis.labelRotationAngle = -45f
 
-        xAxis.labelRotationAngle = -45f 
-        chart.invalidate() // refresh
+        chart.invalidate()
     }
 
     companion object {

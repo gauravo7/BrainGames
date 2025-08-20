@@ -30,6 +30,8 @@ data class GameFetchData(
         val status: Boolean,
         val timeAdded: Int,
         val maxLevels: Int,
+        val viewCount: Int,
+        val playCount: Int,
 //        val totalGames: Int,
         val updatedAt: String?,   // Changed from Any to nullable String
         val updatedById: String?, // Changed from Any to nullable String
