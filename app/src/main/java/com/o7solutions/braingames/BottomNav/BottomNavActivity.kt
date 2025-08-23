@@ -56,6 +56,10 @@ class BottomNavActivity : AppCompatActivity() {
                     navController.navigate(R.id.luckyWheelFragment, null, navOptions)
                     true
                 }
+                R.id.dashboardFragment2 -> {
+                    navController.navigate(R.id.dashboardFragment2, null, navOptions)
+                    true
+                }
                 R.id.profileFragment -> {
                     navController.navigate(R.id.profileFragment, null, navOptions)
                     true

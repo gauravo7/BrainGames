@@ -58,4 +58,9 @@
         android:name="com.o7solutions.braingames.BottomNav.LuckyWheelFragment"
         android:label="fragment_lucky_wheel"
         tools:layout="@layout/fragment_lucky_wheel" />
+    <fragment
+        android:id="@+id/dashboardFragment2"
+        android:name="com.o7solutions.braingames.BottomNav.DashboardFragment"
+        android:label="fragment_dashboard2"
+        tools:layout="@layout/fragment_dashboard2" />
 </navigation>

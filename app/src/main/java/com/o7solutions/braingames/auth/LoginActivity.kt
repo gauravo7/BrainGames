@@ -14,6 +14,7 @@ import com.o7solutions.braingames.BottomNav.BottomNavActivity
 import com.o7solutions.braingames.DataClasses.Auth.LoginRequest
 import com.o7solutions.braingames.DataClasses.Auth.LoginRequest.LoginResponse
 import com.o7solutions.braingames.DataClasses.Auth.UserResponse
+import com.o7solutions.braingames.HomeScreens.HomeScreenActivity
 import com.o7solutions.braingames.Model.RetrofitClient
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.UI.ForgotPasswordActivity
@@ -104,7 +105,7 @@ class LoginActivity : AppCompatActivity() {
 
 
                         binding.progressContainer.visibility = View.GONE
-                         startActivity(Intent(this@LoginActivity, BottomNavActivity::class.java))
+                         startActivity(Intent(this@LoginActivity, HomeScreenActivity::class.java))
                         finish()
                     } else {
                         binding.progressContainer.visibility = View.GONE

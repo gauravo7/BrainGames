@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph3"
+    app:startDestination="@id/dashboardFragment2">
+
+
+    <fragment
+        android:id="@+id/dashboardFragment2"
+        android:name="com.o7solutions.braingames.BottomNav.DashboardFragment"
+        android:label="fragment_dashboard2"
+        tools:layout="@layout/fragment_dashboard2" />
+    <include app:graph="@navigation/mobile_navigation" />
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="com.o7solutions.braingames.BottomNav.HomeFragment"
+        android:label="fragment_home"
+        tools:layout="@layout/fragment_home" />
+    <fragment
+        android:id="@+id/profileFragment"
+        android:name="com.o7solutions.braingames.BottomNav.ProfileFragment"
+        android:label="ProfileFragment" />
+    <fragment
+        android:id="@+id/oddOutFragment"
+        android:name="com.o7solutions.braingames.OddOut.OddOutFragment"
+        android:label="fragment_odd_out"
+        tools:layout="@layout/fragment_odd_out" />
+    <fragment
+        android:id="@+id/firstFragment"
+        android:name="com.o7solutions.braingames.Numbers.FirstFragment"
+        android:label="FirstFragment" />
+    <fragment
+        android:id="@+id/introFragment"
+        android:name="com.o7solutions.braingames.UI.IntroFragment"
+        android:label="IntroFragment" />
+    <fragment
+        android:id="@+id/gameFragment"
+        android:name="com.o7solutions.braingames.FindTheWord.GameFragment"
+        android:label="GameFragment" />
+    <fragment
+        android:id="@+id/gameEndFragment"
+        android:name="com.o7solutions.braingames.UI.GameEndFragment"
+        android:label="fragment_game_end"
+        tools:layout="@layout/fragment_game_end" />
+    <fragment
+        android:id="@+id/guessNumberFragment"
+        android:name="com.o7solutions.braingames.GuessNumber.GuessNumberFragment"
+        android:label="fragment_guess_number"
+        tools:layout="@layout/fragment_guess_number" />
+    <fragment
+        android:id="@+id/wordGameFragment"
+        android:name="com.o7solutions.braingames.WordGame.WordGameFragment"
+        android:label="WordGameFragment" />
+    <fragment
+        android:id="@+id/secondFragment"
+        android:name="com.o7solutions.braingames.UI.SecondFragment"
+        android:label="SecondFragment" />
+</navigation>

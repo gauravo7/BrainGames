@@ -97,7 +97,7 @@ class SignupActivity : AppCompatActivity() {
                     binding.progressContainer.visibility = View.GONE
 
                     Toast.makeText(this@SignupActivity, "Failed: ${response.code()}", Toast.LENGTH_SHORT).show()
-                    Log.e("Register Error",response.code().toString())
+                    Log.e("Register Error",response.message().toString())
                 }
             }
 

@@ -92,6 +92,9 @@ class HomeFragment : Fragment(), GamesAdapter.OnClick {
 
         var recyclerAnimation = AnimationUtils.loadLayoutAnimation(requireContext(),R.anim.fall_down_layout)
 
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().popBackStack()
+        }
 
 
 //        val user = AppFunctions.getUser(requireActivity())
@@ -102,7 +105,7 @@ class HomeFragment : Fragment(), GamesAdapter.OnClick {
 
         Log.d("Token", AppFunctions.getToken(requireContext()).toString())
         adapter = GamesAdapter(logicalList,this)
-        binding.recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerView.layoutManager = GridLayoutManager(requireContext(),2)
         binding.recyclerView.adapter = adapter
         binding.recyclerView.layoutAnimation = recyclerAnimation
         binding.recyclerView.scheduleLayoutAnimation()
@@ -111,7 +114,7 @@ class HomeFragment : Fragment(), GamesAdapter.OnClick {
 
 //        problem solving games
         problemAdapter = GamesAdapter(problemsList,this)
-        binding.recyclerViewProblemSolving.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewProblemSolving.layoutManager = GridLayoutManager(requireContext(),2)
         binding.recyclerViewProblemSolving.adapter = problemAdapter
         binding.recyclerViewProblemSolving.layoutAnimation = recyclerAnimation
         binding.recyclerViewProblemSolving.scheduleLayoutAnimation()
@@ -120,7 +123,7 @@ class HomeFragment : Fragment(), GamesAdapter.OnClick {
 
 //        Memory based games
         memoryAdapter = GamesAdapter(memoryList,this)
-        binding.recyclerViewMemory.layoutManager = LinearLayoutManager(requireContext())
+        binding.recyclerViewMemory.layoutManager = GridLayoutManager(requireContext(),2)
         binding.recyclerViewMemory.adapter = memoryAdapter
         binding.recyclerViewMemory.layoutAnimation = recyclerAnimation
         binding.recyclerViewMemory.scheduleLayoutAnimation()

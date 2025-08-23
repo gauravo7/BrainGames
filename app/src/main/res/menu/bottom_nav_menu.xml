@@ -16,10 +16,10 @@
 <!--        android:icon="@drawable/lucky_wheel"-->
 <!--        android:title="Spin and Win" />-->
 
-<!--    <item-->
-<!--        android:id="@+id/oddOutFragment"-->
-<!--        android:icon="@drawable/thumbs_up"-->
-<!--        android:title="Test" />-->
+    <item
+        android:id="@+id/dashboardFragment2"
+        android:icon="@drawable/thumbs_up"
+        android:title="Test" />
     <item
         android:id="@+id/profileFragment"
         android:icon="@drawable/baseline_person_24"

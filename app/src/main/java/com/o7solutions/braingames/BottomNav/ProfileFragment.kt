@@ -11,6 +11,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.google.firebase.auth.FirebaseAuth
 import com.o7solutions.braingames.BottomNav.ViewModel.HomeViewModel
 import com.o7solutions.braingames.BottomNav.ViewModel.ProfileViewModel
@@ -70,6 +71,9 @@ class ProfileFragment : Fragment() {
             showLogOutDialog()
         }
 
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().popBackStack()
+        }
 
 //        viewModel.userLiveData.observe {  }
         viewModel.getUserById(AppFunctions.getUserId(requireActivity()).toString())
@@ -149,7 +153,7 @@ class ProfileFragment : Fragment() {
                         binding.winRateValue.text = "${user.winRate}%"
                         binding.streakValue.text = user.winStreak.toString()
                         binding.totalScoreValue.text = user.totalScore.toString()
-                        binding.playTimeValue.text = "$playTimeMinutes min"
+                        binding.playTimeValue.text = "$playTimeMinutes"
                         binding.totalWins.text = user.totalWins.toString()
                         binding.usernameText.text = user.name
                         binding.levelText.text = "Level ${user.level}"
@@ -171,8 +175,8 @@ class ProfileFragment : Fragment() {
     fun showLogOutDialog() {
 
         AlertDialog.Builder(context)
-            .setTitle("Logged Out")
-            .setMessage("You are already logged out.")
+            .setTitle("Logging out")
+            .setMessage("Are you sure, you want to logout.")
             .setPositiveButton("OK") { dialog, _ ->
                 AppFunctions.deleteToken(requireActivity())
                 AppFunctions.deleteUserId(requireActivity())

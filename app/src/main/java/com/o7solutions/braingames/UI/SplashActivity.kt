@@ -13,6 +13,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.o7solutions.braingames.BottomNav.BottomNavActivity
+import com.o7solutions.braingames.HomeScreens.HomeScreenActivity
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.auth.LoginActivity
 import com.o7solutions.braingames.utils.AppFunctions
@@ -41,7 +42,7 @@ class SplashActivity : AppCompatActivity() {
             var token = AppFunctions.getToken(this)
 
             if(token != null) {
-                val intent = Intent(this, BottomNavActivity::class.java)
+                val intent = Intent(this, HomeScreenActivity::class.java)
                 startActivity(intent)
                 finish()
             } else {
