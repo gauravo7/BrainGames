@@ -60,4 +60,10 @@ data class UserResponse(
         val _id: String,
         val loginTime: String
     )
+
+    data class GameId(
+        val _id: String,
+        val name: String,
+        val description: String
+    )
 }

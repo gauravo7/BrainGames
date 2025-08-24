@@ -209,11 +209,11 @@ class WordGameFragment : Fragment() {
 
     private suspend fun loadLevelData(level: Int): Boolean {
         totalGameTime = when (level) {
-            1 -> 30000L
-            2 -> 30000L
-            3 -> 30000L
-            4 -> 30000L
-            else -> 120000L
+            1 -> 60000L
+            2 -> 60000L
+            3 -> 60000L
+            4 -> 60000L
+            else -> 60000L
         }
         timeLeftInMillis = totalGameTime
 
