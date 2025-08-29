@@ -30,6 +30,9 @@ class Repository(val api: ApiService) {
 
     suspend fun getUserData(userID: String): StateClass<UserResponse.UserData> {
         return try {
+
+//            RetrofitClient.setToken(appli)
+
             val response = api.getUser(userID)
             if (response.isSuccessful && response.body() != null) {
                 val body = response.body()!!

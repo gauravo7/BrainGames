@@ -12,7 +12,7 @@ import okhttp3.Request
 import okhttp3.logging.HttpLoggingInterceptor
 
 object RetrofitClient {
-    private const val BASE_URL = "http://192.168.10.65:6006/api/"
+    private const val BASE_URL = "https://e1b5fda72c57.ngrok-free.app/api/"
 
     // Token (stored once available)
     private var token: String? = null
@@ -27,9 +27,8 @@ object RetrofitClient {
     private val authInterceptor = Interceptor { chain ->
         val original: Request = chain.request()
         val requestBuilder = original.newBuilder()
-        token?.let {
-            requestBuilder.header("Authorization", "$it")
-        }
+        requestBuilder.header("Authorization", "$token")
+//        requestBuilder.header("Authorization", AppFunctions.getToken(context = ))
         val request = requestBuilder.build()
         chain.proceed(request)
     }

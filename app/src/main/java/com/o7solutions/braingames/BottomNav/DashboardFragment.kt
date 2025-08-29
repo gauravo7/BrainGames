@@ -6,6 +6,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -15,6 +16,7 @@ import com.o7solutions.braingames.Model.Repository
 import com.o7solutions.braingames.Model.RetrofitClient
 import com.o7solutions.braingames.Model.StateClass
 import com.o7solutions.braingames.R
+import com.o7solutions.braingames.auth.LoginActivity
 import com.o7solutions.braingames.databinding.FragmentDashboard2Binding
 import com.o7solutions.braingames.utils.AppFunctions
 
@@ -64,9 +66,12 @@ class DashboardFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        RetrofitClient.setToken(requireActivity())
+        Log.d("Dashboard Fragment Token", AppFunctions.getToken(requireActivity()).toString())
 
         viewModel.getUserById(AppFunctions.getUserId(requireActivity()).toString())
         initView()
+
 
         binding.viewGames.setOnClickListener {
             findNavController().navigate(R.id.homeFragment)
@@ -82,20 +87,22 @@ class DashboardFragment : Fragment() {
         viewModel.userLiveData.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is StateClass.Error -> {
-//                    binding.pgBar.visibility = View.GONE
+                    binding.pgBar.visibility = View.GONE
+                    Toast.makeText(requireActivity(), "Internal Issue try refreshing app", Toast.LENGTH_SHORT).show()
                     Log.e("ProfileFragment", "Error: ${state.message}")
                 }
 
                 StateClass.Loading -> {
-//                    binding.pgBar.visibility = View.VISIBLE
+                    binding.pgBar.visibility = View.VISIBLE
                 }
 
                 is StateClass.Success<*> -> {
-//                    binding.pgBar.visibility = View.GONE
+                    binding.pgBar.visibility = View.GONE
 
                     val user = state.data as UserResponse.UserData
                     AppFunctions.saveUser(requireActivity(), user)
                     Log.d("User Data", user.toString())
+                    Log.d("Token from shared preference", AppFunctions.getToken(requireActivity()).toString())
 
 
                     if (user != null) {

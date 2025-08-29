@@ -94,7 +94,8 @@ class LoginActivity : AppCompatActivity() {
 //                        sharedPref.edit().putString(AppConstants.token, token).apply()
 
                         AppFunctions.saveToken(this@LoginActivity,token)
-                        Log.d("Token",token.toString())
+                        Log.d("Token get",token.toString())
+                        Log.d("Token from shared preference", AppFunctions.getToken(this@LoginActivity).toString())
                         AppFunctions.saveUserId(this@LoginActivity,id)
                         AppFunctions.saveTips(this@LoginActivity,tips)
                         Log.d("User Token", AppFunctions.getToken(this@LoginActivity).toString())

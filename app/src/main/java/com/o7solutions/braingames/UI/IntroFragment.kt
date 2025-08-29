@@ -76,6 +76,12 @@ class IntroFragment : Fragment(), OnLevelClickListener {
             }
         }
 
+
+        binding.toolbar.setNavigationOnClickListener {
+            findNavController().popBackStack()
+        }
+
+        binding.toolbar.title = game.name
         val callback = requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
@@ -156,6 +162,10 @@ class IntroFragment : Fragment(), OnLevelClickListener {
 
     fun getBestScores() {
         var list = arrayListOf<UserResponse.GameHistory>()
+
+        AppFunctions.fetchUserData(AppFunctions.getUserId(requireContext()).toString(),requireContext())
+        Log.d("User Data", AppFunctions.getUser(requireContext()).toString())
+
         var user = AppFunctions.getUser(requireContext())
         if (user != null) {
             list.addAll(user.gameHistory)

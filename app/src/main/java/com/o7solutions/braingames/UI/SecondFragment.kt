@@ -45,7 +45,10 @@ class SecondFragment : Fragment() {
         binding.buttonSubmitPassword.setOnClickListener {
             if(binding.editTextNewPassword.text.toString().isEmpty()) {
                 Toast.makeText(requireContext(), "Please enter password!", Toast.LENGTH_SHORT).show()
-            } else {
+            }  else if(binding.editTextNewPassword.text.toString().length < 8) {
+                Toast.makeText(requireContext(), "Please fill at least 8 characters", Toast.LENGTH_SHORT).show()
+
+            }  else{
                 lifecycleScope.launch {
                     val response = RetrofitClient.authInstance.changePassword(id,binding.editTextNewPassword.text.toString())
 

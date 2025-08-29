@@ -29,6 +29,7 @@ class First2Fragment : Fragment() {
     // onDestroyView.
 
     private lateinit var binding: FragmentFirst2Binding
+    var emailSent = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -49,15 +50,17 @@ class First2Fragment : Fragment() {
 
             val email = binding.editTextEmail.text.toString().trim()
 
+            emailSent = email
             if (email.isNotEmpty()) {
                 lifecycleScope.launch {
                     try {
                         Log.d("Email",email)
                         val response = RetrofitClient.authInstance.requestOTP(email)
+                        var responseBody = response.body() as OtpResponse
 
                         binding.pgBar.visibility = View.GONE
 
-                        if (response.isSuccessful ) {
+                        if (response.isSuccessful && response.code() == 200 && responseBody.status == 200) {
                             // Success case
 
 
@@ -73,6 +76,7 @@ class First2Fragment : Fragment() {
                             binding.editTextOTP.visibility = View.VISIBLE
                             binding.buttonSubmitOTP.visibility = View.VISIBLE
                             binding.buttonSubmit.visibility = View.GONE
+                            binding.editTextEmail.visibility = View.GONE
                         } else {
                             // Failure case
                             Toast.makeText(
@@ -109,11 +113,11 @@ class First2Fragment : Fragment() {
 
 
                     val response = RetrofitClient.authInstance.verifyOTP(
-                        binding.editTextEmail.text.toString(),
+                        emailSent,
                         binding.editTextOTP.text.toString().toInt()
                     )
 
-                    if(response.isSuccessful){
+                    if(response.isSuccessful  && response.code() == 200){
                         binding.pgBar.visibility = View.GONE
 
 //                        var responseBody = response.body() as OtpVerification

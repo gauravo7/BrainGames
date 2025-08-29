@@ -29,6 +29,8 @@ class HomeScreenActivity : AppCompatActivity() {
 
 //        setSupportActionBar(binding.toolbar)
 
+        RetrofitClient.setToken(applicationContext)
+
         val navController = findNavController(R.id.nav_host_fragment_content_home_screen)
 //        appBarConfiguration = AppBarConfiguration(navController.graph)
 //        setupActionBarWithNavController(navController, appBarConfiguration)

@@ -10,7 +10,7 @@
         android:id="@+id/dialogTitle"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Exit?"
+        android:text="Go Back?"
         android:textColor="#6A1B9A"
         android:textSize="20sp"
         android:textStyle="bold"

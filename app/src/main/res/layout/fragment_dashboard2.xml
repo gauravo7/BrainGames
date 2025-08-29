@@ -154,7 +154,7 @@
                     android:id="@+id/tvTotalGames"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="25"
+                    tools:text="25"
                     android:textColor="@color/white"
 
                     android:textSize="16sp" />
@@ -188,7 +188,7 @@
                     android:id="@+id/tvTotalTime"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="10m"
+                    tools:text="10m"
                     android:textColor="@color/white"
                     android:textSize="16sp" />
             </LinearLayout>
@@ -221,7 +221,7 @@
                     android:id="@+id/tvTotalWins"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="15"
+                    tools:text="15"
                     android:textColor="@color/white"
                     android:textSize="16sp" />
             </LinearLayout>
@@ -230,4 +230,14 @@
     </com.google.android.material.card.MaterialCardView>
 
 
+    <ProgressBar
+        android:id="@+id/pgBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"
+        />
 </androidx.constraintlayout.widget.ConstraintLayout>

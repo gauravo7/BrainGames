@@ -293,6 +293,104 @@ object AppFunctions {
         }
     }
 
+    interface UpdateUserCallback {
+        fun onSuccess()
+        fun onError(message: String)
+    }
+
+    fun updateUserDataThroughApi(
+        score: Int,
+        win: Boolean,
+        time: Long,
+        id: String,
+        context: Context,
+        callback: UpdateUserCallback
+    ) {
+        Log.d("UpdateUser", "Function called")
+
+        CoroutineScope(Dispatchers.Main).launch {
+            try {
+                val userId = getUserId(context).toString()
+                Log.d("UpdateUser", "Fetching user with ID: $userId")
+
+                val response = RetrofitClient.authInstance.getUser(userId)
+                if (response.isSuccessful && response.body() != null) {
+
+                    val userData = response.body()!!.data as UserResponse.UserData
+                    Log.d("UpdateUser", "User data fetched successfully")
+
+                    val games = if (userData.totalGames > 0) userData.totalGames else 1
+                    val winRate = ((userData.totalWins.toDouble() / games.toDouble()) * 100).toInt()
+                    val playTime = userData.playTime + time.toInt()
+                    val winStreak = if (win) userData.winStreak + 1 else 0
+
+                    val updatedGameHistory = userData.gameHistory.toMutableList()
+                    val index = updatedGameHistory.indexOfFirst { it.gameId == id }
+
+                    if (index != -1) {
+                        val existingGame = updatedGameHistory[index]
+                        val updatedScoreHistory = existingGame.scoreHistory.toMutableList()
+
+                        updatedScoreHistory.add(
+                            UserResponse.ScoreHistory(
+                                _id = "",
+                                date = getCurrentISODateUTC().toString(),
+                                score = score
+                            )
+                        )
+
+                        val updatedGame = existingGame.copy(
+                            bestScore = maxOf(existingGame.bestScore, score),
+                            scoreHistory = updatedScoreHistory
+                        )
+
+                        updatedGameHistory[index] = updatedGame
+                    } else {
+                        val newScoreHistory = mutableListOf(
+                            UserResponse.ScoreHistory(
+                                _id = "",
+                                date = getCurrentISODateUTC().toString(),
+                                score = score
+                            )
+                        )
+
+                        updatedGameHistory.add(
+                            UserResponse.GameHistory(
+                                _id = "",
+                                gameId = id,
+                                bestScore = score,
+                                scoreHistory = newScoreHistory
+                            )
+                        )
+                    }
+
+                    val updatedUser = userData.copy(
+                        totalScore = userData.totalScore + score,
+                        winRate = winRate,
+                        playTime = playTime,
+                        winStreak = winStreak,
+                        totalGames = userData.totalGames + 1,
+                        totalWins = if (win) userData.totalWins + 1 else userData.totalWins,
+                        gameHistory = updatedGameHistory
+                    )
+
+                    updateScoreUsingFormEncoded(context, userId, id, score)
+                    updateUserData(updatedUser, context)
+
+                    Log.d("UpdateUser", "Update successful ✅")
+                    callback.onSuccess()
+
+                } else {
+                    Log.e("UpdateUser", "API call failed or response is null ❌")
+                    callback.onError("API call failed or response is null")
+                }
+            } catch (e: Exception) {
+                Log.e("UpdateUser", "Exception: ${e.message}", e)
+                callback.onError(e.message ?: "Unknown error")
+            }
+        }
+    }
+
 
 //    fun updateUserDataThroughApi(
 //        score: Int,
@@ -461,7 +559,9 @@ suspend fun updateUserData(user: UserResponse.UserData, context: Context) {
 //
 //    }
 
-    fun fetchUserData(userId: String, context: Context) {
+    fun fetchUserData(userId: String, context: Context){
+
+        var point =0
         CoroutineScope(Dispatchers.IO).launch {
             try {
                 val response = RetrofitClient.authInstance.getUser(userId)
@@ -746,6 +846,9 @@ suspend fun updateUserData(user: UserResponse.UserData, context: Context) {
     }
 
     fun getUser(context: Context): UserResponse.UserData? {
+
+        fetchUserData(getUserId(context).toString(),context)
+
         val sharedPref = context.getSharedPreferences(AppConstants.PREFS_NAME, Context.MODE_PRIVATE)
         val json = sharedPref.getString(AppConstants.USER_KEY, null) ?: return null
         return Gson().fromJson(json, UserResponse.UserData::class.java)

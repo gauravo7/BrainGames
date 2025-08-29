@@ -26,19 +26,22 @@
             android:orientation="vertical"
             android:padding="20dp">
 
-            <!-- New Password -->
-            <EditText
-                android:id="@+id/editTextNewPassword"
+            <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
-                android:layout_height="50dp"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
                 android:hint="Enter new password"
-                android:inputType="textPassword"
-                android:padding="12dp"
-                android:textColor="@color/black"
-                android:textSize="16sp"
-                android:drawableStart="@android:drawable/ic_lock_lock"
-                android:drawablePadding="10dp"
-                android:layout_marginBottom="20dp" />
+                app:endIconMode="password_toggle">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/editTextNewPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="textPassword"
+                    android:padding="12dp"
+                    android:textColor="@color/black"
+                    android:textSize="16sp" />
+            </com.google.android.material.textfield.TextInputLayout>
 
             <!-- Submit Button -->
             <Button

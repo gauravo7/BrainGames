@@ -15,6 +15,7 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.o7solutions.braingames.Model.RetrofitClient
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.ActivityBottomNavBinding
 import com.o7solutions.braingames.utils.AppFunctions
@@ -36,6 +37,7 @@ class BottomNavActivity : AppCompatActivity() {
 //        AppFunctions.updateDailyStreak()
         Log.d("Auth Token =", AppFunctions.getToken(this).toString())
 
+        RetrofitClient.setToken(this)
 
         navView.setOnItemSelectedListener { item ->
             val navOptions = NavOptions.Builder()
