@@ -128,9 +128,10 @@ class IntroFragment : Fragment(), OnLevelClickListener {
                 requireActivity(),
                 LinearLayoutManager.HORIZONTAL, false
             )
-            var unlocked = (bestScored / 200)
-            Log.d("Unlocked",unlocked.toString())
-            adapter = LevelsAdapter(levelsList, game.maxLevels,unlocked,this@IntroFragment)
+            level = (bestScored / 200)
+            level = level + 1
+            Log.d("Unlocked",level.toString())
+            adapter = LevelsAdapter(levelsList, game.maxLevels,level-1,this@IntroFragment,requireContext())
             levelsRecyclerView.adapter = adapter
             adapter.notifyDataSetChanged()
 //            gameName.text = game.name
@@ -138,10 +139,10 @@ class IntroFragment : Fragment(), OnLevelClickListener {
 
                 val bundle = Bundle().apply {
                     putSerializable("game_data", game)
-                    putInt("level",unlocked+1)
+                    putInt("level",level)
                 }
 
-                Log.d("Level",level.toString())
+//                Log.d("Level",level.toString())
 
 
                 val fragmentToGo = game.fragmentId

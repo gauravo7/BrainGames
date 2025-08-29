@@ -12,6 +12,7 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.animation.LayoutAnimationController
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -286,7 +287,11 @@ class OddOutFragment : Fragment() {
                         binding.movePoints.text = "-10"
                         binding.movePoints.visibility = View.VISIBLE
                         binding.movePoints.startAnimation(moveDown)
-                        points = points - 10
+
+                        if(points >= 10) {
+                            points = points - 10
+
+                        }
                         moveDown.setAnimationListener(object : Animation.AnimationListener {
                             override fun onAnimationStart(animation: Animation?) {}
 
@@ -384,6 +389,8 @@ class OddOutFragment : Fragment() {
         val titleView = dialogView.findViewById<TextView>(R.id.dialogTitle)
         val messageView = dialogView.findViewById<TextView>(R.id.dialogMessage)
         val okButton = dialogView.findViewById<Button>(R.id.okButton)
+        val progress = dialogView.findViewById<ProgressBar>(R.id.progressCircular)
+
 
         titleView.startAnimation(animation)
         titleView.text = "\u23F3 Time Up"
@@ -395,30 +402,94 @@ class OddOutFragment : Fragment() {
             .create()
 
         okButton.setOnClickListener {
+            progress.visibility = View.VISIBLE
             if(points < 200) {
 //                AppFunctions.updateUserData(points,false,60000,game._id!!.toInt())
-                AppFunctions.updateUserDataThroughApi(points,true,60000,game._id.toString(),requireContext())
+                AppFunctions.updateUserDataThroughApi(points,true,playedSecond.toLong()*1000,game._id.toString(),requireContext(),
+                    object : AppFunctions.UpdateUserCallback {
+                        override fun onSuccess() {
+                            progress.visibility = View.GONE
+                            Toast.makeText(requireContext(), "User progress updated successfully!", Toast.LENGTH_SHORT).show()
+                            dialog.dismiss()
+                            var bundle = Bundle().apply {
+                                putString("id", game._id)
+                                putString("score", points.toString())
+                            }
+
+                            val fragmentToGo = game.fragmentId
+                            val context = requireContext()
+                            val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
+
+                            resId?.let { destinationId ->
+                                val navOptions = NavOptions.Builder()
+                                    .setPopUpTo(destinationId, true) // clear backstack
+                                    .build()
+
+                                findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
+
+                            }
+                        }
+
+                        override fun onError(message: String) {
+                            progress.visibility = View.GONE
+                            Toast.makeText(requireContext(), "Error updating user progress!", Toast.LENGTH_SHORT).show()
+                        }
+
+
+                    })
 
             } else {
-                AppFunctions.updateUserDataThroughApi(points,true,60000,game._id.toString(),requireContext())
-            }
-            dialog.dismiss()
-            var bundle = Bundle().apply {
-                putString("id",game._id)
-                putString("score",points.toString())
-            }
+                AppFunctions.updateUserDataThroughApi(points,true,playedSecond.toLong()*1000,game._id.toString(),requireContext()
+                ,
+                  object : AppFunctions.UpdateUserCallback {
+                      override fun onSuccess() {
+                          progress.visibility = View.GONE
+                          Toast.makeText(requireContext(), "User progress updated successfully!", Toast.LENGTH_SHORT).show()
+                          dialog.dismiss()
+                          var bundle = Bundle().apply {
+                              putString("id", game._id)
+                              putString("score", points.toString())
+                          }
 
-            val fragmentToGo = game.fragmentId
-            val context = requireContext()
-            val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
+                          val fragmentToGo = game.fragmentId
+                          val context = requireContext()
+                          val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
 
-            resId?.let { destinationId ->
-                val navOptions = NavOptions.Builder()
-                    .setPopUpTo(destinationId, true) // clear backstack
-                    .build()
+                          resId?.let { destinationId ->
+                              val navOptions = NavOptions.Builder()
+                                  .setPopUpTo(destinationId, true) // clear backstack
+                                  .build()
 
-                findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
+                              findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
+
+                          }
+                      }
+
+                      override fun onError(message: String) {
+                          progress.visibility = View.GONE
+                          Toast.makeText(requireContext(), "Error updating user progress!", Toast.LENGTH_SHORT).show()
+                      }
+
+
+                  })
             }
+//            dialog.dismiss()
+//            var bundle = Bundle().apply {
+//                putString("id",game._id)
+//                putString("score",points.toString())
+//            }
+//
+//            val fragmentToGo = game.fragmentId
+//            val context = requireContext()
+//            val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
+//
+//            resId?.let { destinationId ->
+//                val navOptions = NavOptions.Builder()
+//                    .setPopUpTo(destinationId, true) // clear backstack
+//                    .build()
+//
+//                findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
+//            }
 
         }
 

@@ -1,10 +1,12 @@
 package com.o7solutions.braingames.Adapters
 
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import android.widget.Toast
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.recyclerview.widget.RecyclerView
 import com.o7solutions.braingames.R
@@ -19,7 +21,8 @@ class LevelsAdapter(
     private val list: ArrayList<String>,
     private val size: Int,
     private val unlocked: Int,
-    private val listener: OnLevelClickListener
+    private val listener: OnLevelClickListener,
+    private val context: Context
 ) : RecyclerView.Adapter<LevelsAdapter.ViewHolder>() {
 
     private var selectedPosition: Int = if (0 <= unlocked) unlocked else RecyclerView.NO_POSITION
@@ -72,6 +75,10 @@ class LevelsAdapter(
                 notifyItemChanged(selectedPosition)
 
                 listener.onLevelClicked(currentPosition + 1)
+                Toast.makeText(context, "Level ${currentPosition + 1}  selected,click Start Game", Toast.LENGTH_SHORT).show()
+
+            } else {
+                Toast.makeText(context, "The selected Level is locked!", Toast.LENGTH_SHORT).show()
             }
         }
     }

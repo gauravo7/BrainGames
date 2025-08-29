@@ -16,6 +16,7 @@ import android.widget.Button
 import android.widget.GridLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.button.MaterialButton
@@ -61,7 +62,6 @@ class GameFragment : Fragment() {
     var playedSecond = 0
 
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
@@ -83,8 +83,8 @@ class GameFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        lifecycleScope.launch{
-            val response =   RetrofitClient.authInstance.updatePlayCount(game._id,game.playCount + 1)
+        lifecycleScope.launch {
+            val response = RetrofitClient.authInstance.updatePlayCount(game._id, game.playCount + 1)
             if (response.isSuccessful) {
                 Log.d("Play Count", "Updated")
             }
@@ -146,6 +146,7 @@ class GameFragment : Fragment() {
         val titleView = dialogView.findViewById<TextView>(R.id.dialogTitle)
         val messageView = dialogView.findViewById<TextView>(R.id.dialogMessage)
         val okButton = dialogView.findViewById<Button>(R.id.okButton)
+        val progress = dialogView.findViewById<ProgressBar>(R.id.progressCircular)
 
         titleView.startAnimation(animation)
         titleView.text = "\u23F3 Time Up"
@@ -156,6 +157,9 @@ class GameFragment : Fragment() {
             .create()
 
         okButton.setOnClickListener {
+
+            progress.visibility = View.VISIBLE
+
             if (points < 200) {
 
                 AppFunctions.updateUserDataThroughApi(
@@ -163,7 +167,48 @@ class GameFragment : Fragment() {
                     false,
                     totalSeconds.toLong() * 1000,
                     game._id.toString(),
-                    requireContext()
+                    requireContext(), object : AppFunctions.UpdateUserCallback {
+                        override fun onSuccess() {
+                            progress.visibility = View.GONE
+                            Toast.makeText(
+                                requireContext(),
+                                "User progress updated successfully!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            dialog.dismiss()
+                            var bundle = Bundle().apply {
+                                putString("id", game._id)
+                                putString("score", points.toString())
+                            }
+
+                            val fragmentToGo = game.fragmentId
+                            val context = requireContext()
+                            val resId = context.resources?.getIdentifier(
+                                fragmentToGo,
+                                "id",
+                                context.packageName
+                            )
+
+                            resId?.let { destinationId ->
+                                val navOptions = NavOptions.Builder()
+                                    .setPopUpTo(destinationId, true) // clear backstack
+                                    .build()
+
+                                findNavController().navigate(
+                                    R.id.gameEndFragment,
+                                    bundle,
+                                    navOptions
+                                )
+
+                            }
+                        }
+
+                        override fun onError(message: String) {
+                            progress.visibility = View.GONE
+                            Toast.makeText(requireContext(), "Error updating user progress!", Toast.LENGTH_SHORT).show()
+                        }
+
+                    }
                 )
 
 //                AppFunctions.updateUserData(points,false,60000,game._id!!.toInt())
@@ -173,27 +218,69 @@ class GameFragment : Fragment() {
                     false,
                     totalSeconds.toLong() * 1000,
                     game._id.toString(),
-                    requireContext()
+                    requireContext(),
+                    object : AppFunctions.UpdateUserCallback {
+                        override fun onSuccess() {
+                            progress.visibility = View.GONE
+                            Toast.makeText(
+                                requireContext(),
+                                "User progress updated successfully!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            dialog.dismiss()
+                            var bundle = Bundle().apply {
+                                putString("id", game._id)
+                                putString("score", points.toString())
+                            }
+
+                            val fragmentToGo = game.fragmentId
+                            val context = requireContext()
+                            val resId = context.resources?.getIdentifier(
+                                fragmentToGo,
+                                "id",
+                                context.packageName
+                            )
+
+                            resId?.let { destinationId ->
+                                val navOptions = NavOptions.Builder()
+                                    .setPopUpTo(destinationId, true) // clear backstack
+                                    .build()
+
+                                findNavController().navigate(
+                                    R.id.gameEndFragment,
+                                    bundle,
+                                    navOptions
+                                )
+
+                            }
+                        }
+
+                        override fun onError(message: String) {
+                            progress.visibility = View.GONE
+                            Toast.makeText(requireContext(), "Error updating user progress!", Toast.LENGTH_SHORT).show()
+                        }
+
+                    }
                 )
             }
-            dialog.dismiss()
-            var bundle = Bundle().apply {
-                putString("id", game._id)
-                putString("score", points.toString())
-            }
-
-            val fragmentToGo = game.fragmentId
-            val context = requireContext()
-            val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
-
-            resId?.let { destinationId ->
-                val navOptions = NavOptions.Builder()
-                    .setPopUpTo(destinationId, true) // clear backstack
-                    .build()
-
-                findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
-
-            }
+//            dialog.dismiss()
+//            var bundle = Bundle().apply {
+//                putString("id", game._id)
+//                putString("score", points.toString())
+//            }
+//
+//            val fragmentToGo = game.fragmentId
+//            val context = requireContext()
+//            val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
+//
+//            resId?.let { destinationId ->
+//                val navOptions = NavOptions.Builder()
+//                    .setPopUpTo(destinationId, true) // clear backstack
+//                    .build()
+//
+//                findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
+//
+//            }
         }
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
         dialog.show()
@@ -293,7 +380,7 @@ class GameFragment : Fragment() {
     }
 
 
-//    Timer Functionality
+    //    Timer Functionality
     private fun startTimer() {
         countDownTimer?.cancel()
 
@@ -414,7 +501,7 @@ class GameFragment : Fragment() {
             }
 
             Toast.makeText(context, "Great You have Found: $word!", Toast.LENGTH_SHORT).show()
-            points +=20
+            points += 20
             binding.scoreTextView.text = points.toString()
             if (foundWords.size == targetWords.size) {
                 showLevelCompleteDialog()
@@ -646,7 +733,6 @@ class GameFragment : Fragment() {
 
 
 }
-
 
 
 //    private fun startNextLevelOrGoHome() {

@@ -528,6 +528,7 @@ class WordGameFragment : Fragment() {
     }
 
     private fun gameOver() {
+
         isAnswerable = false
         if (::countDownTimer.isInitialized) countDownTimer.cancel()
 
@@ -539,24 +540,25 @@ class WordGameFragment : Fragment() {
             false,
             totalGameTime - timeLeftInMillis,
             game._id,
-            requireActivity()
+            requireActivity(),
+
         )
 
-        val bundle = Bundle().apply {
-            putString("id", game._id)
-            putString("score", score.toString())
-        }
-
-        val fragmentToGo = game.fragmentId
-        val context = requireContext()
-        val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
-
-        resId?.let { destinationId ->
-            val navOptions = NavOptions.Builder()
-                .setPopUpTo(destinationId, true)
-                .build()
-            findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
-        }
+//        val bundle = Bundle().apply {
+//            putString("id", game._id)
+//            putString("score", score.toString())
+//        }
+//
+//        val fragmentToGo = game.fragmentId
+//        val context = requireContext()
+//        val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
+//
+//        resId?.let { destinationId ->
+//            val navOptions = NavOptions.Builder()
+//                .setPopUpTo(destinationId, true)
+//                .build()
+//            findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
+//        }
     }
 
     private fun handleLevelCompletion() {
@@ -582,7 +584,7 @@ class WordGameFragment : Fragment() {
             AppFunctions.updateUserDataThroughApi(
                 score,
                 true,
-                totalGameTime - timeLeftInMillis,
+                (totalGameTime - timeLeftInMillis)*1000,
                 game._id,
                 requireActivity()
             )

@@ -17,6 +17,7 @@ import android.view.animation.Animation
 import android.view.animation.AnimationUtils
 import android.view.inputmethod.EditorInfo
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -73,6 +74,7 @@ class GuessNumberFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
 
+        Log.d("Level Selected",level.toString())
         lifecycleScope.launch{
             val response =   RetrofitClient.authInstance.updatePlayCount(game._id,game.playCount + 1)
             if (response.isSuccessful) {
@@ -80,6 +82,7 @@ class GuessNumberFragment : Fragment() {
             }
         }
 
+        checkLevelRange()
         val callback = requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
             object : OnBackPressedCallback(true) {
@@ -146,6 +149,19 @@ class GuessNumberFragment : Fragment() {
         startTimer()
     }
 
+
+    fun checkLevelRange() {
+        if(level == 2) {
+            lowRange = highRange * 10
+            highRange = highRange * 100
+        } else if(level == 3) {
+            lowRange = highRange * 100
+            highRange = highRange*1000
+        } else if(level == 4) {
+            lowRange = highRange * 1000
+            highRange = highRange*10000
+        }
+    }
     fun gameExit() {
         showCustomDialog("Game Finished", "Your Score: $points\nLevel: $level")
 
@@ -233,7 +249,11 @@ class GuessNumberFragment : Fragment() {
             binding.movePoints.text = "-10"
             binding.movePoints.visibility = View.VISIBLE
             binding.movePoints.startAnimation(moveDown)
-            points -= 10
+
+            if(points >= 10) {
+                points -= 10
+            }
+
             binding.points.text = points.toString()
 
             moveDown.setAnimationListener(object : Animation.AnimationListener {
@@ -245,6 +265,12 @@ class GuessNumberFragment : Fragment() {
 
                 override fun onAnimationRepeat(animation: Animation?) {}
             })
+//            lifecycleScope.launch {
+////                binding.thumbsUp.visibility = View.VISIBLE
+//                binding.numbers.setText("")
+////                binding.thumbsUp.visibility = View.GONE
+//                setData()
+//            }
 
             showResultDialog(userInput, actualNumber.toString(), requireContext())
         }
@@ -268,7 +294,7 @@ class GuessNumberFragment : Fragment() {
             binding.questionTV.text = ""
             binding.questionTV.visibility = View.GONE
             binding.description.text = "Enter number"
-            binding.numbers.setText("")
+//            binding.numbers.setText("")
         }
     }
 
@@ -283,6 +309,7 @@ class GuessNumberFragment : Fragment() {
 
         val dialog = AlertDialog.Builder(context)
             .setView(dialogView)
+            .setCancelable(false)
             .create()
 
         okBtn.setOnClickListener {
@@ -307,6 +334,7 @@ class GuessNumberFragment : Fragment() {
             val titleView = dialogView.findViewById<TextView>(R.id.dialogTitle)
             val messageView = dialogView.findViewById<TextView>(R.id.dialogMessage)
             val okButton = dialogView.findViewById<Button>(R.id.okButton)
+            val progress = dialogView.findViewById<ProgressBar>(R.id.progressCircular)
 
             titleView.text = title
             messageView.text = message
@@ -317,29 +345,44 @@ class GuessNumberFragment : Fragment() {
                 .create()
 
             okButton.setOnClickListener {
+                progress.visibility = View.VISIBLE
                 lifecycleScope.launch {
 
-                        AppFunctions.updateUserDataThroughApi(points,true,playedSecond.toLong(),game._id,requireActivity())
+                    AppFunctions.updateUserDataThroughApi(points,true,playedSecond.toLong()*1000,game._id,requireActivity(),
+                        object : AppFunctions.UpdateUserCallback{
+                            override fun onSuccess() {
+                                progress.visibility = View.GONE
+                                Toast.makeText(requireContext(), "User progress updated successfully!", Toast.LENGTH_SHORT).show()
+                                dialog.dismiss()
+                                var bundle = Bundle().apply {
+                                    putString("id", game._id)
+                                    putString("score", points.toString())
+                                }
+
+                                val fragmentToGo = game.fragmentId
+                                val context = requireContext()
+                                val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
+
+                                resId?.let { destinationId ->
+                                    val navOptions = NavOptions.Builder()
+                                        .setPopUpTo(destinationId, true) // clear backstack
+                                        .build()
+
+                                    findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
+
+                                }
+                            }
+
+                            override fun onError(message: String) {
+                                progress.visibility = View.GONE
+                                Toast.makeText(requireContext(), "Error updating user progress!", Toast.LENGTH_SHORT).show()
+                            }
+
+                        })
+//                        AppFunctions.updateUserDataThroughApi(points,true,playedSecond.toLong(),game._id,requireActivity())
 //                    AppFunctions.updateUserData(points,true,totalSeconds.toLong(),game._id!!.toInt())
                 }
-                dialog.dismiss()
-                var bundle = Bundle().apply {
-                    putString("id", game._id)
-                    putString("score", points.toString())
-                }
 
-                val fragmentToGo = game.fragmentId
-                val context = requireContext()
-                val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
-
-                resId?.let { destinationId ->
-                    val navOptions = NavOptions.Builder()
-                        .setPopUpTo(destinationId, true) // clear backstack
-                        .build()
-
-                    findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
-
-                }
             }
 
             dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
