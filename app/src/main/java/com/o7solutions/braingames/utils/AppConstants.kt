@@ -18,6 +18,6 @@ object AppConstants {
 
     const val PREFS_NAME = "user_prefs"
     const val USER_KEY = "user_data"
-    const val imageAddress = "https://e1b5fda72c57.ngrok-free.app/public/"
+    const val imageAddress = "http://192.168.10.68:6006/public/"
 
 }
