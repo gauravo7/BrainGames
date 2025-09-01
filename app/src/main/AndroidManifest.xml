@@ -5,6 +5,7 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:name=".utils.MyApp"
@@ -26,9 +27,7 @@
             android:name=".UI.ForgotPasswordActivity"
             android:exported="false"
             android:theme="@style/Theme.BrainGames" />
-        <activity
-            android:name=".ForgotPasswordActivity"
-            android:exported="false" />
+
         <activity
             android:name=".auth.SignupActivity"
             android:exported="false" />
@@ -64,6 +63,15 @@
             android:enabled="true"
             android:exported="false"
             android:foregroundServiceType="dataSync" />
+
+        <receiver
+            android:name=".utils.NetworkChangeReceiver"
+            android:enabled="true"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.net.conn.CONNECTIVITY_CHANGE" />
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

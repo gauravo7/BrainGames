@@ -30,6 +30,7 @@ import com.o7solutions.braingames.Model.RetrofitClient
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.FragmentOddOutBinding
 import com.o7solutions.braingames.utils.AppFunctions
+import com.o7solutions.braingames.utils.NetworkChangeReceiver
 import kotlinx.coroutines.launch
 
 // TODO: Rename parameter arguments, choose names that match
@@ -42,7 +43,7 @@ private const val ARG_PARAM2 = "param2"
  * Use the [OddOutFragment.newInstance] factory method to
  * create an instance of this fragment.
  */
-class OddOutFragment : Fragment() {
+class OddOutFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
     // TODO: Rename and change types of parameters
     private var param1: String? = null
     private var param2: String? = null
@@ -54,6 +55,7 @@ class OddOutFragment : Fragment() {
     private lateinit var game: GameFetchData.Data
     var level = 1
     var answerIndex = -1
+    var isPaused = false
     lateinit var controller : LayoutAnimationController
     lateinit var moveUp: Animation
     lateinit var moveDown: Animation
@@ -102,6 +104,35 @@ class OddOutFragment : Fragment() {
 
         updateTipData()
 
+
+        binding.toolbar.setNavigationOnClickListener {
+
+
+            val dialogView = LayoutInflater.from(requireContext())
+                .inflate(R.layout.custom_exit_dialog, null)
+
+            val dialog = AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create()
+
+            dialogView.findViewById<Button>(R.id.btnYes).setOnClickListener {
+                dialog.dismiss()
+//                        AppFunctions.updateUserDataThroughApi(points,false,playedSecond.toLong(),game._id,requireActivity())
+//
+//                        gameExit()
+                findNavController().popBackStack()
+
+            }
+
+            dialogView.findViewById<Button>(R.id.btnNo).setOnClickListener {
+                dialog.dismiss()
+            }
+
+            dialog.show()
+
+
+        }
         binding.tipsCard.setOnClickListener {
 
             if(tips>0) {
@@ -497,5 +528,28 @@ class OddOutFragment : Fragment() {
         dialog.show()
     }
 
+    override fun onStart() {
+        super.onStart()
+        NetworkChangeReceiver.networkStateListener = this
+        startTimer()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        NetworkChangeReceiver.networkStateListener = null
+        countDownTimer?.cancel()
+    }
+
+    override fun onNetworkAvailable() {
+        if (isPaused) {
+            startTimer()
+            isPaused = false
+        }
+    }
+
+    override fun onNetworkLost() {
+        countDownTimer?.cancel()
+        isPaused = true
+    }
 
 }

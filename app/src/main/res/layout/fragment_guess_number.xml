@@ -16,6 +16,17 @@
     android:layout_height="wrap_content"
     >
 
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:title="Code Recall"
+        android:background="@color/primary"
+        app:navigationIcon="@drawable/baseline_arrow_back_ios_24"
+        app:titleTextColor="@color/white"
+        />
+
     <!-- Animated background particles -->
     <View
         android:layout_width="120dp"
@@ -110,7 +121,7 @@
         app:cardBackgroundColor="#20FFFFFF"
         app:layout_constraintEnd_toEndOf="@id/guideV_end"
         app:layout_constraintStart_toStartOf="@id/guideV_start"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toolbar"
         android:layout_marginTop="16dp">
 
         <LinearLayout

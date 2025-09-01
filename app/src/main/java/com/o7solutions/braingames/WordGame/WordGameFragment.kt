@@ -37,6 +37,7 @@ import com.o7solutions.braingames.DataClasses.GameFetchData
 import com.o7solutions.braingames.DataClasses.Wordresponse
 import com.o7solutions.braingames.Model.RetrofitClient
 import com.o7solutions.braingames.utils.AppFunctions
+import com.o7solutions.braingames.utils.NetworkChangeReceiver
 import kotlinx.coroutines.launch
 import kotlin.math.max
 import kotlin.random.Random
@@ -44,7 +45,7 @@ import kotlin.random.Random
 private const val ARG_PARAM1 = "param1"
 private const val ARG_PARAM2 = "param2"
 
-class WordGameFragment : Fragment() {
+class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
 
     private var param1: String? = null
     private var param2: String? = null
@@ -106,6 +107,35 @@ class WordGameFragment : Fragment() {
             if (response.isSuccessful) {
                 Log.d("Play Count", "Updated")
             }
+        }
+
+        binding.toolbar.setNavigationOnClickListener {
+
+
+            val dialogView = LayoutInflater.from(requireContext())
+                .inflate(R.layout.custom_exit_dialog, null)
+
+            val dialog = AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create()
+
+            dialogView.findViewById<Button>(R.id.btnYes).setOnClickListener {
+                dialog.dismiss()
+//                        AppFunctions.updateUserDataThroughApi(points,false,playedSecond.toLong(),game._id,requireActivity())
+//
+//                        gameExit()
+                findNavController().popBackStack()
+
+            }
+
+            dialogView.findViewById<Button>(R.id.btnNo).setOnClickListener {
+                dialog.dismiss()
+            }
+
+            dialog.show()
+
+
         }
 
         if (savedInstanceState == null && currentLevel == 1) score = 0
@@ -695,5 +725,29 @@ class WordGameFragment : Fragment() {
         super.onPause()
         if (!isPaused) togglePause()
         loadingDialog?.dismiss()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        NetworkChangeReceiver.networkStateListener = this
+        startTimer(timeLeftInMillis)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        NetworkChangeReceiver.networkStateListener = null
+        countDownTimer?.cancel()
+    }
+
+    override fun onNetworkAvailable() {
+        if (isPaused) {
+            startTimer(timeLeftInMillis)
+            isPaused = false
+        }
+    }
+
+    override fun onNetworkLost() {
+        countDownTimer?.cancel()
+        isPaused = true
     }
 }

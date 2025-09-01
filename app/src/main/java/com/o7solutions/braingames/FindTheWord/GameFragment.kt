@@ -19,6 +19,7 @@ import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import com.google.android.material.button.MaterialButton
 import kotlin.random.Random
 import com.example.zigzag.WordRepository
@@ -37,12 +38,13 @@ import com.o7solutions.braingames.Model.RetrofitClient
 import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.FragmentGameBinding
 import com.o7solutions.braingames.utils.AppFunctions
+import com.o7solutions.braingames.utils.NetworkChangeReceiver
 import kotlinx.coroutines.launch
 
 private const val ARG_LEVEL_NUMBER = "level_number"
 private const val GRID_SIZE = 8
 
-class GameFragment : Fragment() {
+class GameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
     private var levelNumber: Int = 1
     private lateinit var pauseButton: ImageView
     private lateinit var hintButton: ImageView
@@ -61,6 +63,7 @@ class GameFragment : Fragment() {
     private lateinit var game: GameFetchData.Data
     var playedSecond = 0
 
+    var isPaused = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -90,6 +93,34 @@ class GameFragment : Fragment() {
             }
         }
 
+        binding.toolbar.setNavigationOnClickListener {
+
+
+            val dialogView = LayoutInflater.from(requireContext())
+                .inflate(R.layout.custom_exit_dialog, null)
+
+            val dialog = AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create()
+
+            dialogView.findViewById<Button>(R.id.btnYes).setOnClickListener {
+                dialog.dismiss()
+//                        AppFunctions.updateUserDataThroughApi(points,false,playedSecond.toLong(),game._id,requireActivity())
+//
+//                        gameExit()
+                findNavController().popBackStack()
+
+            }
+
+            dialogView.findViewById<Button>(R.id.btnNo).setOnClickListener {
+                dialog.dismiss()
+            }
+
+            dialog.show()
+
+
+        }
 //        Log.d("level",)
         val levelHeadingTextView = view.findViewById<TextView>(R.id.tv_level_heading)
         levelHeadingTextView.text = "Level $levelNumber"
@@ -205,7 +236,11 @@ class GameFragment : Fragment() {
 
                         override fun onError(message: String) {
                             progress.visibility = View.GONE
-                            Toast.makeText(requireContext(), "Error updating user progress!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                requireContext(),
+                                "Error updating user progress!",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
 
                     }
@@ -257,7 +292,11 @@ class GameFragment : Fragment() {
 
                         override fun onError(message: String) {
                             progress.visibility = View.GONE
-                            Toast.makeText(requireContext(), "Error updating user progress!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                requireContext(),
+                                "Error updating user progress!",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
 
                     }
@@ -714,6 +753,30 @@ class GameFragment : Fragment() {
             return
         }
         binding.tvHintCounter.text = totalHintsRemaining.toString()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        NetworkChangeReceiver.networkStateListener = this
+        startTimer()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        NetworkChangeReceiver.networkStateListener = null
+        countDownTimer?.cancel()
+    }
+
+    override fun onNetworkAvailable() {
+        if (isPaused) {
+            startTimer()
+            isPaused = false
+        }
+    }
+
+    override fun onNetworkLost() {
+        countDownTimer?.cancel()
+        isPaused = true
     }
 
 //    fun addData() {

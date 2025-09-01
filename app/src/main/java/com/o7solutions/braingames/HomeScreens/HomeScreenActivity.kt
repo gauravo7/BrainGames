@@ -1,5 +1,7 @@
 package com.o7solutions.braingames.HomeScreens
 
+import android.content.IntentFilter
+import android.net.ConnectivityManager
 import android.os.Bundle
 import com.google.android.material.snackbar.Snackbar
 import androidx.appcompat.app.AppCompatActivity
@@ -13,14 +15,14 @@ import com.o7solutions.braingames.BottomNav.ViewModel.ProfileViewModel
 import com.o7solutions.braingames.Model.Repository
 import com.o7solutions.braingames.Model.RetrofitClient
 import com.o7solutions.braingames.R
+import com.o7solutions.braingames.utils.NetworkChangeReceiver
 import com.o7solutions.braingames.databinding.ActivityHomeScreenBinding
 
 class HomeScreenActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var binding: ActivityHomeScreenBinding
-
-
+    private lateinit var networkReceiver: NetworkChangeReceiver
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -30,7 +32,7 @@ class HomeScreenActivity : AppCompatActivity() {
 //        setSupportActionBar(binding.toolbar)
 
         RetrofitClient.setToken(applicationContext)
-
+        networkReceiver = NetworkChangeReceiver()
         val navController = findNavController(R.id.nav_host_fragment_content_home_screen)
 //        appBarConfiguration = AppBarConfiguration(navController.graph)
 //        setupActionBarWithNavController(navController, appBarConfiguration)
@@ -46,5 +48,16 @@ class HomeScreenActivity : AppCompatActivity() {
         val navController = findNavController(R.id.nav_host_fragment_content_home_screen)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
+    }
+
+    override fun onStart() {
+        super.onStart()
+        val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)
+        registerReceiver(networkReceiver, filter)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unregisterReceiver(networkReceiver)
     }
 }

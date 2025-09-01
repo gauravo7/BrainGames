@@ -68,7 +68,6 @@ class LoginActivity : AppCompatActivity() {
         binding.textViewSignUp.setOnClickListener {
             val intent = Intent(this, SignupActivity::class.java)
             startActivity(intent)
-            finish()
         }
     }
     private fun loginUserWithApi(email: String, password: String) {

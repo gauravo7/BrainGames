@@ -29,11 +29,12 @@ import com.o7solutions.braingames.R
 import com.o7solutions.braingames.R.layout.dialog_result
 import com.o7solutions.braingames.databinding.FragmentFirstBinding
 import com.o7solutions.braingames.utils.AppFunctions
+import com.o7solutions.braingames.utils.NetworkChangeReceiver
 
 /**
  * A simple [Fragment] subclass as the default destination in the navigation.
  */
-class FirstFragment : Fragment() {
+class FirstFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
 
     private lateinit var binding: FragmentFirstBinding
     var db = FirebaseFirestore.getInstance()
@@ -52,8 +53,8 @@ class FirstFragment : Fragment() {
     var totalSeconds = 60
     var tips = 0
     private var countDownTimer: CountDownTimer? = null
-    var playedSecond= 0
-
+    var playedSecond = 0
+    var isPaused = false
 
     // For level 3+ tracking
     var selectedOperator1 = ""
@@ -86,11 +87,40 @@ class FirstFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        lifecycleScope.launch{
-            val response =   RetrofitClient.authInstance.updatePlayCount(game._id,game.playCount + 1)
+        lifecycleScope.launch {
+            val response = RetrofitClient.authInstance.updatePlayCount(game._id, game.playCount + 1)
             if (response.isSuccessful) {
                 Log.d("Play Count", "Updated")
             }
+        }
+
+        binding.toolbar.setNavigationOnClickListener {
+
+
+            val dialogView = LayoutInflater.from(requireContext())
+                .inflate(R.layout.custom_exit_dialog, null)
+
+            val dialog = AlertDialog.Builder(requireContext())
+                .setView(dialogView)
+                .setCancelable(false)
+                .create()
+
+            dialogView.findViewById<Button>(R.id.btnYes).setOnClickListener {
+                dialog.dismiss()
+//                        AppFunctions.updateUserDataThroughApi(points,false,playedSecond.toLong(),game._id,requireActivity())
+//
+//                        gameExit()
+                findNavController().popBackStack()
+
+            }
+
+            dialogView.findViewById<Button>(R.id.btnNo).setOnClickListener {
+                dialog.dismiss()
+            }
+
+            dialog.show()
+
+
         }
 
         moveUp = AnimationUtils.loadAnimation(requireContext(), R.anim.move_up)
@@ -145,7 +175,7 @@ class FirstFragment : Fragment() {
 
         binding.tipsCard.setOnClickListener {
 
-            if(tips> 0) {
+            if (tips > 0) {
                 performTipsFunctionality()
                 AppFunctions.updateTips(requireActivity(), -1)
                 updateTipData()
@@ -343,7 +373,7 @@ class FirstFragment : Fragment() {
                 val secondsLeft = (millisUntilFinished / 1000).toInt()
                 binding.seekBarBrightness.progress = secondsLeft
                 binding.time.text = "\u23F3 $secondsLeft"
-                playedSecond = totalSeconds-secondsLeft
+                playedSecond = totalSeconds - secondsLeft
             }
 
             override fun onFinish() {
@@ -639,10 +669,22 @@ class FirstFragment : Fragment() {
         }
 
         // Solve the expression based on user’s choice
-        val userAnswer = evaluateExpression(operand1.toInt(), chosenOp1, operand2.toInt(), chosenOp2, operand3.toInt())
+        val userAnswer = evaluateExpression(
+            operand1.toInt(),
+            chosenOp1,
+            operand2.toInt(),
+            chosenOp2,
+            operand3.toInt()
+        )
 
         // Solve the expression for actual correct operators
-        val correctAnswer = evaluateExpression(operand1.toInt(), operator, operand2.toInt(), operator2, operand3.toInt())
+        val correctAnswer = evaluateExpression(
+            operand1.toInt(),
+            operator,
+            operand2.toInt(),
+            operator2,
+            operand3.toInt()
+        )
 
         if (userAnswer == correctAnswer) {
             rightQuestions++
@@ -665,6 +707,7 @@ class FirstFragment : Fragment() {
                     binding.movePoints.text = ""
                     binding.movePoints.visibility = View.INVISIBLE
                 }
+
                 override fun onAnimationRepeat(animation: Animation?) {}
             })
         } else {
@@ -684,6 +727,7 @@ class FirstFragment : Fragment() {
                     binding.movePoints.text = ""
                     binding.movePoints.visibility = View.INVISIBLE
                 }
+
                 override fun onAnimationRepeat(animation: Animation?) {}
             })
 
@@ -699,11 +743,18 @@ class FirstFragment : Fragment() {
             level = 4
             totalSeconds += 60
             startTimer()
-            Toast.makeText(requireContext(), "Level 4 Unlocked! +60 seconds", Toast.LENGTH_LONG).show()
+            Toast.makeText(requireContext(), "Level 4 Unlocked! +60 seconds", Toast.LENGTH_LONG)
+                .show()
         }
     }
 
-    private fun evaluateExpression(op1: Int, operator1: String, op2: Int, operator2: String, op3: Int): Int {
+    private fun evaluateExpression(
+        op1: Int,
+        operator1: String,
+        op2: Int,
+        operator2: String,
+        op3: Int
+    ): Int {
         val first = when (operator1) {
             "+" -> op1 + op2
             "-" -> op1 - op2
@@ -780,10 +831,14 @@ class FirstFragment : Fragment() {
                     totalSeconds.toLong() * 1000,
                     game._id.toString(),
                     requireContext(),
-                    object : AppFunctions.UpdateUserCallback{
+                    object : AppFunctions.UpdateUserCallback {
                         override fun onSuccess() {
                             progress.visibility = View.GONE
-                            Toast.makeText(requireContext(), "User progress updated successfully!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                requireContext(),
+                                "User progress updated successfully!",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             dialog.dismiss()
                             var bundle = Bundle().apply {
                                 putString("id", game._id)
@@ -792,21 +847,33 @@ class FirstFragment : Fragment() {
 
                             val fragmentToGo = game.fragmentId
                             val context = requireContext()
-                            val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
+                            val resId = context.resources?.getIdentifier(
+                                fragmentToGo,
+                                "id",
+                                context.packageName
+                            )
 
                             resId?.let { destinationId ->
                                 val navOptions = NavOptions.Builder()
                                     .setPopUpTo(destinationId, true) // clear backstack
                                     .build()
 
-                                findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
+                                findNavController().navigate(
+                                    R.id.gameEndFragment,
+                                    bundle,
+                                    navOptions
+                                )
 
                             }
                         }
 
                         override fun onError(message: String) {
                             progress.visibility = View.GONE
-                            Toast.makeText(requireContext(), "Error updating user progress!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                requireContext(),
+                                "Error updating user progress!",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
 
                     }
@@ -820,10 +887,14 @@ class FirstFragment : Fragment() {
                     totalSeconds.toLong() * 1000,
                     game._id.toString(),
                     requireContext(),
-                    object : AppFunctions.UpdateUserCallback{
+                    object : AppFunctions.UpdateUserCallback {
                         override fun onSuccess() {
                             progress.visibility = View.GONE
-                            Toast.makeText(requireContext(), "User progress updated successfully!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                requireContext(),
+                                "User progress updated successfully!",
+                                Toast.LENGTH_SHORT
+                            ).show()
                             dialog.dismiss()
                             var bundle = Bundle().apply {
                                 putString("id", game._id)
@@ -832,21 +903,33 @@ class FirstFragment : Fragment() {
 
                             val fragmentToGo = game.fragmentId
                             val context = requireContext()
-                            val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
+                            val resId = context.resources?.getIdentifier(
+                                fragmentToGo,
+                                "id",
+                                context.packageName
+                            )
 
                             resId?.let { destinationId ->
                                 val navOptions = NavOptions.Builder()
                                     .setPopUpTo(destinationId, true) // clear backstack
                                     .build()
 
-                                findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
+                                findNavController().navigate(
+                                    R.id.gameEndFragment,
+                                    bundle,
+                                    navOptions
+                                )
 
                             }
                         }
 
                         override fun onError(message: String) {
                             progress.visibility = View.GONE
-                            Toast.makeText(requireContext(), "Error updating user progress!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                requireContext(),
+                                "Error updating user progress!",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
 
 
@@ -885,4 +968,27 @@ class FirstFragment : Fragment() {
         binding.tipsTV.text = tips.toString()
     }
 
+    override fun onStart() {
+        super.onStart()
+        NetworkChangeReceiver.networkStateListener = this
+        startTimer()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        NetworkChangeReceiver.networkStateListener = null
+        countDownTimer?.cancel()
+    }
+
+    override fun onNetworkAvailable() {
+        if (isPaused) {
+            startTimer()
+            isPaused = false
+        }
+    }
+
+    override fun onNetworkLost() {
+        countDownTimer?.cancel()
+        isPaused = true
+    }
 }
