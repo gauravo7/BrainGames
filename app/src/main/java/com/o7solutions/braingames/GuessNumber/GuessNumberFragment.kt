@@ -55,12 +55,18 @@ class GuessNumberFragment : Fragment(), NetworkChangeReceiver.NetworkStateListen
     var playedSecond = 0
     var isPaused = false
     var delayTime = 0
+    var playedSeconds = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         arguments?.let {
             game = it.getSerializable("game_data") as GameFetchData.Data
             level = it.getInt("level")
+        }
+
+        if(level == 0)
+        {
+            level = 1
         }
     }
 
@@ -216,9 +222,11 @@ class GuessNumberFragment : Fragment(), NetworkChangeReceiver.NetworkStateListen
         countDownTimer = object : CountDownTimer(totalSeconds * 1000L, 1000L) {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsLeft = (millisUntilFinished / 1000).toInt()
+                totalSeconds = secondsLeft
                 binding.timeProgress.progress = secondsLeft
                 binding.time.text = "\u23F3 $secondsLeft"
                 playedSecond = totalSeconds - secondsLeft
+                playedSeconds++
             }
 
             override fun onFinish() {
@@ -336,13 +344,16 @@ class GuessNumberFragment : Fragment(), NetworkChangeReceiver.NetworkStateListen
     }
 
     private fun showResultDialog(userAnswer: String, correctAnswer: String, context: Context) {
+
+        countDownTimer?.cancel()
+
         val dialogView = View.inflate(context, R.layout.dialog_result, null)
         val wrongText = dialogView.findViewById<TextView>(R.id.wrongAnswerText)
         val correctText = dialogView.findViewById<TextView>(R.id.correctAnswerText)
         val okBtn = dialogView.findViewById<Button>(R.id.okButton)
 
-        wrongText.text = "$userAnswer ❌"
-        correctText.text = "$correctAnswer ✅"
+        wrongText.text = "$userAnswer"
+        correctText.text = "$correctAnswer"
 
         val dialog = AlertDialog.Builder(context)
             .setView(dialogView)
@@ -355,6 +366,8 @@ class GuessNumberFragment : Fragment(), NetworkChangeReceiver.NetworkStateListen
                 setData()
                 dialog.dismiss()
             }
+
+            startTimer()
         }
 
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
@@ -386,7 +399,7 @@ class GuessNumberFragment : Fragment(), NetworkChangeReceiver.NetworkStateListen
                 lifecycleScope.launch {
 
                     AppFunctions.updateUserDataThroughApi(
-                        points, true, playedSecond.toLong() * 1000, game._id, requireActivity(),
+                        points, true, playedSeconds.toLong() * 1000, game._id, requireActivity(),level,
                         object : AppFunctions.UpdateUserCallback {
                             override fun onSuccess() {
                                 progress.visibility = View.GONE

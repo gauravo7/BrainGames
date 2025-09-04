@@ -128,10 +128,10 @@ class IntroFragment : Fragment(), OnLevelClickListener {
                 requireActivity(),
                 LinearLayoutManager.HORIZONTAL, false
             )
-            level = (bestScored / 200)
-            level = level + 1
+//            level = (bestScored / 200)
+//            level = level + 1
             Log.d("Unlocked",level.toString())
-            adapter = LevelsAdapter(levelsList, game.maxLevels,level-1,this@IntroFragment,requireContext())
+            adapter = LevelsAdapter(levelsList, game.maxLevels,level,this@IntroFragment,requireContext())
             levelsRecyclerView.adapter = adapter
             adapter.notifyDataSetChanged()
 //            gameName.text = game.name
@@ -177,10 +177,12 @@ class IntroFragment : Fragment(), OnLevelClickListener {
                 if ((i.bestScore ?: 0) > 0) {
 
                     bestScored = i.bestScore
+                    level = i.highestLevel
                     binding.bestScore.text = i.bestScore.toString()
                 } else {
                     binding.bestScore.text = "0"
                     bestScored = 0
+                    level = i.highestLevel
                 }
                 Log.d("Best Score", i.bestScore.toString())
             }

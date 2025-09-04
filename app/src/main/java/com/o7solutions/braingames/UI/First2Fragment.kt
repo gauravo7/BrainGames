@@ -1,5 +1,6 @@
 package com.o7solutions.braingames.UI
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -15,6 +16,7 @@ import com.o7solutions.braingames.R
 import com.o7solutions.braingames.databinding.FragmentFirst2Binding
 import kotlinx.coroutines.launch
 import android.util.Log
+import com.o7solutions.braingames.auth.LoginActivity
 
 
 /**
@@ -44,6 +46,12 @@ class First2Fragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
+        binding.goToLoginScreen.setOnClickListener {
+            val intent = Intent(requireActivity(), LoginActivity::class.java)
+            startActivity(intent)
+            requireActivity().finish()
+        }
 
         binding.buttonSubmit.setOnClickListener {
             binding.pgBar.visibility = View.VISIBLE

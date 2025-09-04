@@ -67,8 +67,7 @@
                     android:id="@+id/wrongAnswerText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/neut"
-                    android:text="12 × 5 = 20 ❌"
+                    android:text="12 × 5 = 20"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#F44336"
@@ -95,8 +94,7 @@
                     android:id="@+id/correctAnswerText"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fontFamily="@font/neut"
-                    android:text="12 + 5 = 17 ✅"
+                    android:text="12 + 5 = 17"
                     android:textSize="16sp"
                     android:textStyle="bold"
                     android:textColor="#4CAF50"
@@ -129,6 +127,10 @@
             android:stateListAnimator="@null"
             android:foreground="?android:attr/selectableItemBackground"
             android:minHeight="48dp" />
+
+
+
+
 
     </LinearLayout>
 

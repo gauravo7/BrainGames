@@ -55,15 +55,19 @@ class FirstFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
     private var countDownTimer: CountDownTimer? = null
     var playedSecond = 0
     var isPaused = false
+    private var selectedOperator: String? = null
+
 
     // For level 3+ tracking
     var selectedOperator1 = ""
     var selectedOperator2 = ""
     var isFirstOperatorSelected = false
+    var instantTime = totalSeconds
 
     lateinit var moveUp: Animation
     lateinit var moveDown: Animation
     private lateinit var game: GameFetchData.Data
+    var playedSeconds = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -190,33 +194,49 @@ class FirstFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
             plus.setOnClickListener {
                 handleOperatorClick("+")
                 binding.plus.setCardBackgroundColor(
-                    ContextCompat.getColor(requireContext(), R.color.divide_button_bg)
+                    ContextCompat.getColor(requireContext(), R.color.blue_500)
                 )
             }
 
             minus.setOnClickListener {
                 handleOperatorClick("-")
                 binding.minus.setCardBackgroundColor(
-                    ContextCompat.getColor(requireContext(), R.color.divide_button_bg)
+                    ContextCompat.getColor(requireContext(), R.color.blue_500)
                 )
             }
 
             division.setOnClickListener {
                 handleOperatorClick("/")
                 binding.division.setCardBackgroundColor(
-                    ContextCompat.getColor(requireContext(), R.color.divide_button_bg)
+                    ContextCompat.getColor(requireContext(), R.color.blue_500)
                 )
             }
 
             multiply.setOnClickListener {
                 handleOperatorClick("x")
                 binding.multiply.setCardBackgroundColor(
-                    ContextCompat.getColor(requireContext(), R.color.divide_button_bg)
+                    ContextCompat.getColor(requireContext(), R.color.blue_500)
                 )
             }
+
         }
         setData()
         startTimer()
+    }
+    fun resetColors() {
+        binding.multiply.setCardBackgroundColor(
+            ContextCompat.getColor(requireContext(), R.color.divide_button_bg)
+        )
+        binding.division.setCardBackgroundColor(
+            ContextCompat.getColor(requireContext(), R.color.divide_button_bg)
+        )
+        binding.minus.setCardBackgroundColor(
+            ContextCompat.getColor(requireContext(), R.color.divide_button_bg)
+        )
+        binding.plus.setCardBackgroundColor(
+            ContextCompat.getColor(requireContext(), R.color.divide_button_bg)
+        )
+
     }
 
     fun gameExit() {
@@ -225,16 +245,37 @@ class FirstFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
         showCustomDialog("Game Finished!", "Total Points=${points}")
     }
 
+    fun disableClicks() {
+        binding.plus.isEnabled = false
+        binding.minus.isEnabled = false
+        binding.multiply.isEnabled = false
+        binding.division.isEnabled = false
+
+    }
+
+    fun enableClicks()
+    {
+        binding.plus.isEnabled = true
+        binding.minus.isEnabled = true
+        binding.multiply.isEnabled = true
+        binding.division.isEnabled = true
+
+    }
+
+
     private fun handleOperatorClick(operatorChoice: String) {
         if (level < 3) {
             // Level 1-2: Single operator guess
             binding.operator1.text =
                 if (operatorChoice == "/") "\u00F7" else if (operatorChoice == "*") "x" else operatorChoice
 
+            disableClicks()
             lifecycleScope.launch {
                 checkAnswer(operatorChoice)
                 delay(1000)
                 setData()
+                resetColors()
+                enableClicks()
             }
         } else {
             if (!isFirstOperatorSelected) {
@@ -253,10 +294,13 @@ class FirstFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
                 binding.operator2.text =
                     if (operatorChoice == "/") "\u00F7" else if (operatorChoice == "*") "x" else operatorChoice
 
+                disableClicks()
                 lifecycleScope.launch {
                     checkAnswerHigherLevel(selectedOperator1, selectedOperator2)
                     delay(1000)
                     setDataLevel3()
+                    resetColors()
+                    enableClicks()
                     isFirstOperatorSelected = false
                     selectedOperator1 = ""
                     selectedOperator2 = ""
@@ -371,9 +415,11 @@ class FirstFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
         countDownTimer = object : CountDownTimer(totalSeconds * 1000L, 1000L) {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsLeft = (millisUntilFinished / 1000).toInt()
+                totalSeconds = secondsLeft
                 binding.seekBarBrightness.progress = secondsLeft
                 binding.time.text = "\u23F3 $secondsLeft"
                 playedSecond = totalSeconds - secondsLeft
+                playedSeconds++
             }
 
             override fun onFinish() {
@@ -413,7 +459,7 @@ class FirstFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
         if (calculatedAnswer.toString() == answer) {
             rightQuestions++
             updateQuestions()
-            Toast.makeText(requireContext(), "Correct answer!", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(requireContext(), "Correct answer!", Toast.LENGTH_SHORT).show()
             index++
             binding.questionCard.setStrokeColor(
                 ContextCompat.getColor(
@@ -451,7 +497,11 @@ class FirstFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
             binding.movePoints.text = "-10"
             binding.movePoints.visibility = View.VISIBLE
             binding.movePoints.startAnimation(moveDown)
-            points = points - 10
+
+            if(points > 0) {
+                points = points - 10
+            }
+
             binding.points.text = points.toString()
             moveDown.setAnimationListener(object : Animation.AnimationListener {
                 override fun onAnimationStart(animation: Animation?) {}
@@ -472,13 +522,13 @@ class FirstFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
 
         if (points >= 200 && level == 1) {
             level = 2
-            totalSeconds = (totalSeconds - playedSecond) + 30
+            totalSeconds += 30
             startTimer()
             Toast.makeText(requireContext(), "Level 2 Unlocked! +60 seconds", Toast.LENGTH_LONG)
                 .show()
         } else if (points >= 400 && level == 2) {
             level = 3
-            totalSeconds = (totalSeconds - playedSecond) + 30
+            totalSeconds +=   30
             startTimer()
             Toast.makeText(
                 requireContext(),
@@ -487,7 +537,7 @@ class FirstFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
             ).show()
         } else if (points >= 600 && level == 3) {
             level = 4
-            totalSeconds = (totalSeconds - playedSecond) + 30
+            totalSeconds += 30
             startTimer()
             Toast.makeText(requireContext(), "Level 4 Unlocked! +60 seconds", Toast.LENGTH_LONG)
                 .show()
@@ -689,7 +739,7 @@ class FirstFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
         if (userAnswer == correctAnswer) {
             rightQuestions++
             updateQuestions()
-            Toast.makeText(requireContext(), "Correct answer!", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(requireContext(), "Correct answer!", Toast.LENGTH_SHORT).show()
             index++
             binding.questionCard.setStrokeColor(
                 ContextCompat.getColor(requireContext(), R.color.green)
@@ -774,21 +824,27 @@ class FirstFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
 
 
     private fun showResultDialog(userAnswer: String, correctAnswer: String) {
+        countDownTimer?.cancel()
+
+
         val dialogView = layoutInflater.inflate(dialog_result, null)
 
         val wrongText = dialogView.findViewById<TextView>(R.id.wrongAnswerText)
         val correctText = dialogView.findViewById<TextView>(R.id.correctAnswerText)
         val okBtn = dialogView.findViewById<Button>(R.id.okButton)
 
-        wrongText.text = "Your Answer: $userAnswer❌"
-        correctText.text = "Correct Answer: $correctAnswer✅"
+        wrongText.text = "Your Answer: $userAnswer"
+        correctText.text = "Correct Answer: $correctAnswer"
 
         val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
+            .setCancelable(false)
             .create()
 
         okBtn.setOnClickListener {
             dialog.dismiss()
+
+            startTimer()
         }
 
         dialog.window?.setBackgroundDrawableResource(android.R.color.transparent)
@@ -828,9 +884,10 @@ class FirstFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
                 AppFunctions.updateUserDataThroughApi(
                     points,
                     false,
-                    totalSeconds.toLong() * 1000,
+                    playedSeconds.toLong() * 1000,
                     game._id.toString(),
                     requireContext(),
+                    level,
                     object : AppFunctions.UpdateUserCallback {
                         override fun onSuccess() {
                             progress.visibility = View.GONE
@@ -884,9 +941,10 @@ class FirstFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
                 AppFunctions.updateUserDataThroughApi(
                     points,
                     true,
-                    totalSeconds.toLong() * 1000,
+                    playedSeconds.toLong() * 1000,
                     game._id.toString(),
                     requireContext(),
+                    level,
                     object : AppFunctions.UpdateUserCallback {
                         override fun onSuccess() {
                             progress.visibility = View.GONE

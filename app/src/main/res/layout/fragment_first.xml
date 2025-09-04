@@ -29,9 +29,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:title="Operator Arena"
-        android:background="@drawable/gradient_background"
+        android:background="#764BA2"
         app:navigationIcon="@drawable/baseline_arrow_back_ios_24"
-
         app:titleTextColor="@color/white"
         />
 

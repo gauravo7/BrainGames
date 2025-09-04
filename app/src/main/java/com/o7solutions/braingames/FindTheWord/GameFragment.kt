@@ -62,6 +62,7 @@ class GameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
     var totalHintsRemaining = 0
     private lateinit var game: GameFetchData.Data
     var playedSecond = 0
+    var playedSeconds = 0
 
     var isPaused = false
 
@@ -198,7 +199,9 @@ class GameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
                     false,
                     totalSeconds.toLong() * 1000,
                     game._id.toString(),
-                    requireContext(), object : AppFunctions.UpdateUserCallback {
+                    requireContext(),
+                    levelNumber,
+                    object : AppFunctions.UpdateUserCallback {
                         override fun onSuccess() {
                             progress.visibility = View.GONE
                             Toast.makeText(
@@ -254,6 +257,7 @@ class GameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
                     totalSeconds.toLong() * 1000,
                     game._id.toString(),
                     requireContext(),
+                    levelNumber,
                     object : AppFunctions.UpdateUserCallback {
                         override fun onSuccess() {
                             progress.visibility = View.GONE
@@ -425,15 +429,20 @@ class GameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
 
         binding.timerProgressBar.max = totalSeconds
         binding.timerProgressBar.progress = totalSeconds
+        val timeToUse = if (currentRemainingSeconds > 0) currentRemainingSeconds else 60
 
-        countDownTimer = object : CountDownTimer(totalSeconds * 1000L, 1000L) {
+
+        countDownTimer = object : CountDownTimer(timeToUse * 1000L, 1000L) {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsLeft = (millisUntilFinished / 1000).toInt()
 //                val secondsLeft = (millisUntilFinished / 1000).toInt()
                 currentRemainingSeconds = secondsLeft
+                totalSeconds = secondsLeft
                 binding.timerProgressBar.progress = secondsLeft
                 binding.timeTextView.text = "\u23F3 $secondsLeft"
                 playedSecond = totalSeconds - secondsLeft
+                playedSeconds++
+                Log.d("Time played",playedSeconds.toString())
             }
 
             override fun onFinish() {

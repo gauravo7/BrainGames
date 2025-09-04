@@ -60,11 +60,9 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
     private lateinit var timerProgressBar: ProgressBar
     private lateinit var progressFeedbackTextView: TextView
     private lateinit var scoreFeedbackTextView: TextView
-
     private var score = 0
     private var hintCount = 3
     var playedSecond = 0
-
     private var currentWord: String = ""
     private var correctAnswer: String = ""
     private var originalWordList: List<String> = emptyList()
@@ -87,6 +85,11 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
             currentLevel = it.getInt("level", 1)
             Log.d("Current level", currentLevel.toString())
             game = it.getSerializable("game_data") as GameFetchData.Data
+        }
+
+        if(currentLevel == 0)
+        {
+            currentLevel = 1
         }
     }
 
@@ -494,12 +497,14 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
     private fun startTimer(time: Long) {
         countDownTimer = object : CountDownTimer(time, 100) {
             override fun onTick(millisUntilFinished: Long) {
+                if (!isAdded) return  // Fragment not attached → skip
                 timeLeftInMillis = millisUntilFinished
                 updateTimerUI()
                 playedSecond = totalGameTime.toInt() - (timeLeftInMillis * 1000).toInt()
             }
 
             override fun onFinish() {
+                if (!isAdded) return  // Fragment not attached → skip
                 timeLeftInMillis = 0
                 updateTimerUI()
                 gameOver()
@@ -570,25 +575,26 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
             false,
             totalGameTime - timeLeftInMillis,
             game._id,
+            level = currentLevel,
             requireActivity(),
 
         )
 
-//        val bundle = Bundle().apply {
-//            putString("id", game._id)
-//            putString("score", score.toString())
-//        }
-//
-//        val fragmentToGo = game.fragmentId
-//        val context = requireContext()
-//        val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
-//
-//        resId?.let { destinationId ->
-//            val navOptions = NavOptions.Builder()
-//                .setPopUpTo(destinationId, true)
-//                .build()
-//            findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
-//        }
+        val bundle = Bundle().apply {
+            putString("id", game._id)
+            putString("score", score.toString())
+        }
+
+        val fragmentToGo = game.fragmentId
+        val context = requireContext()
+        val resId = context.resources?.getIdentifier(fragmentToGo, "id", context.packageName)
+
+        resId?.let { destinationId ->
+            val navOptions = NavOptions.Builder()
+                .setPopUpTo(destinationId, true)
+                .build()
+            findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
+        }
     }
 
     private fun handleLevelCompletion() {
@@ -616,6 +622,7 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
                 true,
                 (totalGameTime - timeLeftInMillis)*1000,
                 game._id,
+                level = currentLevel,
                 requireActivity()
             )
             var bundle = Bundle().apply {
@@ -730,7 +737,9 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
     override fun onStart() {
         super.onStart()
         NetworkChangeReceiver.networkStateListener = this
-        startTimer(timeLeftInMillis)
+        if (!isPaused) {
+            startTimer(timeLeftInMillis)
+        }
     }
 
     override fun onStop() {
@@ -740,14 +749,16 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
     }
 
     override fun onNetworkAvailable() {
+        // Only resume if the game was paused due to network loss
         if (isPaused) {
-            startTimer(timeLeftInMillis)
-            isPaused = false
+            togglePause()
         }
     }
 
     override fun onNetworkLost() {
-        countDownTimer?.cancel()
-        isPaused = true
+        // Only pause if the game is currently running
+        if (!isPaused) {
+            togglePause()
+        }
     }
 }

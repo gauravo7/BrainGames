@@ -83,6 +83,16 @@
         </LinearLayout>
     </androidx.cardview.widget.CardView>
 
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/go_to_login_screen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Go to Login Screen"
+        style="@style/Widget.Material3.Button.TextButton"
+        app:layout_constraintTop_toBottomOf="@id/cardContainer"
+        />
+
     <ProgressBar
         android:id="@+id/pgBar"
         android:layout_width="wrap_content"

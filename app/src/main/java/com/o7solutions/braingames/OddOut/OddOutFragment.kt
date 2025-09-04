@@ -62,6 +62,7 @@ class OddOutFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
     var answerIndexImage = -1
     var tips = 0
     var playedSecond = 0
+    var playedSeconds = 0
 
 
 
@@ -364,9 +365,11 @@ class OddOutFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
         countDownTimer = object : CountDownTimer(totalSeconds * 1000L, 1000L) {
             override fun onTick(millisUntilFinished: Long) {
                 val secondsLeft = (millisUntilFinished / 1000).toInt()
+                totalSeconds = secondsLeft
                 binding.timeText.text = "\u23F3 $secondsLeft"
                 binding.seekBarBrightness.progress = secondsLeft
                 playedSecond = totalSeconds - secondsLeft
+                playedSeconds++
             }
 
             override fun onFinish() {
@@ -436,7 +439,7 @@ class OddOutFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
             progress.visibility = View.VISIBLE
             if(points < 200) {
 //                AppFunctions.updateUserData(points,false,60000,game._id!!.toInt())
-                AppFunctions.updateUserDataThroughApi(points,true,playedSecond.toLong()*1000,game._id.toString(),requireContext(),
+                AppFunctions.updateUserDataThroughApi(points,true,playedSeconds.toLong()*1000,game._id.toString(),requireContext(),level,
                     object : AppFunctions.UpdateUserCallback {
                         override fun onSuccess() {
                             progress.visibility = View.GONE
@@ -470,8 +473,7 @@ class OddOutFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
                     })
 
             } else {
-                AppFunctions.updateUserDataThroughApi(points,true,playedSecond.toLong()*1000,game._id.toString(),requireContext()
-                ,
+                AppFunctions.updateUserDataThroughApi(points,true,playedSecond.toLong()*1000,game._id.toString(),requireContext(),level,
                   object : AppFunctions.UpdateUserCallback {
                       override fun onSuccess() {
                           progress.visibility = View.GONE

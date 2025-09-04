@@ -201,6 +201,7 @@ object AppFunctions {
         win: Boolean,
         time: Long,
         id: String,
+        level: Int,
         context: Context
     ) {
         Log.d("UpdateUser", "Function called")
@@ -236,7 +237,8 @@ object AppFunctions {
                         UserResponse.ScoreHistory(
                             _id = "",
                             date = getCurrentISODateUTC().toString(),
-                            score = score
+                            score = score,
+                            levelCleared = level
                         )
                     )
 
@@ -257,7 +259,8 @@ object AppFunctions {
                         UserResponse.ScoreHistory(
                             _id = "",
                             date = getCurrentISODateUTC().toString(),
-                            score = score
+                            score = score,
+                            levelCleared = level
                         )
                     )
 
@@ -266,7 +269,8 @@ object AppFunctions {
                             _id = "",
                             gameId = id,
                             bestScore = score,
-                            scoreHistory = newScoreHistory
+                            scoreHistory = newScoreHistory,
+                            highestLevel = level
                         )
                     )
 
@@ -284,7 +288,7 @@ object AppFunctions {
                 )
 
                 Log.d("UpdateUser", "Updating user with updatedGameHistory size: ${updatedGameHistory.size}")
-                updateScoreUsingFormEncoded(context,getUserId(context).toString(),id,score)
+                updateScoreUsingFormEncoded(context,getUserId(context).toString(),id,score,level)
                 updateUserData(updatedUser, context)
 
             } else {
@@ -304,6 +308,7 @@ object AppFunctions {
         time: Long,
         id: String,
         context: Context,
+        level: Int,
         callback: UpdateUserCallback
     ) {
         Log.d("UpdateUser", "Function called")
@@ -335,7 +340,8 @@ object AppFunctions {
                             UserResponse.ScoreHistory(
                                 _id = "",
                                 date = getCurrentISODateUTC().toString(),
-                                score = score
+                                score = score,
+                                levelCleared = level
                             )
                         )
 
@@ -350,7 +356,8 @@ object AppFunctions {
                             UserResponse.ScoreHistory(
                                 _id = "",
                                 date = getCurrentISODateUTC().toString(),
-                                score = score
+                                score = score,
+                                levelCleared = level
                             )
                         )
 
@@ -359,7 +366,8 @@ object AppFunctions {
                                 _id = "",
                                 gameId = id,
                                 bestScore = score,
-                                scoreHistory = newScoreHistory
+                                scoreHistory = newScoreHistory,
+                                highestLevel = level
                             )
                         )
                     }
@@ -374,7 +382,7 @@ object AppFunctions {
                         gameHistory = updatedGameHistory
                     )
 
-                    updateScoreUsingFormEncoded(context, userId, id, score)
+                    updateScoreUsingFormEncoded(context, userId, id, score,level)
                     updateUserData(updatedUser, context)
 
                     Log.d("UpdateUser", "Update successful ✅")
@@ -484,7 +492,8 @@ suspend fun updateUserData(user: UserResponse.UserData, context: Context) {
         context: Context,
         userId: String,
         gameId: String,
-        score: Int
+        score: Int,
+        level:Int
     ) {
         CoroutineScope(Dispatchers.IO).launch {
             try {
@@ -492,6 +501,7 @@ suspend fun updateUserData(user: UserResponse.UserData, context: Context) {
                     put(JSONObject().apply {
                         put("gameId", gameId)
                         put("score", score)
+                        put("levelCleared",level)
                     })
                 }.toString()
 
