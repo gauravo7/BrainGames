@@ -70,7 +70,11 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
     private var isAnswerable = true
     private var correctAnswersCount = 0
     private var currentLevel = 1
-    private lateinit var countDownTimer: CountDownTimer
+
+    // Fixed timer declaration - nullable instead of lateinit
+    private var countDownTimer: CountDownTimer? = null
+    private var wasManuallyPaused = false // Track manual vs automatic pause
+
     private var totalGameTime: Long = 60000L
     private var timeLeftInMillis: Long = totalGameTime
     private var isPaused = false
@@ -87,8 +91,7 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
             game = it.getSerializable("game_data") as GameFetchData.Data
         }
 
-        if(currentLevel == 0)
-        {
+        if(currentLevel == 0) {
             currentLevel = 1
         }
     }
@@ -106,15 +109,13 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
         super.onViewCreated(view, savedInstanceState)
 
         lifecycleScope.launch{
-            val response =   RetrofitClient.authInstance.updatePlayCount(game._id,game.playCount + 1)
+            val response = RetrofitClient.authInstance.updatePlayCount(game._id, game.playCount + 1)
             if (response.isSuccessful) {
                 Log.d("Play Count", "Updated")
             }
         }
 
         binding.toolbar.setNavigationOnClickListener {
-
-
             val dialogView = LayoutInflater.from(requireContext())
                 .inflate(R.layout.custom_exit_dialog, null)
 
@@ -125,11 +126,7 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
 
             dialogView.findViewById<Button>(R.id.btnYes).setOnClickListener {
                 dialog.dismiss()
-//                        AppFunctions.updateUserDataThroughApi(points,false,playedSecond.toLong(),game._id,requireActivity())
-//
-//                        gameExit()
                 findNavController().popBackStack()
-
             }
 
             dialogView.findViewById<Button>(R.id.btnNo).setOnClickListener {
@@ -137,8 +134,6 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
             }
 
             dialog.show()
-
-
         }
 
         if (savedInstanceState == null && currentLevel == 1) score = 0
@@ -161,12 +156,17 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
         )
 
         optionTextViews.forEach { it.setOnClickListener { v -> if (isAnswerable) checkAnswer(v as TextView) } }
-        pauseButton.setOnClickListener { togglePause() }
+
+        // Fixed pause button listener with logging
+        pauseButton.setOnClickListener {
+            Log.d("Timer", "Pause button clicked - Before toggle: isPaused=$isPaused")
+            togglePause()
+            Log.d("Timer", "Pause button clicked - After toggle: isPaused=$isPaused")
+        }
+
         setupOnBackPressed()
 
         lifecycleScope.launch {
-
-
             if (isPaused) {
                 Toast.makeText(requireActivity(), "Please resume the timer!", Toast.LENGTH_SHORT)
                     .show()
@@ -175,10 +175,8 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
                     startGame()
                 } else {
                     // No words available → exit gracefully
-//                findNavController().popBackStack()
                 }
             }
-
         }
 
         binding.bulbButton.setOnClickListener {
@@ -189,72 +187,42 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
                 AppFunctions.updateTips(requireActivity(), -1)
                 updateTipData()
             }
-
         }
     }
 
     fun updateTipData() {
         hintCount = AppFunctions.getTips(requireActivity())
-
         updateHintCounter()
         binding.hintCounterTextView.text = hintCount.toString()
     }
 
-//    private fun loadLevelData(level: Int) {
-//        totalGameTime = when (level) {
-//            1 -> 120000L
-//            2 -> 110000L
-//            3 -> 100000L
-//            4 -> 90000L
-//            else -> 120000L
-//        }
-//        timeLeftInMillis = totalGameTime
-//
-//        lifecycleScope.launch {
-//            try {
-//                val response = RetrofitClient.authInstance.getRandomWords(length = 5, count = 50, minLength = 5)
-//
-//                if (response.isSuccessful) {
-//                    val data = response.body()?.data ?: emptyList()
-//                    WordRepository.wordList.clear()
-//                    WordRepository.wordList.addAll(data)
-//
-//                    if (WordRepository.wordList.size < 10) {
-//                        Toast.makeText(requireActivity(), "Not enough words for Level $level.", Toast.LENGTH_LONG).show()
-//                        findNavController().popBackStack()
-//                        return@launch
-//                    }
-//
-//                    originalWordList = WordRepository.wordList
-//                    remainingWords = originalWordList.shuffled().toMutableList()
-//
-//                    startGame()   // 🔥 Start only after words are loaded
-//                } else {
-//                    Toast.makeText(requireActivity(), "Failed to load words.", Toast.LENGTH_LONG).show()
-//                    findNavController().popBackStack()
-//                }
-//            } catch (e: Exception) {
-//                Toast.makeText(requireActivity(), "Error: ${e.message}", Toast.LENGTH_LONG).show()
-//                findNavController().popBackStack()
-//            }
-//        }
-//    }
-
     private suspend fun loadLevelData(level: Int): Boolean {
-        totalGameTime = when (level) {
-            1 -> 60000L
-            2 -> 60000L
-            3 -> 60000L
-            4 -> 60000L
-            else -> 60000L
+        // Don't increment currentLevel here since it's already done in startNextLevel()
+        // Only set the time based on the level passed in
+        when (level) {
+            1 -> totalGameTime = 60000L
+            2 -> totalGameTime = 60000L
+            3 -> totalGameTime = 60000L
+            4 -> totalGameTime = 60000L
+            else -> totalGameTime = 60000L
         }
+
         timeLeftInMillis = totalGameTime
 
         return try {
+            // For level 1, use length 5. For higher levels, use the appropriate length
+            val wordLength = when (level) {
+                1 -> 5
+                2 -> 6
+                3 -> 7
+                4 -> 8
+                else -> 5
+            }
+
             val response = RetrofitClient.authInstance.getRandomWords(
-                length = 5,
+                length = wordLength,
                 count = 50,
-                minLength = 5
+                minLength = wordLength
             )
 
             if (response.isSuccessful) {
@@ -289,6 +257,7 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
     private fun startGame() {
         correctAnswersCount = 0
         isPaused = false
+        wasManuallyPaused = false
         updateProgress()
 
         // Safety: ensure pool is ready before first round
@@ -322,7 +291,7 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
             2 -> 6
             3 -> 7
             4 -> 8
-            else -> 0
+            else -> 5
         }
 
         viewLifecycleOwner.lifecycleScope.launch {
@@ -332,7 +301,6 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
                     count = 50,
                     minLength = requiredLength
                 )
-
 
                 var wordsForLevel = emptyList<String>()
                 if (wordsResponse.isSuccessful) {
@@ -344,19 +312,12 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
                         "API did not provide enough words for the next level.",
                         Toast.LENGTH_SHORT
                     ).show()
-//                    findNavController().popBackStack()
                     return@launch
                 }
+                WordRepository.wordList.clear()
                 WordRepository.wordList.addAll(wordsForLevel)
 
-                if (isPaused) {
-                    Toast.makeText(
-                        requireActivity(),
-                        "Please resume the Timer!",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    return@launch
-                }
+                // Removed the isPaused check that was preventing level progression
                 if (loadLevelData(currentLevel)) {
                     startGame()
                 } else {
@@ -390,7 +351,7 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
         wordTextView.text = currentWord
 
         val options = generateOptions()
-        // We’ll show a shuffled copy but keep correctAnswer = options.first()
+        // We'll show a shuffled copy but keep correctAnswer = options.first()
         correctAnswer = options.first()
         val display = options.shuffled()
         display.forEachIndexed { idx, option -> optionTextViews[idx].text = option }
@@ -442,7 +403,7 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
         updateProgress()
 
         if (isCorrect && correctAnswersCount == 10) {
-            if (::countDownTimer.isInitialized) countDownTimer.cancel()
+            stopTimer()
             Handler(Looper.getMainLooper()).postDelayed({ handleLevelCompletion() }, 1000)
         } else {
             Handler(Looper.getMainLooper()).postDelayed({ setupNewRound() }, 1500)
@@ -494,22 +455,77 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
         scoreTextView.text = score.toString()
     }
 
+    // Fixed timer methods
     private fun startTimer(time: Long) {
+        Log.d("Timer", "startTimer called with ${time}ms")
+
+        // Always cancel existing timer first
+        countDownTimer?.cancel()
+        countDownTimer = null
+
         countDownTimer = object : CountDownTimer(time, 100) {
             override fun onTick(millisUntilFinished: Long) {
-                if (!isAdded) return  // Fragment not attached → skip
+                if (!isAdded) {
+                    Log.d("Timer", "Timer tick cancelled - Fragment not attached")
+                    return
+                }
+
+                // Double check if paused (safety)
+                if (isPaused) {
+                    Log.d("Timer", "Timer tick cancelled - Game is paused")
+                    cancel()
+                    return
+                }
+
                 timeLeftInMillis = millisUntilFinished
                 updateTimerUI()
-                playedSecond = totalGameTime.toInt() - (timeLeftInMillis * 1000).toInt()
+                playedSecond = ((totalGameTime - timeLeftInMillis) / 1000).toInt()
+
+                // Log every 5 seconds for debugging
+                if ((millisUntilFinished / 1000) % 5 == 0L) {
+                    Log.d("Timer", "Timer: ${millisUntilFinished / 1000}s remaining")
+                }
             }
 
             override fun onFinish() {
-                if (!isAdded) return  // Fragment not attached → skip
+                if (!isAdded) return
+                Log.d("Timer", "Timer finished")
                 timeLeftInMillis = 0
                 updateTimerUI()
                 gameOver()
             }
         }.start()
+
+        Log.d("Timer", "Timer started successfully")
+    }
+
+    private fun togglePause() {
+        Log.d("Timer", "togglePause called - current isPaused: $isPaused")
+
+        isPaused = !isPaused
+        wasManuallyPaused = isPaused
+
+        if (isPaused) {
+            // Stop the timer
+            countDownTimer?.cancel()
+            countDownTimer = null
+            pauseButton.setImageResource(R.drawable.ic_resume)
+            isAnswerable = false
+            Log.d("Timer", "✅ Timer PAUSED and CANCELLED")
+        } else {
+            // Resume the timer
+            startTimer(timeLeftInMillis)
+            pauseButton.setImageResource(R.drawable.ic_pause)
+            isAnswerable = true
+            Log.d("Timer", "✅ Timer RESUMED")
+        }
+    }
+
+    private fun stopTimer() {
+        Log.d("Timer", "stopTimer called")
+        countDownTimer?.cancel()
+        countDownTimer = null
+        isPaused = true
     }
 
     private fun updateTimerUI() {
@@ -539,19 +555,6 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
         }
     }
 
-    private fun togglePause() {
-        isPaused = !isPaused
-        if (isPaused) {
-            if (::countDownTimer.isInitialized) countDownTimer.cancel()
-            pauseButton.setImageResource(R.drawable.ic_resume)
-            isAnswerable = false
-        } else {
-            startTimer(timeLeftInMillis)
-            pauseButton.setImageResource(R.drawable.ic_pause)
-            isAnswerable = true
-        }
-    }
-
     private fun showLoadingDialog() {
         val dialogView =
             LayoutInflater.from(requireActivity()).inflate(R.layout.dialog_loading, null)
@@ -563,9 +566,10 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
     }
 
     private fun gameOver() {
+        Log.d("Timer", "gameOver called")
 
         isAnswerable = false
-        if (::countDownTimer.isInitialized) countDownTimer.cancel()
+        stopTimer()
 
         GameResult.finalScore = score
         GameResult.allLevelsCompleted = false
@@ -577,7 +581,6 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
             game._id,
             level = currentLevel,
             requireActivity(),
-
         )
 
         val bundle = Bundle().apply {
@@ -598,6 +601,9 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
     }
 
     private fun handleLevelCompletion() {
+        Log.d("Timer", "handleLevelCompletion called")
+        stopTimer()
+
         if (currentLevel < 4) {
             val dialogView =
                 LayoutInflater.from(requireActivity()).inflate(R.layout.dialog_level_complete, null)
@@ -620,12 +626,12 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
             AppFunctions.updateUserDataThroughApi(
                 score,
                 true,
-                (totalGameTime - timeLeftInMillis)*1000,
+                (totalGameTime - timeLeftInMillis) * 1000,
                 game._id,
                 level = currentLevel,
                 requireActivity()
             )
-            var bundle = Bundle().apply {
+            val bundle = Bundle().apply {
                 putString("id", game._id)
                 putString("score", score.toString())
             }
@@ -640,7 +646,6 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
                     .build()
 
                 findNavController().navigate(R.id.gameEndFragment, bundle, navOptions)
-
             }
         }
     }
@@ -686,7 +691,7 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
 
             Handler(Looper.getMainLooper()).postDelayed({
                 if (correctAnswersCount == 10) {
-                    if (::countDownTimer.isInitialized) countDownTimer.cancel()
+                    stopTimer()
                     handleLevelCompletion()
                 } else {
                     setupNewRound()
@@ -708,10 +713,6 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
         dialogView.findViewById<Button>(R.id.btnYes).setOnClickListener {
             dialog.dismiss()
             findNavController().popBackStack()
-//            AppFunctions.updateUserDataThroughApi(score,true,playedSecond.toLong(),game._id,requireActivity())
-//
-//            gameExit()
-
         }
 
         dialogView.findViewById<Button>(R.id.btnNo).setOnClickListener {
@@ -719,7 +720,6 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
         }
 
         dialog.show()
-
     }
 
     fun gameExit() {
@@ -728,36 +728,69 @@ class WordGameFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener 
         gameOver()
     }
 
-    override fun onPause() {
-        super.onPause()
-        if (!isPaused) togglePause()
-        loadingDialog?.dismiss()
-    }
-
+    // Fixed lifecycle methods
     override fun onStart() {
         super.onStart()
+        Log.d("Timer", "onStart - isPaused: $isPaused, wasManuallyPaused: $wasManuallyPaused")
+
         NetworkChangeReceiver.networkStateListener = this
-        if (!isPaused) {
+
+        // Only auto-start if not manually paused
+        if (!isPaused || !wasManuallyPaused) {
+            if (isPaused) {
+                isPaused = false
+                wasManuallyPaused = false
+            }
             startTimer(timeLeftInMillis)
         }
     }
 
     override fun onStop() {
         super.onStop()
+        Log.d("Timer", "onStop called")
+
         NetworkChangeReceiver.networkStateListener = null
-        countDownTimer?.cancel()
+        stopTimer()
     }
 
+    override fun onPause() {
+        super.onPause()
+        Log.d("Timer", "onPause called - isPaused: $isPaused")
+
+        // Only auto-pause if not already manually paused
+        if (!isPaused) {
+            wasManuallyPaused = false // This is automatic pause
+            togglePause()
+        }
+        loadingDialog?.dismiss()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("Timer", "onResume called - isPaused: $isPaused, wasManuallyPaused: $wasManuallyPaused")
+
+        // Resume if it was automatically paused (not manually)
+        if (isPaused && !wasManuallyPaused) {
+            togglePause()
+        }
+    }
+
+    // Fixed network callbacks
     override fun onNetworkAvailable() {
-        // Only resume if the game was paused due to network loss
-        if (isPaused) {
+        Log.d("Timer", "Network available - isPaused: $isPaused, wasManuallyPaused: $wasManuallyPaused")
+
+        // Only resume if paused due to network loss (not manual pause)
+        if (isPaused && !wasManuallyPaused) {
             togglePause()
         }
     }
 
     override fun onNetworkLost() {
-        // Only pause if the game is currently running
+        Log.d("Timer", "Network lost - isPaused: $isPaused")
+
+        // Pause if currently running
         if (!isPaused) {
+            wasManuallyPaused = false // This is automatic pause
             togglePause()
         }
     }
