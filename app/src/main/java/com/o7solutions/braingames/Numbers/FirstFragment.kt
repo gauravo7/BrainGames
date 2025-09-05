@@ -225,16 +225,16 @@ class FirstFragment : Fragment(), NetworkChangeReceiver.NetworkStateListener {
     }
     fun resetColors() {
         binding.multiply.setCardBackgroundColor(
-            ContextCompat.getColor(requireContext(), R.color.divide_button_bg)
+            ContextCompat.getColor(requireContext(), R.color.primary_dark)
         )
         binding.division.setCardBackgroundColor(
-            ContextCompat.getColor(requireContext(), R.color.divide_button_bg)
+            ContextCompat.getColor(requireContext(), R.color.primary_dark)
         )
         binding.minus.setCardBackgroundColor(
-            ContextCompat.getColor(requireContext(), R.color.divide_button_bg)
+            ContextCompat.getColor(requireContext(), R.color.primary_dark)
         )
         binding.plus.setCardBackgroundColor(
-            ContextCompat.getColor(requireContext(), R.color.divide_button_bg)
+            ContextCompat.getColor(requireContext(), R.color.primary_dark)
         )
 
     }

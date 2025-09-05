@@ -48,7 +48,7 @@
         app:layout_constraintEnd_toEndOf="@id/guideV80"
         app:layout_constraintTop_toTopOf="@id/guideH30"
         app:layout_constraintBottom_toBottomOf="@id/guideH70"
-        android:src="@drawable/logo"
+        android:src="@drawable/app_logo"
         />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

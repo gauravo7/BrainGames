@@ -11,8 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:orientation="vertical"
-      >
+        android:orientation="vertical">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbar"
@@ -21,18 +20,18 @@
             app:layout_constraintTop_toTopOf="parent"
             app:navigationIcon="@drawable/baseline_arrow_back_ios_24"
             android:background="@android:color/transparent"
-            app:titleTextColor="@color/white"
-            />
+            app:titleTextColor="@color/white" />
 
         <!-- Hero Section with Game Icon -->
         <com.google.android.material.card.MaterialCardView
-            android:layout_width="@dimen/_260sdp"
+            android:layout_width="match_parent"
             android:layout_height="@dimen/_160sdp"
-            android:layout_marginBottom="28dp"
+            android:layout_marginBottom="6dp"
+            android:layout_marginHorizontal="16dp"
             app:cardBackgroundColor="#FFFFFF"
             app:cardCornerRadius="32dp"
             app:cardElevation="24dp"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="4dp"
             app:strokeWidth="0dp">
 
             <ImageView
@@ -43,37 +42,35 @@
 
         </com.google.android.material.card.MaterialCardView>
 
-        <!-- Game Description -->
-
-
         <!-- Best Score Card with Enhanced Design -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginBottom="32dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="8dp"
             app:cardBackgroundColor="#FFFFFF"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="12dp">
+            app:cardCornerRadius="20dp"
+            android:layout_marginTop="2dp"
+            app:cardElevation="10dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_vertical"
                 android:orientation="horizontal"
-                android:padding="24dp">
+                android:padding="8dp">
 
                 <!-- Trophy Icon with Enhanced Background -->
                 <LinearLayout
-                    android:layout_width="64dp"
-                    android:layout_height="64dp"
-                    android:layout_marginEnd="24dp"
+                    android:layout_width="48dp"
+                    android:layout_height="48dp"
+                    android:layout_marginEnd="16dp"
                     android:background="#FEF3C7"
                     android:gravity="center">
 
                     <ImageView
-                        android:layout_width="32dp"
-                        android:layout_height="32dp"
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
                         android:layout_gravity="center"
                         android:src="@drawable/trophy" />
 
@@ -91,17 +88,17 @@
                         android:fontFamily="@font/neut"
                         android:text="🏆 Best Score"
                         android:textColor="#64748B"
-                        android:textSize="16sp"
+                        android:textSize="14sp"
                         android:textStyle="bold" />
 
                     <TextView
                         android:id="@+id/bestScore"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="6dp"
+                        android:layout_marginTop="3dp"
                         android:fontFamily="@font/neut"
                         android:textColor="#1E293B"
-                        android:textSize="32sp"
+                        android:textSize="24sp"
                         android:textStyle="bold"
                         android:letterSpacing="0.02"
                         tools:text="1,250" />
@@ -113,7 +110,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="✨"
-                    android:textSize="28sp"
+                    android:textSize="20sp"
                     android:alpha="0.8" />
 
             </LinearLayout>
@@ -124,8 +121,8 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginBottom="20dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="6dp"
             android:gravity="center_vertical"
             android:orientation="horizontal">
 
@@ -136,15 +133,15 @@
                 android:fontFamily="@font/neut"
                 android:text="🎯 Levels"
                 android:textColor="#F8FAFC"
-                android:textSize="24sp"
+                android:textSize="20sp"
                 android:textStyle="bold" />
 
             <View
-                android:layout_width="50dp"
-                android:layout_height="3dp"
+                android:layout_width="40dp"
+                android:layout_height="2dp"
                 android:background="#FFFFFF"
                 android:alpha="0.7"
-                android:layout_marginStart="16dp" />
+                android:layout_marginStart="12dp" />
 
         </LinearLayout>
 
@@ -152,40 +149,40 @@
             android:id="@+id/levelsRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="40dp"
+            android:layout_marginBottom="6dp"
             android:clipToPadding="false"
-            android:paddingHorizontal="20dp" />
+            android:paddingHorizontal="16dp" />
 
         <!-- Enhanced Start Game Button -->
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/startGame"
-            android:layout_width="@dimen/_140sdp"
-            android:layout_height="@dimen/_140sdp"
-            android:layout_marginBottom="32dp"
+            android:layout_width="@dimen/_120sdp"
+            android:layout_height="@dimen/_120sdp"
+            android:layout_marginBottom="6dp"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?android:attr/selectableItemBackground"
             app:cardBackgroundColor="@color/primary_dark"
-            app:cardCornerRadius="@dimen/_70sdp"
-            app:cardElevation="20dp"
+            app:cardCornerRadius="@dimen/_60sdp"
+            app:cardElevation="16dp"
             app:strokeColor="#FFFFFF"
-            app:strokeWidth="6dp">
+            app:strokeWidth="4dp">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:gravity="center"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="16dp">
 
                 <!-- Enhanced Play Symbol -->
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginBottom="8dp"
+                    android:layout_marginBottom="6dp"
                     android:text="▶"
                     android:textColor="@color/white"
-                    android:textSize="@dimen/_36ssp"
+                    android:textSize="@dimen/_28ssp"
                     android:textStyle="bold"
                     android:shadowColor="#80000000"
                     android:shadowDx="2"
@@ -202,7 +199,7 @@
                     android:text="START\nGAME"
                     android:textAlignment="center"
                     android:textColor="@color/white"
-                    android:textSize="@dimen/_16ssp"
+                    android:textSize="@dimen/_14ssp"
                     android:textStyle="bold"
                     android:shadowColor="#80000000"
                     android:shadowDx="1"
@@ -217,25 +214,25 @@
             android:id="@+id/description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="20dp"
-            android:layout_marginBottom="32dp"
+            android:layout_marginHorizontal="16dp"
+            android:layout_marginBottom="16dp"
             android:fontFamily="@font/neut"
             android:gravity="center"
-            android:lineSpacingExtra="4dp"
+            android:lineSpacingExtra="2dp"
             android:textColor="#F8FAFC"
-            android:textSize="18sp"
+            android:textSize="16sp"
             android:alpha="0.95" />
 
         <!-- Elegant Divider -->
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginVertical="24dp"
+            android:layout_marginVertical="12dp"
             android:gravity="center"
             android:orientation="horizontal">
 
             <View
-                android:layout_width="40dp"
+                android:layout_width="30dp"
                 android:layout_height="2dp"
                 android:background="#CBD5E1"
                 android:alpha="0.6" />
@@ -243,14 +240,14 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginHorizontal="16dp"
+                android:layout_marginHorizontal="12dp"
                 android:text="◆"
                 android:textColor="#CBD5E1"
-                android:textSize="12sp"
+                android:textSize="10sp"
                 android:alpha="0.7" />
 
             <View
-                android:layout_width="40dp"
+                android:layout_width="30dp"
                 android:layout_height="2dp"
                 android:background="#CBD5E1"
                 android:alpha="0.6" />
@@ -262,13 +259,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingHorizontal="20dp">
+            android:paddingHorizontal="16dp">
 
             <!-- Section Title with Icon -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="24dp"
+                android:layout_marginBottom="12dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -279,12 +276,12 @@
                     android:fontFamily="@font/neut"
                     android:text="📊 Statistics"
                     android:textColor="#F8FAFC"
-                    android:textSize="24sp"
+                    android:textSize="20sp"
                     android:textStyle="bold" />
 
                 <View
-                    android:layout_width="60dp"
-                    android:layout_height="3dp"
+                    android:layout_width="50dp"
+                    android:layout_height="2dp"
                     android:background="#FFFFFF"
                     android:alpha="0.7" />
 
@@ -294,10 +291,10 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="8dp"
                 app:cardBackgroundColor="#F0FDF4"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
                 app:strokeColor="#DCFCE7"
                 app:strokeWidth="1dp">
 
@@ -306,12 +303,12 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="24dp">
+                    android:padding="12dp">
 
                     <View
-                        android:layout_width="8dp"
-                        android:layout_height="60dp"
-                        android:layout_marginEnd="24dp"
+                        android:layout_width="6dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="16dp"
                         android:background="#10B981" />
 
                     <LinearLayout
@@ -326,18 +323,18 @@
                             android:fontFamily="@font/neut"
                             android:text="✅ Positive Score"
                             android:textColor="#059669"
-                            android:textSize="16sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/positiveScore"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
+                            android:layout_marginTop="4dp"
                             android:fontFamily="@font/neut"
                             android:text="850"
                             android:textColor="#047857"
-                            android:textSize="28sp"
+                            android:textSize="22sp"
                             android:textStyle="bold"
                             android:letterSpacing="0.02"
                             tools:text="850" />
@@ -345,8 +342,8 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
                         android:background="#E6FFFA"
                         android:gravity="center">
 
@@ -354,7 +351,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="📈"
-                            android:textSize="24sp" />
+                            android:textSize="18sp" />
 
                     </LinearLayout>
 
@@ -366,10 +363,10 @@
             <com.google.android.material.card.MaterialCardView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="20dp"
+                android:layout_marginBottom="8dp"
                 app:cardBackgroundColor="#FEF2F2"
-                app:cardCornerRadius="20dp"
-                app:cardElevation="8dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="6dp"
                 app:strokeColor="#FECACA"
                 app:strokeWidth="1dp">
 
@@ -378,12 +375,12 @@
                     android:layout_height="wrap_content"
                     android:gravity="center_vertical"
                     android:orientation="horizontal"
-                    android:padding="24dp">
+                    android:padding="12dp">
 
                     <View
-                        android:layout_width="8dp"
-                        android:layout_height="60dp"
-                        android:layout_marginEnd="24dp"
+                        android:layout_width="6dp"
+                        android:layout_height="40dp"
+                        android:layout_marginEnd="16dp"
                         android:background="#EF4444" />
 
                     <LinearLayout
@@ -398,18 +395,18 @@
                             android:fontFamily="@font/neut"
                             android:text="❌ Negative Score"
                             android:textColor="#DC2626"
-                            android:textSize="16sp"
+                            android:textSize="14sp"
                             android:textStyle="bold" />
 
                         <TextView
                             android:id="@+id/negativeScore"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginTop="8dp"
+                            android:layout_marginTop="4dp"
                             android:fontFamily="@font/neut"
                             android:text="245"
                             android:textColor="#B91C1C"
-                            android:textSize="28sp"
+                            android:textSize="22sp"
                             android:textStyle="bold"
                             android:letterSpacing="0.02"
                             tools:text="245" />
@@ -417,8 +414,8 @@
                     </LinearLayout>
 
                     <LinearLayout
-                        android:layout_width="48dp"
-                        android:layout_height="48dp"
+                        android:layout_width="36dp"
+                        android:layout_height="36dp"
                         android:background="#FFEBEE"
                         android:gravity="center">
 
@@ -426,7 +423,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="📉"
-                            android:textSize="24sp" />
+                            android:textSize="18sp" />
 
                     </LinearLayout>
 
@@ -439,7 +436,7 @@
         <!-- Bottom Spacing -->
         <View
             android:layout_width="match_parent"
-            android:layout_height="40dp" />
+            android:layout_height="20dp" />
 
     </LinearLayout>
 </ScrollView>

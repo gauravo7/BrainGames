@@ -34,8 +34,8 @@ class SplashActivity : AppCompatActivity() {
 
         auth = FirebaseAuth.getInstance()
 
-        val animationZoomOut = AnimationUtils.loadAnimation(this, R.anim.rotate)
-        findViewById<ImageView>(R.id.logoImg).startAnimation(animationZoomOut)
+//        val animationZoomOut = AnimationUtils.loadAnimation(this, R.anim.rotate)
+//        findViewById<ImageView>(R.id.logoImg).startAnimation(animationZoomOut)
 
         Handler(Looper.getMainLooper()).postDelayed({
 
